@@ -1,0 +1,62 @@
+/* Baseline reset lives in MuiCssBaseline; this file only adds what it doesn't cover. */
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+@keyframes kokyu-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+@keyframes kokyu-breathe-slow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Settings → Aparência → "Tamanho do texto": scales the root font-size
+ * so every `rem`-based typography token (the whole `typeScale`) scales
+ * proportionally with it — never `transform: scale`, which would blur
+ * text and break layout. Percentages are relative to the browser's own
+ * default (usually 16px), matching the "Padrão" state exactly.
+ * Applied by `PreferencesProvider` as a `data-*` attribute on <html>.
+ */
+html[data-kokyu-text-size='small'] {
+  font-size: 93.75%;
+}
+
+html[data-kokyu-text-size='large'] {
+  font-size: 112.5%;
+}

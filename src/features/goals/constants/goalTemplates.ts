@@ -1,0 +1,96 @@
+import type { GoalTemplate } from '../types';
+
+/**
+ * Starting points offered during creation — never mandatory, never pre-filled with a required
+ * value (see the spec's own "sem inserir valores obrigatórios").
+ */
+export const goalTemplates: GoalTemplate[] = [
+  {
+    id: 'template-simple',
+    title: 'Meta simples',
+    description: 'Alcançar um valor até uma data.',
+    area: 'personal',
+    type: 'numeric',
+    category: 'generic',
+  },
+  {
+    id: 'template-project',
+    title: 'Projeto',
+    description: 'Concluir um objetivo através de marcos.',
+    area: 'work',
+    type: 'milestone',
+    category: 'generic',
+  },
+  {
+    id: 'template-consistency',
+    title: 'Consistência',
+    description: 'Fazer algo um número de vezes por período.',
+    area: 'habits',
+    type: 'consistency',
+    category: 'generic',
+  },
+  {
+    id: 'template-cumulative',
+    title: 'Acumulativa',
+    description: 'Acumular horas, quilômetros, páginas etc.',
+    area: 'personal',
+    type: 'numeric',
+    category: 'generic',
+  },
+  {
+    id: 'template-key-results',
+    title: 'Resultado-chave',
+    description: 'Um objetivo maior com múltiplos resultados mensuráveis.',
+    area: 'work',
+    type: 'keyResult',
+    category: 'generic',
+  },
+  {
+    id: 'template-leisure-books',
+    title: 'Ler alguns livros',
+    description: 'Progresso automático a partir de Tempo Livre.',
+    area: 'leisure',
+    type: 'numeric',
+    category: 'integrated',
+    suggestedUnit: 'books',
+    suggestedSource: { module: 'leisure', metricId: 'leisure.booksCompleted' },
+  },
+  {
+    id: 'template-training-sessions',
+    title: 'Completar treinos',
+    description: 'Progresso automático a partir de Treinamento.',
+    area: 'training',
+    type: 'numeric',
+    category: 'integrated',
+    suggestedUnit: 'workouts',
+    suggestedSource: { module: 'training', metricId: 'training.sessionsCompleted' },
+  },
+  {
+    id: 'template-habits-consistency',
+    title: 'Manter consistência nos hábitos',
+    description: 'Progresso automático a partir de Hábitos.',
+    area: 'habits',
+    type: 'numeric',
+    category: 'integrated',
+    suggestedUnit: 'percentage',
+    suggestedSource: { module: 'habit', metricId: 'habit.consistencyRate' },
+  },
+  {
+    id: 'template-nutrition-recipes',
+    title: 'Preparar receitas novas',
+    description: 'Progresso automático a partir de Nutrição.',
+    area: 'nutrition',
+    type: 'numeric',
+    category: 'integrated',
+    suggestedUnit: 'recipes',
+    suggestedSource: { module: 'nutrition', metricId: 'nutrition.recipesCooked' },
+  },
+  {
+    id: 'template-missions-project',
+    title: 'Concluir um projeto',
+    description: 'Divida um objetivo de trabalho em marcos, ligados a Missões.',
+    area: 'work',
+    type: 'milestone',
+    category: 'integrated',
+  },
+];
