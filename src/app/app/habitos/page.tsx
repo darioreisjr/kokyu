@@ -1,14 +1,10 @@
-import type { Metadata } from 'next';
-import Typography from '@mui/material/Typography';
+import { TodayHabitsPage } from '@/features/habits/components/TodayHabitsPage/TodayHabitsPage';
 
-export const metadata: Metadata = {
-  title: 'Hábitos',
+export const metadata = {
+  title: 'Hábitos Hoje | Kokyu',
+  description: 'Acompanhe seus hábitos e rotinas do dia no Kokyu.',
 };
 
-export default function HabitosPage() {
-  return (
-    <Typography variant="displaySmall" component="h1">
-      Hábitos
-    </Typography>
-  );
+export default function HabitosHojePage() {
+  return <TodayHabitsPage />;
 }
