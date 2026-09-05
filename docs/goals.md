@@ -95,19 +95,23 @@ dali, nunca hardcodam um módulo.
 **Integração real vs. preparada** — decisão de escopo documentada aqui porque não é óbvia lendo só
 o código:
 
-- **`leisureGoalAdapter` e `nutritionGoalAdapter`** — `features/leisure` e `features/nutrition` já
-  existem como features completas. Como `goals` não pode importar serviços de outra feature (regra
-  de dependência do projeto), esses adapters leem um snapshot local
-  (`mocks/leisureSourceData.mock.ts`, `mocks/nutritionSourceData.mock.ts`) com a mesma forma que os
+- **`leisureGoalAdapter`, `nutritionGoalAdapter` e `missionGoalAdapter`** — `features/leisure`,
+  `features/nutrition` e `features/missions` já existem como features completas. Como `goals` não
+  pode importar serviços de outra feature (regra de dependência do projeto — `home` e
+  `daily-rhythm` são as únicas exceções documentadas, por serem features de síntese), esses
+  adapters leem um snapshot local (`mocks/leisureSourceData.mock.ts`,
+  `mocks/nutritionSourceData.mock.ts`, `mocks/missionsSourceData.mock.ts`) com a mesma forma que os
   dados reais têm hoje — é a integração mais próxima do real possível sem violar a fronteira de
-  arquitetura.
-- **`missionGoalAdapter`, `trainingGoalAdapter`, `habitGoalAdapter`** — `features/missions`,
-  `features/training` e `features/habits` **ainda não existem** (`/app/missoes`, `/app/treinamento`
-  e `/app/habitos` são só stubs com um `<Typography>`). Esses três adapters cumprem o contrato e já
-  aparecem na Etapa 6 da criação, rodando sobre snapshots autocontidos
-  (`mocks/missionsSourceData.mock.ts`, etc.) — no dia em que essas features existirem, só a
-  implementação interna do adapter muda (trocar o snapshot por uma chamada real), a interface e
-  tudo que depende dela continuam iguais.
+  arquitetura. Compare com `features/home/providers/missionHomeProvider.ts`, que lê
+  `missionService` de verdade porque `home` tem essa permissão (`docs/respiration-home.md`).
+- **`trainingGoalAdapter` e `habitGoalAdapter`** — `features/training` **ainda não existe**
+  (`/app/treinamento` é só um stub com um `<Typography>`); `habitGoalAdapter` também segue o padrão
+  de snapshot mesmo `features/habits` já existindo, pela mesma regra de dependência acima. Ambos
+  cumprem o contrato e já aparecem na Etapa 6 da criação, rodando sobre snapshots autocontidos
+  (`mocks/trainingSourceData.mock.ts`, `mocks/habitsSourceData.mock.ts`) — no dia em que
+  `features/training` existir, só a implementação interna daquele adapter muda (trocar o snapshot
+  por uma chamada real via um provider de síntese, já que `goals` propriamente dito continua sem
+  poder importar `features/training` diretamente).
 
 Adicionar uma fonte nova: criar `mocks/xSourceData.mock.ts`, um adapter em `services/adapters/`
 implementando `GoalProgressSource`, e registrá-lo em `services/adapters/index.ts`.

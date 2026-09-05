@@ -1,4 +1,5 @@
 import { navigationItems } from '@/features/navigation/config/navigationItems';
+import { HOME_SECTION_IDS } from '@/shared/home/types';
 
 import type { UserPreferences } from '../types/preferences.types';
 
@@ -89,5 +90,13 @@ export const defaultPreferences: UserPreferences = {
   privacy: {
     usageAnalytics: false,
     personalizedSuggestions: false,
+  },
+  home: {
+    sectionOrder: [...HOME_SECTION_IDS],
+    hiddenSections: [],
+    compactMode: false,
+    showGreeting: true,
+    showCapacity: true,
+    showInsights: true,
   },
 };

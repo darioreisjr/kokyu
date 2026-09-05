@@ -35,6 +35,7 @@ function mergeWithDefaults(stored: Partial<UserPreferences>): UserPreferences {
     sound: { ...defaultPreferences.sound, ...stored.sound },
     accessibility: { ...defaultPreferences.accessibility, ...stored.accessibility },
     privacy: { ...defaultPreferences.privacy, ...stored.privacy },
+    home: { ...defaultPreferences.home, ...stored.home },
   };
 }
 

@@ -8,7 +8,13 @@ const metricValues: Record<string, number> = {
   'mission.portfolioProjectPercent': missionsSourceSnapshot.projectCompletionPercent.portfolio ?? 0,
 };
 
-/** `features/missions` doesn't exist yet (`/app/missoes` is a stub) — prepared the same way as `trainingGoalAdapter`; see `docs/goals.md`. */
+/**
+ * `features/missions` exists now, but `goals` still can't import its service directly — the same
+ * dependency rule that keeps `leisureGoalAdapter`/`nutritionGoalAdapter` on a local snapshot even
+ * though those features are fully built (see `docs/goals.md#integração-real-vs-preparada`).
+ * `mocks/missionsSourceData.mock.ts` is hand-kept in the same shape as `features/missions/mocks/missions.mock.ts`'s
+ * seed data so the numbers stay representative.
+ */
 export const missionGoalAdapter: GoalProgressSource = {
   module: 'mission',
   metrics: [

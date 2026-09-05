@@ -1,14 +1,11 @@
 import type { Metadata } from 'next';
-import Typography from '@mui/material/Typography';
+import { RespirationPage } from '@/features/home';
 
 export const metadata: Metadata = {
-  title: 'Respiração',
+  title: 'Respiração — Kokyu',
+  description: 'Veja onde está seu ritmo agora.',
 };
 
 export default function RespiracaoPage() {
-  return (
-    <Typography variant="displaySmall" component="h1">
-      Respiração
-    </Typography>
-  );
+  return <RespirationPage />;
 }

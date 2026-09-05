@@ -1,4 +1,5 @@
 import type { AccentStyle, ContrastMode } from '@/design-system/tokens/semantic';
+import type { HomeSectionId } from '@/shared/home/types';
 
 // Re-exported so the rest of this feature can import both preference
 // and theme-parameter types from one place — the canonical definition
@@ -100,5 +101,15 @@ export interface UserPreferences {
   privacy: {
     usageAnalytics: boolean;
     personalizedSuggestions: boolean;
+  };
+
+  /** "Personalizar Respiração" — see `docs/respiration-home.md`. */
+  home: {
+    sectionOrder: HomeSectionId[];
+    hiddenSections: HomeSectionId[];
+    compactMode: boolean;
+    showGreeting: boolean;
+    showCapacity: boolean;
+    showInsights: boolean;
   };
 }
