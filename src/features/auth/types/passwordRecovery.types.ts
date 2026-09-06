@@ -5,12 +5,17 @@ export interface PasswordRecoveryRequest {
 export type PasswordRecoveryResult = { success: true } | { success: false; error: string };
 
 /**
- * Contract for a future real recovery-request call (send email, issue a
- * token, ...). Mocked for now — see `services/passwordRecoveryService.ts`.
- * Deliberately has no way to report "email not found": whether the
+ * Contract for the recovery-request call (send email) and the
+ * subsequent password update once the user lands on `/reset-password`
+ * with a valid recovery session. Deliberately has no way for
+ * `requestPasswordRecovery` to report "email not found": whether the
  * address is registered is never observable from this contract, so the
  * UI can't leak it even by accident.
  */
 export interface PasswordRecoveryService {
-  requestPasswordRecovery: (request: PasswordRecoveryRequest) => Promise<PasswordRecoveryResult>;
+  requestPasswordRecovery: (
+    request: PasswordRecoveryRequest,
+    captchaToken?: string,
+  ) => Promise<PasswordRecoveryResult>;
+  updatePassword: (newPassword: string) => Promise<PasswordRecoveryResult>;
 }

@@ -24,6 +24,7 @@ import { useCreateAccountForm } from '../../hooks/useCreateAccountForm';
 import type { UsernameAvailability } from '../../types/createAccount.types';
 import { PasswordRequirements } from '../PasswordRequirements/PasswordRequirements';
 import { PasswordStrength } from '../PasswordStrength/PasswordStrength';
+import { Turnstile } from '../Turnstile/Turnstile';
 
 const text = authText.createAccount;
 
@@ -72,6 +73,8 @@ export function CreateAccountForm() {
     submitError,
     usernameAvailability,
     onSubmit,
+    onCaptchaVerify,
+    onCaptchaExpire,
   } = useCreateAccountForm();
 
   const [passwordTouched, setPasswordTouched] = useState(false);
@@ -104,6 +107,16 @@ export function CreateAccountForm() {
   return (
     <Stack component="form" noValidate onSubmit={onSubmit} spacing={3}>
       <Stack spacing={2.5}>
+        <KokyuTextField
+          label={text.emailLabel}
+          type="email"
+          autoComplete="email"
+          error={Boolean(errors.email)}
+          helperText={errors.email?.message}
+          disabled={isSubmitting}
+          {...register('email')}
+        />
+
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2.5 }}>
           <KokyuTextField
             label={text.firstNameLabel}
@@ -181,6 +194,8 @@ export function CreateAccountForm() {
           {...register('confirmPassword')}
         />
       </Stack>
+
+      <Turnstile onVerify={onCaptchaVerify} onExpire={onCaptchaExpire} />
 
       {submitError ? <Alert severity="error">{submitError}</Alert> : null}
 

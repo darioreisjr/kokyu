@@ -12,8 +12,12 @@ describe('password requirements', () => {
     expect(meetsAllPasswordRequirements(password)).toBe(false);
   });
 
-  it('"Abcdefg1!" meets every requirement', () => {
-    expect(meetsAllPasswordRequirements('Abcdefg1!')).toBe(true);
+  it('"Abcdefgh123!" meets every requirement', () => {
+    expect(meetsAllPasswordRequirements('Abcdefgh123!')).toBe(true);
+  });
+
+  it('rejects a password that meets every character class but is shorter than the minimum length', () => {
+    expect(meetsAllPasswordRequirements('Abcdefg1!')).toBe(false);
   });
 
   it('reports exactly which requirements a partial password meets', () => {
@@ -22,6 +26,6 @@ describe('password requirements', () => {
   });
 
   it('accepts accented letters for the uppercase/lowercase requirements', () => {
-    expect(meetsAllPasswordRequirements('Àbcdefg1!')).toBe(true);
+    expect(meetsAllPasswordRequirements('Àbcdefgh123!')).toBe(true);
   });
 });

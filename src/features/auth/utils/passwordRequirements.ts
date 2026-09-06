@@ -14,7 +14,11 @@ export interface PasswordRequirement {
  * password isn't penalized for not having an unaccented A-Z.
  */
 export const passwordRequirements: PasswordRequirement[] = [
-  { id: 'length', label: authText.passwordRequirements.length, test: (value) => value.length >= 8 },
+  {
+    id: 'length',
+    label: authText.passwordRequirements.length,
+    test: (value) => value.length >= 12,
+  },
   {
     id: 'uppercase',
     label: authText.passwordRequirements.uppercase,

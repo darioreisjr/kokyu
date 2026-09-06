@@ -18,9 +18,9 @@ export const Weak: Story = {
 };
 
 export const Medium: Story = {
-  args: { password: 'abcdefgh1' },
+  args: { password: 'abcdefghijkl1' },
 };
 
 export const Strong: Story = {
-  args: { password: 'Abcdefg1!' },
+  args: { password: 'Abcdefgh123!' },
 };

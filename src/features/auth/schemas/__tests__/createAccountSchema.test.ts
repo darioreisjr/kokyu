@@ -3,11 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createAccountSchema } from '../createAccountSchema';
 
 const VALID_BASE = {
+  email: 'dario@example.com',
   firstName: 'Dario',
   lastName: 'Reis',
   username: 'dario_reis',
-  password: 'Abcdefg1!',
-  confirmPassword: 'Abcdefg1!',
+  password: 'Abcdefgh123!',
+  confirmPassword: 'Abcdefgh123!',
 };
 
 function parse(overrides: Partial<Record<string, unknown>> = {}) {
@@ -37,6 +38,18 @@ describe('createAccountSchema', () => {
   it('accepts a fully valid submission', () => {
     const result = parse({ birthDate: new Date(2000, 0, 1) });
     expect(result.success).toBe(true);
+  });
+
+  it('requires an email', () => {
+    expect(firstMessage(parse({ email: '', birthDate: new Date(2000, 0, 1) }), 'email')).toBe(
+      'Informe seu e-mail',
+    );
+  });
+
+  it('rejects an invalid email', () => {
+    expect(
+      firstMessage(parse({ email: 'not-an-email', birthDate: new Date(2000, 0, 1) }), 'email'),
+    ).toBe('Informe um e-mail válido');
   });
 
   it('requires firstName', () => {

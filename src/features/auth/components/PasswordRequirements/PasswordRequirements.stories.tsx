@@ -22,5 +22,5 @@ export const PartiallyMet: Story = {
 };
 
 export const AllMet: Story = {
-  args: { password: 'Abcdefg1!' },
+  args: { password: 'Abcdefgh123!' },
 };

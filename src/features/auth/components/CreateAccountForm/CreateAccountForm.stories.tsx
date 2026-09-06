@@ -23,10 +23,11 @@ export const ValidationErrors: Story = {
 
 export const Filled: Story = {
   play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText('E-mail'), 'dario@example.com');
     await userEvent.type(canvas.getByLabelText('Nome'), 'Dario');
     await userEvent.type(canvas.getByLabelText('Sobrenome'), 'Reis');
     await userEvent.type(canvas.getByLabelText('Username'), 'dario_reis');
-    await userEvent.type(canvas.getByLabelText('Senha', { exact: true }), 'Abcdefg1!');
-    await userEvent.type(canvas.getByLabelText('Confirmar senha'), 'Abcdefg1!');
+    await userEvent.type(canvas.getByLabelText('Senha', { exact: true }), 'Abcdefgh123!');
+    await userEvent.type(canvas.getByLabelText('Confirmar senha'), 'Abcdefgh123!');
   },
 };

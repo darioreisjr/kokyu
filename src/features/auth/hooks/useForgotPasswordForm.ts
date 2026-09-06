@@ -23,6 +23,8 @@ export interface UseForgotPasswordFormResult {
   resendCooldownSeconds: number;
   onSubmit: () => void;
   onResend: () => void;
+  onCaptchaVerify: (token: string) => void;
+  onCaptchaExpire: () => void;
 }
 
 /**
@@ -52,6 +54,7 @@ export function useForgotPasswordForm(): UseForgotPasswordFormResult {
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
   const [resendCooldownSeconds, setResendCooldownSeconds] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const isCoolingDown = resendCooldownSeconds > 0;
 
@@ -66,7 +69,10 @@ export function useForgotPasswordForm(): UseForgotPasswordFormResult {
   }, [isCoolingDown]);
 
   async function requestRecovery(email: string) {
-    const result = await passwordRecoveryService.requestPasswordRecovery({ email });
+    const result = await passwordRecoveryService.requestPasswordRecovery(
+      { email },
+      captchaToken ?? undefined,
+    );
     if (result.success) {
       setSubmittedEmail(email);
       setStatus('success');
@@ -87,5 +93,15 @@ export function useForgotPasswordForm(): UseForgotPasswordFormResult {
     requestRecovery(submittedEmail).finally(() => setIsResending(false));
   };
 
-  return { form, status, submittedEmail, isResending, resendCooldownSeconds, onSubmit, onResend };
+  return {
+    form,
+    status,
+    submittedEmail,
+    isResending,
+    resendCooldownSeconds,
+    onSubmit,
+    onResend,
+    onCaptchaVerify: setCaptchaToken,
+    onCaptchaExpire: () => setCaptchaToken(null),
+  };
 }

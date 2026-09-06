@@ -8,6 +8,7 @@ export { CreateAccountForm } from './components/CreateAccountForm/CreateAccountF
 export { CreateAccountFooter } from './components/CreateAccountFooter/CreateAccountFooter';
 export { ForgotPasswordForm } from './components/ForgotPasswordForm/ForgotPasswordForm';
 export { ForgotPasswordFooter } from './components/ForgotPasswordFooter/ForgotPasswordFooter';
+export { ResetPasswordForm } from './components/ResetPasswordForm/ResetPasswordForm';
 export { PasswordRecoverySuccess } from './components/PasswordRecoverySuccess/PasswordRecoverySuccess';
 export { authText } from './constants/authText';
 export { authService } from './services/authService';

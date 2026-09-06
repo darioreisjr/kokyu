@@ -8,6 +8,7 @@ import { KokyuButton, KokyuTextField } from '@/design-system/components';
 import { authText } from '../../constants/authText';
 import { useForgotPasswordForm } from '../../hooks/useForgotPasswordForm';
 import { PasswordRecoverySuccess } from '../PasswordRecoverySuccess/PasswordRecoverySuccess';
+import { Turnstile } from '../Turnstile/Turnstile';
 
 const text = authText.forgotPassword;
 
@@ -23,6 +24,8 @@ export function ForgotPasswordForm() {
     resendCooldownSeconds,
     onSubmit,
     onResend,
+    onCaptchaVerify,
+    onCaptchaExpire,
   } = useForgotPasswordForm();
 
   if (status === 'success') {
@@ -49,6 +52,8 @@ export function ForgotPasswordForm() {
         disabled={isSubmitting}
         {...register('email')}
       />
+
+      <Turnstile onVerify={onCaptchaVerify} onExpire={onCaptchaExpire} />
 
       {status === 'error' ? <Alert severity="error">{text.genericError}</Alert> : null}
 

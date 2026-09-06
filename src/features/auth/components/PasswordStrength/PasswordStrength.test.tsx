@@ -15,12 +15,12 @@ describe('PasswordStrength', () => {
   });
 
   it('labels a medium password', () => {
-    render(<PasswordStrength password="abcdefgh1" />);
+    render(<PasswordStrength password="abcdefghijkl1" />);
     expect(screen.getByText(/Média/)).toBeInTheDocument();
   });
 
   it('labels a strong password', () => {
-    render(<PasswordStrength password="Abcdefg1!" />);
+    render(<PasswordStrength password="Abcdefgh123!" />);
     expect(screen.getByText(/Forte/)).toBeInTheDocument();
   });
 });

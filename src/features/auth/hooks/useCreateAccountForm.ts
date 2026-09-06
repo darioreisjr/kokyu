@@ -16,6 +16,8 @@ export interface UseCreateAccountFormResult {
   submitError: string | null;
   usernameAvailability: ReturnType<typeof useUsernameAvailability>;
   onSubmit: () => void;
+  onCaptchaVerify: (token: string) => void;
+  onCaptchaExpire: () => void;
 }
 
 /**
@@ -29,6 +31,7 @@ export function useCreateAccountForm(): UseCreateAccountFormResult {
     // `birthDate` starts unset (the date field renders it as `null`);
     // the schema — not this default — is what makes it required.
     defaultValues: {
+      email: '',
       firstName: '',
       lastName: '',
       username: '',
@@ -44,6 +47,7 @@ export function useCreateAccountForm(): UseCreateAccountFormResult {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const onSubmit = form.handleSubmit(async (values) => {
     setSubmitError(null);
@@ -56,7 +60,7 @@ export function useCreateAccountForm(): UseCreateAccountFormResult {
     setIsSubmitting(true);
     try {
       const payload = mapFormDataToPayload(values);
-      const result = await createAccountService.createAccount(payload);
+      const result = await createAccountService.createAccount(payload, captchaToken ?? undefined);
       if (result.success) {
         setIsSuccess(true);
       } else {
@@ -67,5 +71,14 @@ export function useCreateAccountForm(): UseCreateAccountFormResult {
     }
   });
 
-  return { form, isSubmitting, isSuccess, submitError, usernameAvailability, onSubmit };
+  return {
+    form,
+    isSubmitting,
+    isSuccess,
+    submitError,
+    usernameAvailability,
+    onSubmit,
+    onCaptchaVerify: setCaptchaToken,
+    onCaptchaExpire: () => setCaptchaToken(null),
+  };
 }

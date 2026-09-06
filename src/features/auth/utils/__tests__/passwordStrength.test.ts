@@ -12,11 +12,11 @@ describe('getPasswordStrength', () => {
   });
 
   it('is medium when three or four requirements are met', () => {
-    expect(getPasswordStrength('abcdefgh1')).toBe('medium');
+    expect(getPasswordStrength('abcdefghijkl1')).toBe('medium');
   });
 
   it('is strong once every requirement is met', () => {
-    expect(getPasswordStrength('Abcdefg1!')).toBe('strong');
+    expect(getPasswordStrength('Abcdefgh123!')).toBe('strong');
   });
 
   it('never regresses to weak once the full policy is satisfied, regardless of length', () => {

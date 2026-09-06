@@ -20,6 +20,7 @@ type TransitionKind = 'swap' | 'micro';
 const FLOW_OF: Record<string, AuthFlow> = {
   '/login': 'sign-in',
   '/forgot-password': 'sign-in',
+  '/reset-password': 'sign-in',
   '/create-account': 'sign-up',
 };
 
@@ -27,6 +28,7 @@ const FLOW_OF: Record<string, AuthFlow> = {
 const ENTRY_DIRECTION: Record<string, 1 | -1> = {
   '/login': -1,
   '/forgot-password': -1,
+  '/reset-password': -1,
   '/create-account': 1,
 };
 

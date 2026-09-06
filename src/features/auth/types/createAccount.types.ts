@@ -1,5 +1,6 @@
 /** Everything the create-account form collects, including client-only fields. */
 export interface CreateAccountFormData {
+  email: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -15,6 +16,7 @@ export interface CreateAccountFormData {
  * ISO date string. See `services/createAccountService.ts`'s mapper.
  */
 export interface CreateAccountPayload {
+  email: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -54,5 +56,8 @@ export interface UsernameAvailabilityService {
 
 /** Contract for a future real account-creation call. Mocked for now. */
 export interface CreateAccountService extends UsernameAvailabilityService {
-  createAccount: (payload: CreateAccountPayload) => Promise<CreateAccountResult>;
+  createAccount: (
+    payload: CreateAccountPayload,
+    captchaToken?: string,
+  ) => Promise<CreateAccountResult>;
 }

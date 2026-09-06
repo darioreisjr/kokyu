@@ -18,6 +18,8 @@ export interface UseLoginFormResult {
   submitError: string | null;
   onSubmit: () => void;
   onGoogleSignIn: () => void;
+  onCaptchaVerify: (token: string) => void;
+  onCaptchaExpire: () => void;
 }
 
 /**
@@ -38,6 +40,9 @@ export function useLoginForm(): UseLoginFormResult {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Google OAuth never needs this — Attack Protection's CAPTCHA only
+  // applies to email/password flows, see docs/security.md.
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   // Settings → Geral → "Continuar de onde parei" takes priority over
   // "Página inicial" when there's actually somewhere to resume —
@@ -51,7 +56,7 @@ export function useLoginForm(): UseLoginFormResult {
     setSubmitError(null);
     setIsSubmitting(true);
     try {
-      const result = await authService.signInWithCredentials(values);
+      const result = await authService.signInWithCredentials(values, captchaToken ?? undefined);
       if (result.success) {
         router.push(destination);
       } else {
@@ -77,5 +82,14 @@ export function useLoginForm(): UseLoginFormResult {
       .finally(() => setIsGoogleLoading(false));
   };
 
-  return { form, isSubmitting, isGoogleLoading, submitError, onSubmit, onGoogleSignIn };
+  return {
+    form,
+    isSubmitting,
+    isGoogleLoading,
+    submitError,
+    onSubmit,
+    onGoogleSignIn,
+    onCaptchaVerify: setCaptchaToken,
+    onCaptchaExpire: () => setCaptchaToken(null),
+  };
 }

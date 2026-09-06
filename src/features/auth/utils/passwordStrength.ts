@@ -2,7 +2,11 @@ import { getMetPasswordRequirements } from './passwordRequirements';
 
 export type PasswordStrength = 'weak' | 'medium' | 'strong';
 
-const LONG_PASSWORD_LENGTH = 12;
+// Bonus threshold for going beyond the policy's own minimum length
+// (`passwordRequirements.ts`'s `length` check, currently 12) — keep this
+// higher than that minimum, or every password that merely clears the
+// base requirement would also claim the "extra length" bonus.
+const LONG_PASSWORD_LENGTH = 16;
 
 /**
  * A simple, honest strength indicator — not a security guarantee.

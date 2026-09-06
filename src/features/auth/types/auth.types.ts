@@ -17,7 +17,7 @@ export type AuthResult = { success: true; user: AuthUser } | { success: false; e
  * concrete provider — see `services/authService.ts`.
  */
 export interface AuthService {
-  signInWithCredentials: (credentials: AuthCredentials) => Promise<AuthResult>;
+  signInWithCredentials: (credentials: AuthCredentials, captchaToken?: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }

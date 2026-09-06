@@ -40,12 +40,15 @@ async function fillBirthDate(user: ReturnType<typeof userEvent.setup>, value: st
   await user.paste(value);
 }
 
+const VALID_PASSWORD = 'Abcdefgh123!';
+
 async function fillRequiredNonDateFields(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText('E-mail'), 'dario@example.com');
   await user.type(screen.getByLabelText('Nome'), 'Dario');
   await user.type(screen.getByLabelText('Sobrenome'), 'Reis');
   await user.type(screen.getByLabelText('Username'), 'dario_reis_valido');
-  await user.type(screen.getByLabelText('Senha', { exact: true }), 'Abcdefg1!');
-  await user.type(screen.getByLabelText('Confirmar senha'), 'Abcdefg1!');
+  await user.type(screen.getByLabelText('Senha', { exact: true }), VALID_PASSWORD);
+  await user.type(screen.getByLabelText('Confirmar senha'), VALID_PASSWORD);
 }
 
 describe('CreateAccountForm', () => {
@@ -57,6 +60,7 @@ describe('CreateAccountForm', () => {
   it('renders every field', () => {
     render(<CreateAccountForm />);
 
+    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
     expect(screen.getByLabelText('Nome')).toBeInTheDocument();
     expect(screen.getByLabelText('Sobrenome')).toBeInTheDocument();
     expect(screen.getByLabelText('Username')).toBeInTheDocument();
@@ -72,7 +76,8 @@ describe('CreateAccountForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
 
-    expect(await screen.findByText('Informe seu nome')).toBeInTheDocument();
+    expect(await screen.findByText('Informe seu e-mail')).toBeInTheDocument();
+    expect(screen.getByText('Informe seu nome')).toBeInTheDocument();
     expect(screen.getByText('Informe seu sobrenome')).toBeInTheDocument();
     expect(screen.getByText('O username deve ter entre 3 e 30 caracteres')).toBeInTheDocument();
     expect(screen.getByText('Informe sua data de nascimento')).toBeInTheDocument();
@@ -213,7 +218,7 @@ describe('CreateAccountForm', () => {
     render(<CreateAccountForm />);
 
     const password = screen.getByLabelText('Senha', { exact: true });
-    await user.type(password, 'Abcdefg1!');
+    await user.type(password, VALID_PASSWORD);
     expect(password).toHaveAttribute('type', 'password');
 
     // Both password fields render their own "Mostrar senha" toggle;
@@ -252,15 +257,19 @@ describe('CreateAccountForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
 
-    expect(await screen.findByText('Conta criada com sucesso')).toBeInTheDocument();
-    expect(screen.getByText('Seu perfil inicial está pronto.')).toBeInTheDocument();
+    expect(await screen.findByText('Verifique seu e-mail')).toBeInTheDocument();
+    expect(
+      screen.getByText('Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.'),
+    ).toBeInTheDocument();
     expect(mockedCreateAccount).toHaveBeenCalledWith(
       expect.objectContaining({
+        email: 'dario@example.com',
         firstName: 'Dario',
         lastName: 'Reis',
         username: 'dario_reis_valido',
         birthDate: '2000-08-28',
       }),
+      undefined,
     );
     // `confirmPassword` must never reach the payload.
     expect(mockedCreateAccount.mock.calls[0]?.[0]).not.toHaveProperty('confirmPassword');
@@ -270,11 +279,12 @@ describe('CreateAccountForm', () => {
     const user = userEvent.setup();
     render(<CreateAccountForm />);
 
+    await user.type(screen.getByLabelText('E-mail'), 'dario@example.com');
     await user.type(screen.getByLabelText('Nome'), 'Dario');
     await user.type(screen.getByLabelText('Sobrenome'), 'Reis');
     await user.type(screen.getByLabelText('Username'), 'admin');
-    await user.type(screen.getByLabelText('Senha', { exact: true }), 'Abcdefg1!');
-    await user.type(screen.getByLabelText('Confirmar senha'), 'Abcdefg1!');
+    await user.type(screen.getByLabelText('Senha', { exact: true }), VALID_PASSWORD);
+    await user.type(screen.getByLabelText('Confirmar senha'), VALID_PASSWORD);
     await fillBirthDate(user, '28/08/2000');
 
     await screen.findByText('Este username já está em uso', {}, { timeout: 2000 });

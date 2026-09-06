@@ -7,7 +7,7 @@ describe('PasswordRequirements', () => {
   it('renders every requirement label', () => {
     render(<PasswordRequirements password="" />);
 
-    expect(screen.getByText('8 ou mais caracteres')).toBeInTheDocument();
+    expect(screen.getByText('12 ou mais caracteres')).toBeInTheDocument();
     expect(screen.getByText('Uma letra maiúscula')).toBeInTheDocument();
     expect(screen.getByText('Uma letra minúscula')).toBeInTheDocument();
     expect(screen.getByText('Um número')).toBeInTheDocument();
@@ -25,7 +25,7 @@ describe('PasswordRequirements', () => {
   });
 
   it('marks every requirement met for a fully valid password', () => {
-    render(<PasswordRequirements password="Abcdefg1!" />);
+    render(<PasswordRequirements password="Abcdefgh123!" />);
 
     const items = screen.getAllByRole('listitem');
     for (const item of items) {

@@ -56,7 +56,10 @@ describe('ForgotPasswordForm', () => {
     await user.click(screen.getByRole('button', { name: 'Enviar instruções' }));
 
     await waitFor(() => {
-      expect(mockedRequestRecovery).toHaveBeenCalledWith({ email: 'usuario@example.com' });
+      expect(mockedRequestRecovery).toHaveBeenCalledWith(
+        { email: 'usuario@example.com' },
+        undefined,
+      );
     });
   });
 

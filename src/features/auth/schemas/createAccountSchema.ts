@@ -3,11 +3,13 @@ import { z } from 'zod';
 import { authConfig } from '../constants/authConfig';
 import { meetsAllPasswordRequirements } from '../utils/passwordRequirements';
 import { birthDateSchema } from './birthDateSchema';
+import { emailSchema } from './emailSchema';
 import { nameSchema } from './nameSchema';
 import { usernameSchema } from './usernameSchema';
 
 export const createAccountSchema = z
   .object({
+    email: emailSchema,
     firstName: nameSchema('Informe seu nome'),
     lastName: nameSchema('Informe seu sobrenome'),
     username: usernameSchema,

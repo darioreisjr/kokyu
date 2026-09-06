@@ -5,10 +5,14 @@ import { render, screen, waitFor } from '../../../../test/test-utils';
 import { LoginForm } from '../components/LoginForm/LoginForm';
 import { authService } from '../services/authService';
 
-const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
+const { mockPush, mockSearchParams } = vi.hoisted(() => ({
+  mockPush: vi.fn(),
+  mockSearchParams: vi.fn(() => new URLSearchParams()),
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
+  useSearchParams: mockSearchParams,
 }));
 
 vi.mock('../services/authService', () => ({
@@ -32,6 +36,16 @@ describe('LoginForm', () => {
     mockedSignIn.mockClear();
     mockedGoogleSignIn.mockClear();
     mockPush.mockClear();
+    mockSearchParams.mockReturnValue(new URLSearchParams());
+  });
+
+  it('shows a generic error when arriving from a failed OAuth/recovery callback', async () => {
+    mockSearchParams.mockReturnValue(new URLSearchParams('error=auth_callback_failed'));
+    render(<LoginForm />);
+
+    expect(
+      await screen.findByText('Não foi possível concluir a autenticação. Tente novamente.'),
+    ).toBeInTheDocument();
   });
 
   it('renders the email field', () => {
@@ -141,11 +155,14 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => {
-      expect(mockedSignIn).toHaveBeenCalledWith({
-        email: 'user@example.com',
-        password: 'super-secret',
-        rememberMe: false,
-      });
+      expect(mockedSignIn).toHaveBeenCalledWith(
+        {
+          email: 'user@example.com',
+          password: 'super-secret',
+          rememberMe: false,
+        },
+        undefined,
+      );
     });
   });
 
