@@ -51,9 +51,14 @@ export function RespirationPage() {
 
   useEffect(() => {
     let cancelled = false;
-    profileService.getProfile().then((loaded) => {
-      if (!cancelled) setProfile(loaded);
-    });
+    profileService
+      .getProfile()
+      .then((loaded) => {
+        if (!cancelled) setProfile(loaded);
+      })
+      .catch(() => {
+        // Greeting/avatar are optional decoration here — a failed fetch just leaves them blank.
+      });
     return () => {
       cancelled = true;
     };

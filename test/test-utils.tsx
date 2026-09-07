@@ -9,6 +9,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { MotionPreferenceProvider } from '@/design-system/providers/MotionPreferenceProvider';
 import { SnackbarProvider } from '@/design-system/providers/SnackbarProvider';
 import { kokyuTheme } from '@/design-system/theme';
+import { CurrentUserProvider } from '@/features/current-user';
 import { PreferencesProvider } from '@/features/settings';
 
 function AllProviders({ children }: { children: ReactNode }) {
@@ -18,7 +19,17 @@ function AllProviders({ children }: { children: ReactNode }) {
       <PreferencesProvider>
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
           <MotionPreferenceProvider>
-            <SnackbarProvider>{children}</SnackbarProvider>
+            <SnackbarProvider>
+              {/* `null` by default — matches an unauthenticated/not-yet-
+                  loaded snapshot, so existing tests written before this
+                  context existed (which mock their own data source, e.g.
+                  `profileService.getProfile`) keep behaving exactly as
+                  they did. A test that needs a signed-in identity wraps
+                  its own render with `<CurrentUserProvider
+                  initialCurrentUser={mockCompleteCurrentUser}>` instead
+                  of relying on this default. */}
+              <CurrentUserProvider initialCurrentUser={null}>{children}</CurrentUserProvider>
+            </SnackbarProvider>
           </MotionPreferenceProvider>
         </LocalizationProvider>
       </PreferencesProvider>

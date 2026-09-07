@@ -8,7 +8,10 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 
 import type { NavigationItemConfig } from '../NavigationItem/NavigationItem';
+import type { AppShellUser } from './AppShellUser';
 import { KokyuAppShell } from './KokyuAppShell';
+
+const sampleUser: AppShellUser = { name: 'Dario Reis', initials: 'DR', avatarUrl: null };
 
 const items: NavigationItemConfig[] = [
   { id: 'respiracao', label: 'Respiração', href: '/app', icon: HomeRoundedIcon },
@@ -64,5 +67,15 @@ export const Tablet: Story = {
 };
 
 export const Mobile: Story = {
+  globals: { viewport: { value: 'mobile' } },
+};
+
+export const DesktopWithUser: Story = {
+  args: { user: sampleUser },
+  globals: { viewport: { value: 'desktop' } },
+};
+
+export const MobileWithUser: Story = {
+  args: { user: sampleUser },
   globals: { viewport: { value: 'mobile' } },
 };

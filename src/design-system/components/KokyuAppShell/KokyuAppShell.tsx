@@ -9,15 +9,20 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { themePalette } from '../../theme/useThemePalette';
 import { isNavigationItemActive } from '../NavigationItem/isNavigationItemActive';
 import { type NavigationItemConfig } from '../NavigationItem/NavigationItem';
+import type { AppShellUser } from './AppShellUser';
 import { MobileTopBar } from '../MobileTopBar/MobileTopBar';
 import { NavigationDrawer } from '../NavigationDrawer/NavigationDrawer';
 import { Sidebar } from '../Sidebar/Sidebar';
+
+export type { AppShellUser } from './AppShellUser';
 
 export interface KokyuAppShellProps {
   items: NavigationItemConfig[];
   bottomItems: NavigationItemConfig[];
   onLogout: () => void;
   children: ReactNode;
+  /** Omitted renders no identity chrome — e.g. Storybook/tests with no session to show. */
+  user?: AppShellUser;
   /**
    * Externally-controlled collapse state — pass both this and
    * `onToggleCollapse` to hand collapse ownership to the caller (e.g.
@@ -54,6 +59,7 @@ export function KokyuAppShell({
   children,
   collapsed: collapsedProp,
   onToggleCollapse,
+  user,
 }: KokyuAppShellProps) {
   const pathname = usePathname();
   const theme = useTheme();
@@ -110,11 +116,16 @@ export function KokyuAppShell({
           collapsed={collapsed}
           onToggleCollapse={toggleCollapsed}
           onLogout={onLogout}
+          user={user}
         />
       </Box>
 
       <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-        <MobileTopBar title={activeItem?.label} onMenuClick={() => setMobileOpen(true)} />
+        <MobileTopBar
+          title={activeItem?.label}
+          onMenuClick={() => setMobileOpen(true)}
+          user={user}
+        />
       </Box>
       <NavigationDrawer
         items={items}
@@ -123,6 +134,7 @@ export function KokyuAppShell({
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         onLogout={onLogout}
+        user={user}
       />
 
       <Box

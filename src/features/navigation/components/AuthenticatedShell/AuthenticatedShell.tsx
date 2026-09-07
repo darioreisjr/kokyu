@@ -5,12 +5,28 @@ import { useTheme } from '@mui/material/styles';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 
-import { KokyuAppShell } from '@/design-system/components';
+import { KokyuAppShell, type AppShellUser } from '@/design-system/components';
+import { useCurrentUser } from '@/features/current-user';
 import { usePreferences } from '@/features/settings/providers/PreferencesProvider';
 import { preferencesStorage } from '@/features/settings/services/preferencesStorage';
 
 import { bottomNavigationItems, navigationItems } from '../../config/navigationItems';
 import { useLogout } from '../../hooks/useLogout';
+
+/**
+ * `CurrentUser.profile` → the shell's generic `AppShellUser` — kept
+ * here rather than in `features/profile` (whose `getInitials` this
+ * deliberately doesn't import) so `features/navigation` never has to
+ * cross into another feature just to render a name/avatar; `current-
+ * user` is the one cross-cutting identity source every feature is
+ * meant to read from directly.
+ */
+function toAppShellUser(profile: { firstName: string; lastName: string | null; avatarUrl: string | null }): AppShellUser {
+  const lastName = profile.lastName ?? '';
+  const name = `${profile.firstName} ${lastName}`.trim();
+  const initials = `${profile.firstName.trim().charAt(0)}${lastName.trim().charAt(0)}`.toUpperCase();
+  return { name, initials, avatarUrl: profile.avatarUrl };
+}
 
 /**
  * Wires the Kokyu-specific menu config and the (mocked) logout flow
@@ -33,6 +49,7 @@ import { useLogout } from '../../hooks/useLogout';
  */
 export function AuthenticatedShell({ children }: { children: ReactNode }) {
   const { logout } = useLogout();
+  const { profile } = useCurrentUser();
   const pathname = usePathname();
   const { preferences, updateSection } = usePreferences();
   const { sidebarMode, rememberSidebarState } = preferences.navigation;
@@ -83,6 +100,7 @@ export function AuthenticatedShell({ children }: { children: ReactNode }) {
       onLogout={logout}
       collapsed={collapsed}
       onToggleCollapse={toggleCollapsed}
+      user={profile ? toAppShellUser(profile) : undefined}
     >
       {children}
     </KokyuAppShell>

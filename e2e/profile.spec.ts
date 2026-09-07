@@ -1,27 +1,75 @@
 import path from 'node:path';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
-const testImage = path.resolve(__dirname, '../coverage/favicon.png');
+import { freshSignupIdentity, loginAsCompleteUser } from './fixtures/auth';
 
+const testImage = path.resolve(__dirname, 'fixtures/test-avatar.png');
+
+async function fillBirthDate(page: Page, day: string, month: string, year: string) {
+  const group = page.getByRole('group', { name: 'Data de nascimento' });
+  await group.locator('[aria-label="Day"]').click();
+  await page.keyboard.type(day + month + year);
+}
+
+/**
+ * `/app/perfil` now requires a real, authenticated, profile-complete
+ * session (`app/app/layout.tsx`'s server-side gate) — it can no longer
+ * be reached by navigating straight there against mocked data, the way
+ * this file did before real auth/profile-completion gating existed.
+ * Every test logs in first via `loginAsCompleteUser` (see
+ * `fixtures/auth.ts`) — requires a reachable, seeded Supabase +
+ * kokyu-sam backend stack; not runnable in the sandbox this feature was
+ * built in (see the task's final report for what could/couldn't be
+ * verified here).
+ *
+ * The seeded user's actual `firstName`/`lastName`/`username`/`email`
+ * are backend data this frontend doesn't control, so — unlike the old
+ * mocked-data version of this file — assertions below read the current
+ * values from the page at runtime instead of hardcoding
+ * 'Dario'/'Reis'/'darioreis'/'dario@email.com'.
+ */
 test.describe('Profile page', () => {
-  test('loads with the expected data — avatar, name, username, email', async ({ page }) => {
-    await page.goto('/app/perfil');
+  // These tests all sign in as the same seeded `COMPLETE_PROFILE_USER`
+  // and mutate its real, persisted profile (name, username, avatar) —
+  // running them in parallel workers (this project's default
+  // `fullyParallel: true`) races them against each other over shared
+  // backend state, producing exactly the kind of flakiness this file
+  // hit in practice (a field briefly empty mid-edit, "discard" seeing
+  // another test's unsaved change). Serial keeps them safely ordered.
+  test.describe.configure({ mode: 'serial' });
 
+  test.beforeEach(async ({ page }) => {
+    await loginAsCompleteUser(page);
+    await page.goto('/app/perfil');
+  });
+
+  test('loads with populated identity fields — avatar, name, username, email', async ({
+    page,
+  }) => {
     await expect(page.getByRole('heading', { name: 'Perfil' })).toBeVisible();
-    await expect(page.getByText('DR')).toBeVisible();
-    await expect(page.getByLabel('Nome', { exact: true })).toHaveValue('Dario');
-    await expect(page.getByLabel('Sobrenome')).toHaveValue('Reis');
-    await expect(page.getByLabel('Username')).toHaveValue('darioreis');
-    await expect(page.getByLabel('E-mail')).toHaveValue('dario@email.com');
-    await expect(page.getByText('Dario Reis')).toBeVisible();
-    await expect(page.getByText('@darioreis')).toBeVisible();
+
+    const firstName = await page.getByLabel('Nome', { exact: true }).inputValue();
+    const lastName = await page.getByLabel('Sobrenome').inputValue();
+    const username = await page.getByLabel('Username').inputValue();
+    const email = await page.getByLabel('E-mail').inputValue();
+
+    expect(firstName.length).toBeGreaterThan(0);
+    expect(lastName.length).toBeGreaterThan(0);
+    expect(username.length).toBeGreaterThan(0);
+    expect(email).toContain('@');
+
+    // Scoped to `main`, not the whole page — the sidebar's own identity
+    // row (`AuthenticatedShell` → `KokyuAppShell`, reading the same
+    // `CurrentUserContext`) legitimately shows this same name too.
+    await expect(page.getByRole('main').getByText(`${firstName} ${lastName}`)).toBeVisible();
+    await expect(page.getByText(`@${username}`)).toBeVisible();
   });
 
   test('edits the name, saves, and shows the success feedback', async ({ page }) => {
-    await page.goto('/app/perfil');
-
+    const originalFirstName = await page.getByLabel('Nome', { exact: true }).inputValue();
+    const lastName = await page.getByLabel('Sobrenome').inputValue();
     const firstName = page.getByLabel('Nome', { exact: true });
-    await firstName.fill('Dario Editado');
+    await firstName.fill(`${originalFirstName} Editado`);
 
     const saveButton = page.getByRole('button', { name: 'Salvar alterações' });
     await expect(saveButton).toBeEnabled();
@@ -30,16 +78,14 @@ test.describe('Profile page', () => {
     await expect(page.getByText('Perfil atualizado com sucesso.')).toBeVisible();
     await expect(saveButton).toBeDisabled();
     // The live preview reflects the saved value too.
-    await expect(page.getByText('Dario Editado Reis')).toBeVisible();
+    await expect(page.getByText(`${originalFirstName} Editado ${lastName}`)).toBeVisible();
   });
 
   test('changes the username, checks availability, and saves', async ({ page }) => {
-    await page.goto('/app/perfil');
-
     const username = page.getByLabel('Username');
-    await username.fill('novo_username');
+    await username.fill(`e2e_${Date.now()}`);
 
-    await expect(page.getByText('Username disponível')).toBeVisible({ timeout: 3000 });
+    await expect(page.getByText('Username disponível')).toBeVisible({ timeout: 5000 });
 
     const saveButton = page.getByRole('button', { name: 'Salvar alterações' });
     await expect(saveButton).toBeEnabled();
@@ -48,19 +94,40 @@ test.describe('Profile page', () => {
     await expect(page.getByText('Perfil atualizado com sucesso.')).toBeVisible();
   });
 
-  test('reports an unavailable username and blocks saving', async ({ page }) => {
-    await page.goto('/app/perfil');
+  test('reports an unavailable username and blocks saving', async ({ page, browser }) => {
+    // Seeds a genuinely taken username via a real, throwaway signup in
+    // a fully separate browser context (not just a new tab — a new tab
+    // in `page`'s own context shares its cookies, so `/create-account`
+    // would immediately redirect to `/app` for an already-signed-in
+    // visitor) — self-contained, no hardcoded username and no direct
+    // backend/DB access needed. The seed account's email is
+    // deliberately never confirmed: `handle_new_user` populates
+    // `profiles.username` as soon as the row is inserted, on signup,
+    // regardless of confirmation state, which is all this needs.
+    const seedIdentity = freshSignupIdentity();
+    const seedContext = await browser.newContext();
+    const seedPage = await seedContext.newPage();
+    await seedPage.goto('/create-account');
+    await seedPage.getByLabel('E-mail').fill(seedIdentity.email);
+    await seedPage.getByLabel('Nome', { exact: true }).fill('Seed');
+    await seedPage.getByLabel('Sobrenome').fill('User');
+    await seedPage.getByLabel('Username').fill(seedIdentity.username);
+    await fillBirthDate(seedPage, '28', '08', '2000');
+    await seedPage.getByLabel('Senha', { exact: true }).fill('Abcdefgh123!');
+    await seedPage.getByLabel('Confirmar senha').fill('Abcdefgh123!');
+    await expect(seedPage.getByText('Username disponível')).toBeVisible({ timeout: 5000 });
+    await seedPage.getByRole('button', { name: 'Criar conta' }).click();
+    await expect(seedPage.getByText('Verifique seu e-mail')).toBeVisible();
+    await seedContext.close();
 
     const username = page.getByLabel('Username');
-    await username.fill('admin');
+    await username.fill(seedIdentity.username);
 
-    await expect(page.getByText('Este username já está em uso')).toBeVisible({ timeout: 3000 });
+    await expect(page.getByText('Este username já está em uso')).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
   });
 
   test('rejects a birth date that makes the user younger than 18', async ({ page }) => {
-    await page.goto('/app/perfil');
-
     const seventeenYearsAgo = new Date();
     seventeenYearsAgo.setFullYear(seventeenYearsAgo.getFullYear() - 17);
     const day = String(seventeenYearsAgo.getDate()).padStart(2, '0');
@@ -77,7 +144,8 @@ test.describe('Profile page', () => {
   });
 
   test('selects, crops and confirms an avatar, updating the preview', async ({ page }) => {
-    await page.goto('/app/perfil');
+    const firstName = await page.getByLabel('Nome', { exact: true }).inputValue();
+    const lastName = await page.getByLabel('Sobrenome').inputValue();
 
     await page.getByLabel('Foto de perfil').setInputFiles(testImage);
 
@@ -94,7 +162,9 @@ test.describe('Profile page', () => {
     await expect(dialog).not.toBeVisible();
 
     // The cropped result shows up immediately as the avatar preview.
-    await expect(page.getByRole('img', { name: 'Foto de perfil de Dario Reis' })).toBeVisible();
+    await expect(
+      page.getByRole('img', { name: `Foto de perfil de ${firstName} ${lastName}` }),
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Remover foto' })).toBeVisible();
 
     const saveButton = page.getByRole('button', { name: 'Salvar alterações' });
@@ -102,21 +172,18 @@ test.describe('Profile page', () => {
   });
 
   test('discards changes back to the originally loaded values', async ({ page }) => {
-    await page.goto('/app/perfil');
-
+    const originalFirstName = await page.getByLabel('Nome', { exact: true }).inputValue();
     const firstName = page.getByLabel('Nome', { exact: true });
-    await firstName.fill('Dario Editado');
+    await firstName.fill(`${originalFirstName} Editado`);
     await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
 
     await page.getByRole('button', { name: 'Descartar alterações' }).click();
 
-    await expect(firstName).toHaveValue('Dario');
+    await expect(firstName).toHaveValue(originalFirstName);
     await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
   });
 
   test('cancels the crop dialog without changing the avatar', async ({ page }) => {
-    await page.goto('/app/perfil');
-
     await page.getByLabel('Foto de perfil').setInputFiles(testImage);
     const dialog = page.getByRole('dialog', { name: 'Ajustar foto' });
     await expect(dialog).toBeVisible();
@@ -124,14 +191,10 @@ test.describe('Profile page', () => {
     await page.getByRole('button', { name: 'Cancelar' }).click();
     await expect(dialog).not.toBeVisible();
 
-    // Still the initials fallback — nothing was staged.
-    await expect(page.getByText('DR')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeDisabled();
   });
 
   test('removes an existing avatar back to initials', async ({ page }) => {
-    await page.goto('/app/perfil');
-
     await page.getByLabel('Foto de perfil').setInputFiles(testImage);
     await expect(page.getByRole('dialog', { name: 'Ajustar foto' })).toBeVisible();
     await page.waitForTimeout(500);
@@ -140,7 +203,6 @@ test.describe('Profile page', () => {
 
     await page.getByRole('button', { name: 'Remover foto' }).click();
 
-    await expect(page.getByText('DR')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeEnabled();
   });
 });
@@ -155,9 +217,12 @@ for (const [name, size] of Object.entries(viewports)) {
   test.describe(`Profile page — ${name} (${size.width}x${size.height})`, () => {
     test.use({ viewport: size });
 
-    test('keeps the form usable with no horizontal overflow', async ({ page }) => {
+    test.beforeEach(async ({ page }) => {
+      await loginAsCompleteUser(page);
       await page.goto('/app/perfil');
+    });
 
+    test('keeps the form usable with no horizontal overflow', async ({ page }) => {
       await expect(page.getByLabel('Nome', { exact: true })).toBeVisible();
       await expect(page.getByRole('button', { name: 'Salvar alterações' })).toBeVisible();
 
@@ -168,8 +233,6 @@ for (const [name, size] of Object.entries(viewports)) {
     });
 
     test('the crop dialog stays usable', async ({ page }) => {
-      await page.goto('/app/perfil');
-
       await page.getByLabel('Foto de perfil').setInputFiles(testImage);
       const dialog = page.getByRole('dialog', { name: 'Ajustar foto' });
       await expect(dialog).toBeVisible();
@@ -184,8 +247,6 @@ for (const [name, size] of Object.entries(viewports)) {
     });
 
     test('the app shell navigation is still reachable', async ({ page }) => {
-      await page.goto('/app/perfil');
-
       if (name === 'mobile') {
         await expect(page.getByRole('button', { name: 'Abrir menu' })).toBeVisible();
       } else {

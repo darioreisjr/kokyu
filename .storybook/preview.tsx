@@ -9,6 +9,7 @@ import type { Viewport } from 'storybook/viewport';
 import { MotionPreferenceProvider } from '../src/design-system/providers/MotionPreferenceProvider';
 import { SnackbarProvider } from '../src/design-system/providers/SnackbarProvider';
 import { kokyuTheme } from '../src/design-system/theme';
+import { CurrentUserProvider } from '../src/features/current-user';
 import { PreferencesProvider } from '../src/features/settings';
 
 const kokyuViewports: Record<string, Viewport> = {
@@ -44,6 +45,13 @@ const kokyuViewports: Record<string, Viewport> = {
   },
 };
 
+// `initialCurrentUser={null}` by default — same reasoning as
+// `test/test-utils.tsx`'s `AllProviders`: stories written against
+// `profileService`/`createAccountService` mocks keep resolving through
+// those exactly as before. A story that needs a signed-in identity
+// (onboarding's `PrefilledEmail`/`PrefilledGoogle`, ...) wraps its own
+// render or decorator with `<CurrentUserProvider initialCurrentUser=
+// {mockCompleteCurrentUser}>` instead.
 const withKokyuTheme: Decorator = (Story) => (
   <ThemeProvider theme={kokyuTheme}>
     <CssBaseline />
@@ -51,7 +59,9 @@ const withKokyuTheme: Decorator = (Story) => (
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
         <MotionPreferenceProvider>
           <SnackbarProvider>
-            <Story />
+            <CurrentUserProvider initialCurrentUser={null}>
+              <Story />
+            </CurrentUserProvider>
           </SnackbarProvider>
         </MotionPreferenceProvider>
       </LocalizationProvider>

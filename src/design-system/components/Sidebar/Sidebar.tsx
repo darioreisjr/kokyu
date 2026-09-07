@@ -6,13 +6,17 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
+import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import { motion } from 'motion/react';
 
 import { useEffectiveReducedMotion } from '../../providers/MotionPreferenceProvider';
 import { navigationTokens } from '../../tokens/component/navigation';
 import { sidebarCollapseMotion } from '../../tokens/semantic/motion';
 import { darkColorTokens } from '../../tokens/semantic/colors';
+import { KokyuAvatar } from '../KokyuAvatar/KokyuAvatar';
+import type { AppShellUser } from '../KokyuAppShell/AppShellUser';
 import { KokyuLogo } from '../KokyuLogo/KokyuLogo';
 import { isNavigationItemActive } from '../NavigationItem/isNavigationItemActive';
 import { NavigationItem, type NavigationItemConfig } from '../NavigationItem/NavigationItem';
@@ -25,6 +29,8 @@ export interface SidebarProps {
   onToggleCollapse: () => void;
   onLogout: () => void;
   logoutLabel?: string;
+  /** Omitted renders no identity row — e.g. Storybook/tests with no session to show. */
+  user?: AppShellUser;
 }
 
 /**
@@ -42,6 +48,7 @@ export function Sidebar({
   onToggleCollapse,
   onLogout,
   logoutLabel = 'Sair',
+  user,
 }: SidebarProps) {
   const shouldReduceMotion = useEffectiveReducedMotion();
 
@@ -122,6 +129,36 @@ export function Sidebar({
 
       <div style={{ flexShrink: 0 }}>
         <Divider sx={{ borderColor: darkColorTokens.border.subtle }} />
+        {user ? (
+          <>
+            <Stack
+              direction="row"
+              spacing={1.5}
+              sx={{
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                padding: collapsed ? '12px 8px' : '12px 16px',
+                minWidth: 0,
+              }}
+            >
+              <Tooltip title={collapsed ? user.name : ''} placement="right">
+                <span>
+                  <KokyuAvatar src={user.avatarUrl} alt={user.name} initials={user.initials} size="xs" />
+                </span>
+              </Tooltip>
+              {!collapsed ? (
+                <Typography
+                  variant="labelLarge"
+                  noWrap
+                  sx={{ color: darkColorTokens.text.primary, minWidth: 0 }}
+                >
+                  {user.name}
+                </Typography>
+              ) : null}
+            </Stack>
+            <Divider sx={{ borderColor: darkColorTokens.border.subtle }} />
+          </>
+        ) : null}
         <List component="div" sx={{ paddingInline: 1.5, paddingBlock: 1 }}>
           {bottomItems.map((item) => (
             <NavigationItem

@@ -7,12 +7,13 @@ async function fillBirthDate(page: Page, day: string, month: string, year: strin
 }
 
 async function fillValidProfile(page: Page, username: string) {
+  await page.getByLabel('E-mail').fill(`${username}@example.com`);
   await page.getByLabel('Nome', { exact: true }).fill('Dario');
   await page.getByLabel('Sobrenome').fill('Reis');
   await page.getByLabel('Username').fill(username);
   await fillBirthDate(page, '28', '08', '2000');
-  await page.getByLabel('Senha', { exact: true }).fill('Abcdefg1!');
-  await page.getByLabel('Confirmar senha').fill('Abcdefg1!');
+  await page.getByLabel('Senha', { exact: true }).fill('Abcdefgh123!');
+  await page.getByLabel('Confirmar senha').fill('Abcdefgh123!');
 }
 
 function nYearsAgo(years: number): { day: string; month: string; year: string } {
@@ -98,8 +99,10 @@ test.describe('Create account flow', () => {
 
     await page.getByRole('button', { name: 'Criar conta' }).click();
 
-    await expect(page.getByText('Conta criada com sucesso')).toBeVisible();
-    await expect(page.getByText('Seu perfil inicial está pronto.')).toBeVisible();
+    await expect(page.getByText('Verifique seu e-mail')).toBeVisible();
+    await expect(
+      page.getByText('Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.'),
+    ).toBeVisible();
   });
 
   test('navigates back to login from the "Entrar" link', async ({ page }) => {

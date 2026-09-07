@@ -8,8 +8,11 @@ import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 
+import type { AppShellUser } from '../KokyuAppShell/AppShellUser';
 import type { NavigationItemConfig } from '../NavigationItem/NavigationItem';
 import { Sidebar } from './Sidebar';
+
+const sampleUser: AppShellUser = { name: 'Dario Reis', initials: 'DR', avatarUrl: null };
 
 const items: NavigationItemConfig[] = [
   { id: 'respiracao', label: 'Respiração', href: '/app', icon: HomeRoundedIcon },
@@ -62,4 +65,12 @@ export const Expanded: Story = {};
 
 export const Collapsed: Story = {
   args: { collapsed: true },
+};
+
+export const WithUser: Story = {
+  args: { user: sampleUser },
+};
+
+export const CollapsedWithUser: Story = {
+  args: { collapsed: true, user: sampleUser },
 };

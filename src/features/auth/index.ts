@@ -29,3 +29,18 @@ export type { UsernameAvailability } from './types/createAccount.types';
 export { PasswordRequirements } from './components/PasswordRequirements/PasswordRequirements';
 export { PasswordStrength } from './components/PasswordStrength/PasswordStrength';
 export { meetsAllPasswordRequirements } from './utils/passwordRequirements';
+// `resolvePostAuthDestinationServer` is deliberately NOT re-exported
+// here — it pulls in `@/lib/supabase/server` (`next/headers`), which
+// must never end up reachable from this barrel's Client Component
+// consumers (`LoginForm`, `AuthTransition`, ...). `app/auth/callback/
+// route.ts` (a Route Handler, itself server-only) imports it directly
+// from `./utils/resolvePostAuthDestination` instead — same reason
+// every auth page already imports `@/lib/supabase/server` directly
+// rather than through a barrel.
+export {
+  DEFAULT_AUTHENTICATED_PATH,
+  LOGIN_PATH,
+  ONBOARDING_PATH,
+  resolveDestinationForCurrentUser,
+  resolvePostAuthDestinationClient,
+} from './utils/resolvePostAuthDestination';

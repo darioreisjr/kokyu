@@ -86,9 +86,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
         <Stack spacing={4}>
           <ProfileIdentityForm
+            control={control}
             register={register}
             errors={errors}
             usernameAvailability={usernameAvailability}
+            firstNameValue={firstName ?? ''}
+            lastNameValue={lastName ?? ''}
+            usernameValue={username ?? ''}
             bioValue={bio ?? ''}
             disabled={isSaving}
           />

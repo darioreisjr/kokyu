@@ -34,6 +34,14 @@ export function ProfilePersonalInfoForm({
 }: ProfilePersonalInfoFormProps) {
   const birthDate = useWatch({ control, name: 'birthDate' });
   const age = birthDate ? calculateAge(birthDate) : null;
+  // `region`/`city` are registered via `register()` (ref-based, unlike
+  // `birthDate`/`country` above which are `Controller`-driven and so
+  // already correctly server-rendered) — see `ProfileIdentityForm`'s
+  // "Sobre você" field for why an uncontrolled field also needs an
+  // explicit `defaultValue`, or the server ships it empty and a fast
+  // interaction right after load can corrupt it.
+  const region = useWatch({ control, name: 'region' });
+  const city = useWatch({ control, name: 'city' });
 
   return (
     <Stack spacing={2.5}>
@@ -100,6 +108,7 @@ export function ProfilePersonalInfoForm({
           disabled={disabled}
           error={Boolean(errors.region)}
           helperText={errors.region?.message}
+          defaultValue={region ?? ''}
           {...register('region')}
         />
         <KokyuTextField
@@ -107,6 +116,7 @@ export function ProfilePersonalInfoForm({
           disabled={disabled}
           error={Boolean(errors.city)}
           helperText={errors.city?.message}
+          defaultValue={city ?? ''}
           {...register('city')}
         />
       </Box>

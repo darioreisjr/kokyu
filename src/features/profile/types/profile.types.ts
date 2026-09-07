@@ -1,3 +1,5 @@
+import type { ProfileUpdatePayload } from '@/lib/api/types';
+
 /** What the page displays — includes account-level, non-editable fields (`email`, `id`). */
 export interface UserProfile {
   id: string;
@@ -25,22 +27,6 @@ export interface ProfileFormData {
   city: string;
 }
 
-/**
- * What a future API would accept. Deliberately excludes `age` — it's
- * always derived from `birthDate` (`calculateAge`), never stored or
- * sent on its own.
- */
-export interface UpdateProfilePayload {
-  firstName: string;
-  lastName: string;
-  username: string;
-  bio: string;
-  birthDate: string;
-  country: string;
-  region: string;
-  city: string;
-}
-
 export type UpdateProfileResult =
   { success: true; profile: UserProfile } | { success: false; error: string };
 
@@ -50,15 +36,21 @@ export type UpdateAvatarResult =
 export type RemoveAvatarResult = { success: true } | { success: false; error: string };
 
 /**
- * Contract for a future real profile API. Mocked for now
- * (`services/profileService.ts`) — same pattern as `AuthService`.
- * Avatar upload/removal are their own methods (not folded into
- * `updateProfile`) because they're a separate upload flow, per the
- * future `PATCH profile` + separate avatar upload split.
+ * Contract the real profile screen depends on instead of the kokyu-sam
+ * backend directly (`services/profileService.ts`) — same pattern as
+ * `AuthService`. Avatar upload/removal are their own methods (not
+ * folded into `updateProfile`) because they're a separate direct-to-
+ * Supabase-Storage upload flow — see `services/avatarUploadService.ts`.
+ *
+ * `updateProfile`'s payload is `ProfileUpdatePayload` from `@/lib/api/
+ * types` (the backend's own `PATCH /profile` body shape,
+ * `countryCode`/optional fields included) — not a locally-declared
+ * type — so this contract can never drift from what `/me` actually
+ * accepts.
  */
 export interface ProfileService {
   getProfile: () => Promise<UserProfile>;
-  updateProfile: (payload: UpdateProfilePayload) => Promise<UpdateProfileResult>;
+  updateProfile: (payload: ProfileUpdatePayload) => Promise<UpdateProfileResult>;
   updateAvatar: (file: Blob) => Promise<UpdateAvatarResult>;
   removeAvatar: () => Promise<RemoveAvatarResult>;
 }

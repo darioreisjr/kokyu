@@ -1,5 +1,7 @@
 import { format } from 'date-fns';
 
+import { apiRequest } from '@/lib/api/request';
+import type { UsernameAvailabilityResponse } from '@/lib/api/types';
 import { createClient } from '@/lib/supabase/client';
 
 import { authText } from '../constants/authText';
@@ -38,18 +40,19 @@ export function mapFormDataToPayload(formData: CreateAccountFormData): CreateAcc
  * this file changed when it stopped being a mock.
  */
 const supabaseCreateAccountService: CreateAccountService = {
-  async checkUsernameAvailability(): Promise<UsernameAvailabilityResult> {
-    // The kokyu-sam backend doesn't expose a public availability-check
-    // endpoint (checking one would need anon read access to
-    // public.profiles, which RLS deliberately denies — see its
-    // docs/security.md). Uniqueness is still enforced for real: a
-    // case-insensitive unique index on profiles.username, backed by the
-    // handle_new_user() trigger, which silently omits a colliding
-    // username at signup rather than failing it (see the trigger's own
-    // migration). Until a dedicated endpoint exists, this can only ever
-    // report "available" — it has no way to check without either lying
-    // or calling something that doesn't exist.
-    return { available: true };
+  async checkUsernameAvailability(username: string): Promise<UsernameAvailabilityResult> {
+    // `GET /usernames/availability` needs no auth — this can run for a
+    // not-yet-authenticated visitor filling out create-account, and for
+    // an already-authenticated one editing their profile/onboarding
+    // (both go through `useUsernameAvailability`, the one shared hook).
+    try {
+      const result = await apiRequest<UsernameAvailabilityResponse>(
+        `/usernames/availability?username=${encodeURIComponent(username)}`,
+      );
+      return result.available ? { available: true } : { available: false, reason: 'taken' };
+    } catch {
+      return { available: false, reason: 'error' };
+    }
   },
 
   async createAccount(

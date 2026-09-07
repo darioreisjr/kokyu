@@ -105,4 +105,31 @@ describe('NavigationDrawer', () => {
     await user.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('shows the identity row when a user is given, and omits it otherwise', () => {
+    const { rerender } = render(
+      <NavigationDrawer
+        items={items}
+        bottomItems={bottomItems}
+        pathname="/app"
+        open
+        onClose={vi.fn()}
+        onLogout={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText('Dario Reis')).not.toBeInTheDocument();
+
+    rerender(
+      <NavigationDrawer
+        items={items}
+        bottomItems={bottomItems}
+        pathname="/app"
+        open
+        onClose={vi.fn()}
+        onLogout={vi.fn()}
+        user={{ name: 'Dario Reis', initials: 'DR', avatarUrl: null }}
+      />,
+    );
+    expect(screen.getByText('Dario Reis')).toBeInTheDocument();
+  });
 });

@@ -122,4 +122,32 @@ describe('Sidebar', () => {
     // The accessible name survives collapse even though the visible text doesn't.
     expect(screen.getByRole('link', { name: 'Respiração' })).toBeInTheDocument();
   });
+
+  it('renders the identity row when a user is given, and omits it otherwise', () => {
+    const { rerender } = render(
+      <Sidebar
+        items={items}
+        bottomItems={bottomItems}
+        pathname="/app"
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        onLogout={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText('Dario Reis')).not.toBeInTheDocument();
+
+    rerender(
+      <Sidebar
+        items={items}
+        bottomItems={bottomItems}
+        pathname="/app"
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        onLogout={vi.fn()}
+        user={{ name: 'Dario Reis', initials: 'DR', avatarUrl: null }}
+      />,
+    );
+    expect(screen.getByText('Dario Reis')).toBeInTheDocument();
+    expect(screen.getByText('DR')).toBeInTheDocument();
+  });
 });

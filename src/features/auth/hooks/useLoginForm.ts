@@ -10,6 +10,7 @@ import { usePreferences } from '@/features/settings/providers/PreferencesProvide
 import { authText } from '../constants/authText';
 import { loginDefaultValues, loginSchema, type LoginFormValues } from '../schemas/loginSchema';
 import { authService } from '../services/authService';
+import { resolvePostAuthDestinationClient } from '../utils/resolvePostAuthDestination';
 
 export interface UseLoginFormResult {
   form: ReturnType<typeof useForm<LoginFormValues>>;
@@ -58,7 +59,11 @@ export function useLoginForm(): UseLoginFormResult {
     try {
       const result = await authService.signInWithCredentials(values, captchaToken ?? undefined);
       if (result.success) {
-        router.push(destination);
+        // Profile-incomplete users always land on `/perfil/completar`,
+        // regardless of `destination` — see `resolvePostAuthDestination`'s
+        // own doc comment for why this is the single place that decides.
+        const target = await resolvePostAuthDestinationClient(destination);
+        router.push(target);
       } else {
         setSubmitError(result.error || authText.login.genericError);
       }
@@ -72,9 +77,10 @@ export function useLoginForm(): UseLoginFormResult {
     setIsGoogleLoading(true);
     authService
       .signInWithGoogle()
-      .then((result) => {
+      .then(async (result) => {
         if (result.success) {
-          router.push(destination);
+          const target = await resolvePostAuthDestinationClient(destination);
+          router.push(target);
         } else {
           setSubmitError(result.error || authText.login.genericError);
         }

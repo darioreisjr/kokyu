@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 
+import type { AppShellUser } from '../KokyuAppShell/AppShellUser';
 import { MobileTopBar } from './MobileTopBar';
+
+const sampleUser: AppShellUser = { name: 'Dario Reis', initials: 'DR', avatarUrl: null };
 
 const meta = {
   title: 'Kokyu Components/MobileTopBar',
@@ -23,4 +26,8 @@ export const Default: Story = {};
 
 export const WithoutTitle: Story = {
   args: { title: undefined },
+};
+
+export const WithUser: Story = {
+  args: { user: sampleUser },
 };

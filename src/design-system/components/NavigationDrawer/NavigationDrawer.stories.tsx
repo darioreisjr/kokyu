@@ -5,8 +5,11 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 
+import type { AppShellUser } from '../KokyuAppShell/AppShellUser';
 import type { NavigationItemConfig } from '../NavigationItem/NavigationItem';
 import { NavigationDrawer } from './NavigationDrawer';
+
+const sampleUser: AppShellUser = { name: 'Dario Reis', initials: 'DR', avatarUrl: null };
 
 const items: NavigationItemConfig[] = [
   { id: 'respiracao', label: 'Respiração', href: '/app', icon: HomeRoundedIcon },
@@ -47,4 +50,8 @@ export const Closed: Story = {};
 
 export const Open: Story = {
   args: { open: true },
+};
+
+export const OpenWithUser: Story = {
+  args: { open: true, user: sampleUser },
 };

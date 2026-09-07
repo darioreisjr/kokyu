@@ -28,4 +28,31 @@ describe('MobileTopBar', () => {
     render(<MobileTopBar onMenuClick={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'Abrir menu' })).toBeInTheDocument();
   });
+
+  it('shows the user avatar when a user is given, and omits it otherwise', () => {
+    const { rerender } = render(<MobileTopBar onMenuClick={vi.fn()} />);
+    expect(screen.queryByAltText('Dario Reis')).not.toBeInTheDocument();
+
+    rerender(
+      <MobileTopBar
+        onMenuClick={vi.fn()}
+        user={{ name: 'Dario Reis', initials: 'DR', avatarUrl: null }}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Menu do usuário — Dario Reis' })).toBeInTheDocument();
+  });
+
+  it('opens the drawer when the user avatar is clicked', async () => {
+    const onMenuClick = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MobileTopBar
+        onMenuClick={onMenuClick}
+        user={{ name: 'Dario Reis', initials: 'DR', avatarUrl: null }}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Menu do usuário — Dario Reis' }));
+    expect(onMenuClick).toHaveBeenCalledTimes(1);
+  });
 });

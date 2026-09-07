@@ -1,9 +1,45 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { mapFormDataToPayload, profileService } from './profileService';
+import type { CurrentUser } from '@/lib/api/types';
+
+const { mockApiFetchClient, mockUploadAvatar, mockRemoveAvatarUpload } = vi.hoisted(() => ({
+  mockApiFetchClient: vi.fn(),
+  mockUploadAvatar: vi.fn(),
+  mockRemoveAvatarUpload: vi.fn(),
+}));
+
+vi.mock('@/lib/api/client', () => ({ apiFetchClient: mockApiFetchClient }));
+vi.mock('./avatarUploadService', () => ({
+  uploadAvatar: mockUploadAvatar,
+  removeAvatarUpload: mockRemoveAvatarUpload,
+}));
+
+const { mapCurrentUserToProfile, mapFormDataToPayload, profileService } = await import(
+  './profileService'
+);
+
+const baseCurrentUser: CurrentUser = {
+  id: 'mock-user',
+  email: 'dario@email.com',
+  emailVerified: true,
+  providers: ['email'],
+  profile: {
+    firstName: 'Dario',
+    lastName: 'Reis',
+    username: 'darioreis',
+    birthDate: '2000-08-28',
+    bio: 'Olá!',
+    avatarUrl: null,
+    countryCode: 'BR',
+    region: 'SP',
+    city: 'São Paulo',
+  },
+  profileCompletion: { completed: true, completedAt: '2024-01-01', version: 1, missingFields: [] },
+  access: { canUseApplication: true, redirectTo: null },
+};
 
 describe('mapFormDataToPayload', () => {
-  it('narrows form data into a payload, formatting the birth date', () => {
+  it('narrows form data into the backend PATCH /profile body, renaming country -> countryCode', () => {
     const payload = mapFormDataToPayload({
       firstName: 'Dario',
       lastName: 'Reis',
@@ -21,63 +57,110 @@ describe('mapFormDataToPayload', () => {
       username: 'dario_reis',
       bio: 'Olá!',
       birthDate: '2000-08-28',
-      country: 'BR',
+      countryCode: 'BR',
       region: 'SP',
       city: 'São Paulo',
     });
   });
 });
 
-describe('profileService (mock provider)', () => {
-  it('resolves getProfile with a plausible profile', async () => {
-    const profile = await profileService.getProfile();
-    expect(profile.firstName).toBeTruthy();
-    expect(profile.email).toContain('@');
-    expect(profile.birthDate).toBeInstanceOf(Date);
+describe('mapCurrentUserToProfile', () => {
+  it('maps the backend shape into UserProfile', () => {
+    const profile = mapCurrentUserToProfile(baseCurrentUser);
+    expect(profile.firstName).toBe('Dario');
+    expect(profile.country).toBe('BR');
+    expect(profile.birthDate).toEqual(new Date(2000, 7, 28));
+    expect(profile.email).toBe('dario@email.com');
   });
 
-  it('updateProfile persists the given fields and returns them back', async () => {
+  it('falls back to empty strings for nullable optional fields', () => {
+    const profile = mapCurrentUserToProfile({
+      ...baseCurrentUser,
+      profile: { ...baseCurrentUser.profile, bio: null, region: null, city: null },
+    });
+    expect(profile.bio).toBe('');
+    expect(profile.region).toBe('');
+    expect(profile.city).toBe('');
+  });
+});
+
+describe('profileService (real backend-backed implementation)', () => {
+  it('getProfile calls GET /me and maps the result', async () => {
+    mockApiFetchClient.mockResolvedValueOnce(baseCurrentUser);
+    const profile = await profileService.getProfile();
+    expect(mockApiFetchClient).toHaveBeenCalledWith('/me');
+    expect(profile.firstName).toBe('Dario');
+  });
+
+  it('getProfile throws a friendly error when the request fails', async () => {
+    mockApiFetchClient.mockRejectedValueOnce(new Error('network down'));
+    await expect(profileService.getProfile()).rejects.toThrow(
+      'Não foi possível carregar seu perfil agora.',
+    );
+  });
+
+  it('updateProfile PATCHes /profile and returns the mapped profile', async () => {
+    mockApiFetchClient.mockResolvedValueOnce({
+      ...baseCurrentUser,
+      profile: { ...baseCurrentUser.profile, firstName: 'Novo' },
+    });
+
     const result = await profileService.updateProfile({
       firstName: 'Novo',
       lastName: 'Nome',
       username: 'novo_nome',
       bio: 'Bio atualizada',
       birthDate: '1995-05-10',
-      country: 'PT',
+      countryCode: 'PT',
       region: 'Lisboa',
       city: 'Lisboa',
     });
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.profile.firstName).toBe('Novo');
-      expect(result.profile.bio).toBe('Bio atualizada');
-      expect(result.profile.birthDate).toEqual(new Date(1995, 4, 10));
-    }
-
-    const reloaded = await profileService.getProfile();
-    expect(reloaded.firstName).toBe('Novo');
+    expect(mockApiFetchClient).toHaveBeenCalledWith(
+      '/profile',
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+    expect(result).toEqual({
+      success: true,
+      profile: expect.objectContaining({ firstName: 'Novo' }),
+    });
   });
 
-  it('updateAvatar returns a usable object URL and persists it', async () => {
+  it('updateProfile returns a friendly error on failure, never a raw one', async () => {
+    mockApiFetchClient.mockRejectedValueOnce(new Error('raw backend detail'));
+
+    const result = await profileService.updateProfile({
+      firstName: 'Novo',
+      lastName: 'Nome',
+      username: 'novo_nome',
+      bio: '',
+      birthDate: '1995-05-10',
+    });
+
+    expect(result).toEqual({
+      success: false,
+      error: 'Não foi possível atualizar seu perfil. Tente novamente.',
+    });
+  });
+
+  it('updateAvatar delegates to uploadAvatar and returns the new avatarUrl', async () => {
+    mockUploadAvatar.mockResolvedValueOnce({
+      ...baseCurrentUser,
+      profile: { ...baseCurrentUser.profile, avatarUrl: 'https://cdn.example.com/avatar.jpg' },
+    });
+
     const blob = new Blob(['fake-image-bytes'], { type: 'image/jpeg' });
     const result = await profileService.updateAvatar(blob);
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.avatarUrl).toMatch(/^blob:/);
-    }
-
-    const reloaded = await profileService.getProfile();
-    expect(reloaded.avatarUrl).toBe(result.success ? result.avatarUrl : null);
+    expect(mockUploadAvatar).toHaveBeenCalledWith(blob);
+    expect(result).toEqual({ success: true, avatarUrl: 'https://cdn.example.com/avatar.jpg' });
   });
 
-  it('removeAvatar clears the avatar back to null', async () => {
-    await profileService.updateAvatar(new Blob(['x'], { type: 'image/png' }));
+  it('removeAvatar delegates to removeAvatarUpload', async () => {
+    mockRemoveAvatarUpload.mockResolvedValueOnce(baseCurrentUser);
     const result = await profileService.removeAvatar();
 
-    expect(result.success).toBe(true);
-    const reloaded = await profileService.getProfile();
-    expect(reloaded.avatarUrl).toBeNull();
+    expect(mockRemoveAvatarUpload).toHaveBeenCalled();
+    expect(result).toEqual({ success: true });
   });
 });

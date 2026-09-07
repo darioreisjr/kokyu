@@ -28,6 +28,18 @@ vi.mock('../services/authService', () => ({
   },
 }));
 
+// `useLoginForm` funnels every successful sign-in through this resolver
+// instead of pushing `destination` directly — mocked here so these
+// tests exercise the wiring (it gets called, its result is what's
+// pushed) without needing a real `/me` call. Defaults to a complete
+// profile's outcome (the preference-based fallback, `/app`); the
+// "still incomplete" case gets its own test below.
+const mockResolvePostAuthDestinationClient = vi.fn(async (_fallback?: string) => '/app');
+vi.mock('../utils/resolvePostAuthDestination', () => ({
+  resolvePostAuthDestinationClient: (fallback?: string) =>
+    mockResolvePostAuthDestinationClient(fallback),
+}));
+
 const mockedSignIn = vi.mocked(authService.signInWithCredentials);
 const mockedGoogleSignIn = vi.mocked(authService.signInWithGoogle);
 
@@ -37,6 +49,8 @@ describe('LoginForm', () => {
     mockedGoogleSignIn.mockClear();
     mockPush.mockClear();
     mockSearchParams.mockReturnValue(new URLSearchParams());
+    mockResolvePostAuthDestinationClient.mockClear();
+    mockResolvePostAuthDestinationClient.mockImplementation(async () => '/app');
   });
 
   it('shows a generic error when arriving from a failed OAuth/recovery callback', async () => {
@@ -188,6 +202,18 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/app'));
+  });
+
+  it('navigates to /perfil/completar instead of /app when the resolver says the profile is incomplete', async () => {
+    mockResolvePostAuthDestinationClient.mockImplementationOnce(async () => '/perfil/completar');
+    const user = userEvent.setup();
+    render(<LoginForm />);
+
+    await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
+    await user.type(screen.getByLabelText('Senha'), 'super-secret');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/perfil/completar'));
   });
 
   it('calls the Google sign-in callback when the Google button is clicked', async () => {

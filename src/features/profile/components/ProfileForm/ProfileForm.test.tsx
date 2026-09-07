@@ -230,6 +230,11 @@ describe('ProfileForm', () => {
     render(<ProfileForm profile={baseProfile} />);
 
     const bio = screen.getByLabelText('Sobre você');
+    // The bio field is disabled for one render until `useHasMounted`
+    // flips (see `ProfileIdentityForm`'s doc comment on why) — wait for
+    // that, exactly like the rest of this suite already waits for other
+    // async-settled state before interacting.
+    await waitFor(() => expect(bio).toBeEnabled());
     await user.click(bio);
     // `paste()`, not 161 individual keystrokes — same value, one event.
     await user.paste('a'.repeat(161));
@@ -244,6 +249,7 @@ describe('ProfileForm', () => {
     render(<ProfileForm profile={baseProfile} />);
 
     const bio = screen.getByLabelText('Sobre você');
+    await waitFor(() => expect(bio).toBeEnabled());
     await user.clear(bio);
     await user.type(bio, 'Olá');
 

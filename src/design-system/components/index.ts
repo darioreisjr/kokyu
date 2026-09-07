@@ -29,6 +29,7 @@ export { Sidebar, type SidebarProps } from './Sidebar/Sidebar';
 export { MobileTopBar, type MobileTopBarProps } from './MobileTopBar/MobileTopBar';
 export { NavigationDrawer, type NavigationDrawerProps } from './NavigationDrawer/NavigationDrawer';
 export { KokyuAppShell, type KokyuAppShellProps } from './KokyuAppShell/KokyuAppShell';
+export type { AppShellUser } from './KokyuAppShell/AppShellUser';
 export {
   KokyuAvatar,
   type KokyuAvatarProps,

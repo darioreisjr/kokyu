@@ -27,6 +27,7 @@ describe('mapFormDataToPayload', () => {
 });
 
 const signUp = vi.fn();
+const mockApiRequest = vi.fn();
 
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
@@ -35,6 +36,8 @@ vi.mock('@/lib/supabase/client', () => ({
     },
   }),
 }));
+
+vi.mock('@/lib/api/request', () => ({ apiRequest: (...args: unknown[]) => mockApiRequest(...args) }));
 
 const VALID_PAYLOAD = {
   email: 'dario@example.com',
@@ -46,9 +49,33 @@ const VALID_PAYLOAD = {
 };
 
 describe('createAccountService (Supabase provider)', () => {
-  it('always reports usernames as available — no backend endpoint exists to check them yet', async () => {
-    const result = await createAccountService.checkUsernameAvailability('anything-at-all');
+  it('reports a username as available when the backend says so', async () => {
+    mockApiRequest.mockResolvedValueOnce({ username: 'dario', available: true });
+    const result = await createAccountService.checkUsernameAvailability('dario');
+
+    expect(mockApiRequest).toHaveBeenCalledWith('/usernames/availability?username=dario');
     expect(result).toEqual({ available: true });
+  });
+
+  it('reports a username as taken when the backend says so', async () => {
+    mockApiRequest.mockResolvedValueOnce({ username: 'admin', available: false });
+    const result = await createAccountService.checkUsernameAvailability('admin');
+
+    expect(result).toEqual({ available: false, reason: 'taken' });
+  });
+
+  it('reports an error result when the availability check itself fails', async () => {
+    mockApiRequest.mockRejectedValueOnce(new Error('network down'));
+    const result = await createAccountService.checkUsernameAvailability('dario');
+
+    expect(result).toEqual({ available: false, reason: 'error' });
+  });
+
+  it('URL-encodes the username when checking availability', async () => {
+    mockApiRequest.mockResolvedValueOnce({ username: 'a b', available: true });
+    await createAccountService.checkUsernameAvailability('a b');
+
+    expect(mockApiRequest).toHaveBeenCalledWith('/usernames/availability?username=a%20b');
   });
 
   it('signs up with Supabase, mapping profile fields into user_metadata', async () => {

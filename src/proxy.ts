@@ -28,9 +28,35 @@ function isUnderPrefix(pathname: string, prefix: string): boolean {
  * IMPORTANT (per Supabase's own guidance): nothing runs between
  * `createServerClient` and `supabase.auth.getUser()` below - inserting
  * logic there is a common way to end up with users randomly signed out.
+ *
+ * Deliberately NOT doing here: the profile-completion gate
+ * (`/perfil/completar`). That would mean calling the kokyu-sam backend's
+ * `/me` on every single request this matcher touches — real latency and
+ * cost for a check that's only actually decisive on navigations into
+ * `/app/**`. `app/app/layout.tsx` (and `app/perfil/completar/page.tsx`)
+ * already perform that check authoritatively, server-side, with no
+ * client-side-only redirect and so no flash of `/app` content either —
+ * this proxy only needs to keep doing what it already did: bounce a
+ * signed-out visitor off `/app/**` before Next even renders the layout
+ * that would otherwise make the (more expensive) `/me` call. Revisit
+ * this trade-off if `/app/**` ever needs to reject a signed-in-but-
+ * incomplete visitor before the layout's own render — it doesn't today.
  */
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  // Set before `createServerClient` (never between it and `getUser()`,
+  // per the invariant above) so `app/app/layout.tsx` can read the
+  // *original* requested path via `headers()` — the one piece of
+  // context a Server Component layout otherwise has no way to see —
+  // and carry it into `/perfil/completar` as `returnTo` when it
+  // redirects a profile-incomplete visitor there. Nothing reads this
+  // header for any authorization decision; it's routing convenience
+  // only (validated again, narrowly, by `sanitizeReturnTo` before ever
+  // being used in a redirect).
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', request.nextUrl.pathname);
+  const nextInit = { request: { headers: requestHeaders } };
+
+  let response = NextResponse.next(nextInit);
 
   const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {
     cookies: {
@@ -41,7 +67,7 @@ export async function proxy(request: NextRequest) {
         for (const { name, value } of cookiesToSet) {
           request.cookies.set(name, value);
         }
-        response = NextResponse.next({ request });
+        response = NextResponse.next(nextInit);
         for (const { name, value, options } of cookiesToSet) {
           response.cookies.set(name, value, options);
         }

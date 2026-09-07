@@ -53,7 +53,18 @@ export function useUsernameAvailability(
         .checkUsernameAvailability(username)
         .then((checkResult) => {
           if (latestRequestId.current !== requestId) return;
-          setResult({ username, status: checkResult.available ? 'available' : 'unavailable' });
+          // `reason: 'error'` (the check itself failed — network, backend
+          // down, ...) is distinct from `available: false` (the backend
+          // successfully confirmed the username is taken) — surfacing
+          // both as "unavailable" would tell the user their preferred
+          // username is taken when the real problem is just that nobody
+          // could ask.
+          const status = checkResult.available
+            ? 'available'
+            : checkResult.reason === 'error'
+              ? 'error'
+              : 'unavailable';
+          setResult({ username, status });
         })
         .catch(() => {
           if (latestRequestId.current !== requestId) return;
