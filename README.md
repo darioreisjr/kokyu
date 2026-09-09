@@ -54,8 +54,14 @@ pnpm install
 pnpm dev
 ```
 
-Abra [http://localhost:3000](http://localhost:3000) — a rota raiz `/` redireciona
+Abra [http://localhost:3001](http://localhost:3001) — a rota raiz `/` redireciona
 automaticamente para `/login`.
+
+> O frontend roda na porta `3001` porque a porta `3000` é reservada para o backend
+> (`kokyu-sam`, ver `docs/deployment.md` naquele repo e `NEXT_PUBLIC_API_URL` em `.env.local`).
+> Rode `pnpm dev` no repositório `kokyu-sam` antes de testar fluxos que dependem da API
+> (login, criação de conta, etc.) — sem o backend ativo, chamadas para `/api/v1/...`
+> caem no próprio Next.js e retornam 404.
 
 ## Scripts
 
