@@ -9,6 +9,11 @@ export type ApiErrorCode =
   | 'PROFILE_NOT_FOUND'
   | 'AVATAR_INVALID'
   | 'AVATAR_TOO_LARGE'
+  | 'LEISURE_ITEM_NOT_FOUND'
+  | 'LEISURE_ITEM_DETAILS_INVALID'
+  | 'LEISURE_PLAN_ENTRY_NOT_FOUND'
+  | 'LEISURE_NOTE_NOT_FOUND'
+  | 'LEISURE_COLLECTION_NOT_FOUND'
   | (string & {});
 
 /** RFC 9457 Problem Details, plus the backend's own `code`/`redirectTo` extensions. */
@@ -59,6 +64,11 @@ const FRIENDLY_ERROR_MESSAGES: Partial<Record<string, string>> = {
   PROFILE_NOT_FOUND: 'Não foi possível encontrar seu perfil.',
   AVATAR_INVALID: 'Selecione uma imagem JPEG, PNG ou WebP.',
   AVATAR_TOO_LARGE: 'A imagem deve ter no máximo 5 MB.',
+  LEISURE_ITEM_NOT_FOUND: 'Este item não foi encontrado.',
+  LEISURE_ITEM_DETAILS_INVALID: 'Alguns dados desse item são inválidos. Revise e tente novamente.',
+  LEISURE_PLAN_ENTRY_NOT_FOUND: 'Este planejamento não foi encontrado.',
+  LEISURE_NOTE_NOT_FOUND: 'Esta nota não foi encontrada.',
+  LEISURE_COLLECTION_NOT_FOUND: 'Esta coleção não foi encontrada.',
 };
 
 /** Maps a stable error code to pt-BR copy; falls back to the error's own message, then to `fallback`. */

@@ -1,49 +1,54 @@
+import { apiFetchClient } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
+
 import type { LeisurePlanEntry } from '../types/leisurePlan.types';
-import { generateId, leisureDb } from './leisureMockDb';
 
 export type PlanEntryInput = Omit<LeisurePlanEntry, 'id' | 'createdAt' | 'completed'> & {
   completed?: boolean;
 };
 
-/** Mocked — no real backend. */
 export const leisurePlanService = {
   async getLeisurePlan(startDate: string, endDate: string): Promise<LeisurePlanEntry[]> {
-    return leisureDb.planEntries.filter(
-      (entry) => entry.date >= startDate && entry.date <= endDate,
+    return apiFetchClient<LeisurePlanEntry[]>(
+      `/leisure/plan?startDate=${startDate}&endDate=${endDate}`,
     );
   },
 
   async getPlanEntriesForDate(date: string): Promise<LeisurePlanEntry[]> {
-    return leisureDb.planEntries.filter((entry) => entry.date === date);
+    return leisurePlanService.getLeisurePlan(date, date);
   },
 
   async createPlanEntry(input: PlanEntryInput): Promise<LeisurePlanEntry> {
-    const entry: LeisurePlanEntry = {
-      id: generateId('plan'),
-      completed: false,
-      createdAt: new Date().toISOString(),
-      ...input,
-    };
-    leisureDb.planEntries.push(entry);
-    return entry;
+    return apiFetchClient<LeisurePlanEntry>('/leisure/plan', { method: 'POST', body: input });
   },
 
   async updatePlanEntry(
     id: string,
     patch: Partial<PlanEntryInput>,
   ): Promise<LeisurePlanEntry | null> {
-    const index = leisureDb.planEntries.findIndex((entry) => entry.id === id);
-    if (index === -1) return null;
-    const updated = { ...leisureDb.planEntries[index]!, ...patch };
-    leisureDb.planEntries[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async deletePlanEntry(id: string): Promise<void> {
-    leisureDb.planEntries = leisureDb.planEntries.filter((entry) => entry.id !== id);
+    await apiFetchClient<void>(`/leisure/plan/${id}`, { method: 'DELETE' });
   },
 
   async completePlanEntry(id: string): Promise<LeisurePlanEntry | null> {
-    return leisurePlanService.updatePlanEntry(id, { completed: true });
+    try {
+      return await apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}/complete`, {
+        method: 'POST',
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 };

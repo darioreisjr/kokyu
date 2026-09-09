@@ -1,41 +1,38 @@
+import { apiFetchClient } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
+
 import type { Note } from '../types/note.types';
-import { generateId, leisureDb } from './leisureMockDb';
 
 export type NoteInput = Omit<Note, 'id' | 'createdAt' | 'updatedAt' | 'pinned' | 'archived'> & {
   pinned?: boolean;
   archived?: boolean;
 };
 
-/** Mocked — no real backend. */
 export const noteService = {
   async getNotes(): Promise<Note[]> {
-    return [...leisureDb.notes];
+    return apiFetchClient<Note[]>('/leisure/notes');
   },
 
   async getNote(id: string): Promise<Note | null> {
-    return leisureDb.notes.find((note) => note.id === id) ?? null;
+    try {
+      return await apiFetchClient<Note>(`/leisure/notes/${id}`);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async createNote(input: NoteInput): Promise<Note> {
-    const now = new Date().toISOString();
-    const note: Note = {
-      id: generateId('note'),
-      pinned: false,
-      archived: false,
-      createdAt: now,
-      updatedAt: now,
-      ...input,
-    };
-    leisureDb.notes.push(note);
-    return note;
+    return apiFetchClient<Note>('/leisure/notes', { method: 'POST', body: input });
   },
 
   async updateNote(id: string, patch: Partial<NoteInput>): Promise<Note | null> {
-    const index = leisureDb.notes.findIndex((note) => note.id === id);
-    if (index === -1) return null;
-    const updated = { ...leisureDb.notes[index]!, ...patch, updatedAt: new Date().toISOString() };
-    leisureDb.notes[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<Note>(`/leisure/notes/${id}`, { method: 'PATCH', body: patch });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async archiveNote(id: string): Promise<Note | null> {
@@ -43,30 +40,26 @@ export const noteService = {
   },
 
   async deleteNote(id: string): Promise<void> {
-    leisureDb.notes = leisureDb.notes.filter((note) => note.id !== id);
+    await apiFetchClient<void>(`/leisure/notes/${id}`, { method: 'DELETE' });
   },
 
   async togglePin(id: string): Promise<Note | null> {
-    const index = leisureDb.notes.findIndex((note) => note.id === id);
-    if (index === -1) return null;
-    const existing = leisureDb.notes[index]!;
-    const updated = { ...existing, pinned: !existing.pinned, updatedAt: new Date().toISOString() };
-    leisureDb.notes[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<Note>(`/leisure/notes/${id}/pin`, { method: 'POST' });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async toggleChecklistItem(noteId: string, checklistItemId: string): Promise<Note | null> {
-    const index = leisureDb.notes.findIndex((note) => note.id === noteId);
-    if (index === -1) return null;
-    const existing = leisureDb.notes[index]!;
-    const updated = {
-      ...existing,
-      checklistItems: existing.checklistItems?.map((entry) =>
-        entry.id === checklistItemId ? { ...entry, checked: !entry.checked } : entry,
-      ),
-      updatedAt: new Date().toISOString(),
-    };
-    leisureDb.notes[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<Note>(`/leisure/notes/${noteId}/checklist/${checklistItemId}`, {
+        method: 'PATCH',
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 };

@@ -1,106 +1,98 @@
+import { apiFetchClient } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
+
 import type { DistributiveOmit, LeisureItem, LeisureItemType } from '../types/leisureItem.types';
-import { generateId, leisureDb } from './leisureMockDb';
 
 export type LeisureItemInput = DistributiveOmit<LeisureItem, 'id' | 'createdAt' | 'updatedAt'>;
 
-/** Mocked — no real backend, no HTTP. */
+/**
+ * Real kokyu-sam backend implementation - GET/POST/PATCH bodies already
+ * match `LeisureItemInput`'s wire shape 1:1 (the type-specific slice keyed
+ * by `type`, e.g. `{ type: 'movie', movie: {...} }`), so no mapping layer
+ * is needed here, unlike profileService's `mapCurrentUserToProfile`.
+ */
 export const leisureItemService = {
   async getLeisureItems(): Promise<LeisureItem[]> {
-    return [...leisureDb.items];
+    return apiFetchClient<LeisureItem[]>('/leisure/items');
   },
 
   async getLeisureItem(id: string): Promise<LeisureItem | null> {
-    return leisureDb.items.find((item) => item.id === id) ?? null;
+    try {
+      return await apiFetchClient<LeisureItem>(`/leisure/items/${id}`);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async createLeisureItem(input: LeisureItemInput): Promise<LeisureItem> {
-    const now = new Date().toISOString();
-    const item = {
-      ...input,
-      id: generateId('leisure'),
-      createdAt: now,
-      updatedAt: now,
-    } as LeisureItem;
-    leisureDb.items.push(item);
-    return item;
+    return apiFetchClient<LeisureItem>('/leisure/items', { method: 'POST', body: input });
   },
 
   async updateLeisureItem(
     id: string,
     patch: Partial<LeisureItemInput>,
   ): Promise<LeisureItem | null> {
-    const index = leisureDb.items.findIndex((item) => item.id === id);
-    if (index === -1) return null;
-    const updated = {
-      ...leisureDb.items[index]!,
-      ...patch,
-      updatedAt: new Date().toISOString(),
-    } as LeisureItem;
-    leisureDb.items[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisureItem>(`/leisure/items/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async deleteLeisureItem(id: string): Promise<void> {
-    leisureDb.items = leisureDb.items.filter((item) => item.id !== id);
+    await apiFetchClient<void>(`/leisure/items/${id}`, { method: 'DELETE' });
   },
 
   async archiveLeisureItem(id: string): Promise<LeisureItem | null> {
-    const now = new Date().toISOString();
-    return leisureItemService.updateLeisureItem(id, {
-      status: 'archived',
-      archivedAt: now,
-    } as Partial<LeisureItemInput>);
+    try {
+      return await apiFetchClient<LeisureItem>(`/leisure/items/${id}/archive`, { method: 'POST' });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async toggleFavorite(id: string): Promise<LeisureItem | null> {
-    const index = leisureDb.items.findIndex((item) => item.id === id);
-    if (index === -1) return null;
-    const existing = leisureDb.items[index]!;
-    const updated = {
-      ...existing,
-      favorite: !existing.favorite,
-      updatedAt: new Date().toISOString(),
-    } as LeisureItem;
-    leisureDb.items[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisureItem>(`/leisure/items/${id}/favorite`, { method: 'POST' });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
-  /** Merges a patch into the item's own type-specific data slice — e.g. `{ currentPage: 155 }` for a book. Never touches base fields. */
+  /** Merges a patch into the item's own type-specific data slice - e.g. `{ currentPage: 155 }` for a book. Never touches base fields. */
   async updateProgress(id: string, patch: Record<string, unknown>): Promise<LeisureItem | null> {
-    const index = leisureDb.items.findIndex((item) => item.id === id);
-    if (index === -1) return null;
-    const existing = leisureDb.items[index]!;
-    const existingSlice = (existing as unknown as Record<string, unknown>)[existing.type];
-    const updated = {
-      ...existing,
-      [existing.type]: {
-        ...(typeof existingSlice === 'object' && existingSlice ? existingSlice : {}),
-        ...patch,
-      },
-      updatedAt: new Date().toISOString(),
-    } as unknown as LeisureItem;
-    leisureDb.items[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisureItem>(`/leisure/items/${id}/progress`, {
+        method: 'PATCH',
+        body: { progress: patch },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
-  /** "Organizar" a Quick Capture item — swaps its type (and type-specific slice) once the user classifies an "Ainda não sei" item, without touching its id or history. */
+  /** "Organizar" a Quick Capture item - swaps its type (and type-specific slice) once the user classifies an "Ainda não sei" item, without touching its id or history. */
   async reclassifyLeisureItem(
     id: string,
     newType: LeisureItemType,
     typeData: Record<string, unknown> = {},
   ): Promise<LeisureItem | null> {
-    const index = leisureDb.items.findIndex((item) => item.id === id);
-    if (index === -1) return null;
-    const existing = leisureDb.items[index]!;
-    const rest = { ...(existing as unknown as Record<string, unknown>) };
-    delete rest[existing.type];
-    const updated = {
-      ...rest,
-      type: newType,
-      [newType]: typeData,
-      updatedAt: new Date().toISOString(),
-    } as unknown as LeisureItem;
-    leisureDb.items[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisureItem>(`/leisure/items/${id}/reclassify`, {
+        method: 'POST',
+        body: { type: newType, details: typeData },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 };

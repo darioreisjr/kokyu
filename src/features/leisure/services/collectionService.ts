@@ -1,5 +1,7 @@
+import { apiFetchClient } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
+
 import type { LeisureCollection } from '../types/collection.types';
-import { generateId, leisureDb } from './leisureMockDb';
 
 export interface CollectionInput {
   name: string;
@@ -7,64 +9,58 @@ export interface CollectionInput {
   itemIds?: string[];
 }
 
-/** Mocked — no real backend. An item belongs to a collection by id only; it's never physically moved or duplicated. */
 export const collectionService = {
   async getCollections(): Promise<LeisureCollection[]> {
-    return [...leisureDb.collections];
+    return apiFetchClient<LeisureCollection[]>('/leisure/collections');
   },
 
   async getCollection(id: string): Promise<LeisureCollection | null> {
-    return leisureDb.collections.find((collection) => collection.id === id) ?? null;
+    try {
+      return await apiFetchClient<LeisureCollection>(`/leisure/collections/${id}`);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async createCollection(input: CollectionInput): Promise<LeisureCollection> {
-    const now = new Date().toISOString();
-    const collection: LeisureCollection = {
-      id: generateId('collection'),
-      name: input.name,
-      description: input.description,
-      itemIds: input.itemIds ?? [],
-      createdAt: now,
-      updatedAt: now,
-    };
-    leisureDb.collections.push(collection);
-    return collection;
+    return apiFetchClient<LeisureCollection>('/leisure/collections', {
+      method: 'POST',
+      body: input,
+    });
   },
 
   async addItemToCollection(
     collectionId: string,
     itemId: string,
   ): Promise<LeisureCollection | null> {
-    const index = leisureDb.collections.findIndex((collection) => collection.id === collectionId);
-    if (index === -1) return null;
-    const existing = leisureDb.collections[index]!;
-    if (existing.itemIds.includes(itemId)) return existing;
-    const updated = {
-      ...existing,
-      itemIds: [...existing.itemIds, itemId],
-      updatedAt: new Date().toISOString(),
-    };
-    leisureDb.collections[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisureCollection>(`/leisure/collections/${collectionId}/items`, {
+        method: 'POST',
+        body: { itemId },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async removeItemFromCollection(
     collectionId: string,
     itemId: string,
   ): Promise<LeisureCollection | null> {
-    const index = leisureDb.collections.findIndex((collection) => collection.id === collectionId);
-    if (index === -1) return null;
-    const existing = leisureDb.collections[index]!;
-    const updated = {
-      ...existing,
-      itemIds: existing.itemIds.filter((id) => id !== itemId),
-      updatedAt: new Date().toISOString(),
-    };
-    leisureDb.collections[index] = updated;
-    return updated;
+    try {
+      return await apiFetchClient<LeisureCollection>(
+        `/leisure/collections/${collectionId}/items/${itemId}`,
+        { method: 'DELETE' },
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
   },
 
   async deleteCollection(id: string): Promise<void> {
-    leisureDb.collections = leisureDb.collections.filter((collection) => collection.id !== id);
+    await apiFetchClient<void>(`/leisure/collections/${id}`, { method: 'DELETE' });
   },
 };
