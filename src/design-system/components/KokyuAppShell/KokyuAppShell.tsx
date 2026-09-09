@@ -107,7 +107,14 @@ export function KokyuAppShell({
     // full-width bar above it. The switch happens at `sm` (600px)
     // rather than `md` so the project's "tablet" viewport (820px) gets
     // the compact sidebar the spec asks for, not the mobile drawer.
-    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, minHeight: '100dvh' }}>
+    //
+    // `height` (not `minHeight`) is deliberate: it caps this shell at
+    // exactly the viewport, so a tall page can never grow it past that
+    // and hand scrolling to `body`. With that cap in place, `main`'s own
+    // `overflowY: 'auto'` below becomes the only thing that scrolls —
+    // Sidebar/MobileTopBar never move, without even needing `position:
+    // sticky` to do it (Sidebar keeps it anyway, defensively).
+    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, height: '100dvh' }}>
       <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
         <Sidebar
           items={items}
