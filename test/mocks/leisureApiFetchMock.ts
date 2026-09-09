@@ -89,6 +89,14 @@ function handleItems(
   const id = segments[2];
   const sub = segments[3];
 
+  if (id === 'covers' && sub === 'upload-url' && method === 'POST') {
+    return {
+      path: `mock-user/${generateId('cover')}.png`,
+      token: 'mock-token',
+      signedUrl: 'https://mock-storage.test/upload',
+    };
+  }
+
   if (!id) {
     if (method === 'GET') return [...leisureDb.items];
     if (method === 'POST') {

@@ -70,6 +70,20 @@ describe('LeisureItemDialog', () => {
     expect(screen.getByLabelText('Duração (min)')).toBeInTheDocument();
   });
 
+  it('includes a pasted cover image link in the saved payload', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    render(<LeisureItemDialog open onClose={vi.fn()} onSave={onSave} />);
+
+    await user.type(screen.getByLabelText('Título'), 'Duna');
+    await user.type(screen.getByLabelText('Link da imagem (opcional)'), 'https://x.test/duna.jpg');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ coverImage: 'https://x.test/duna.jpg' }),
+    );
+  });
+
   it('closes via Cancelar', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();

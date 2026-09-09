@@ -52,6 +52,21 @@ describe('mapFormValuesToLeisureItemInput', () => {
     const input = mapFormValuesToLeisureItemInput({ ...leisureItemFormDefaultValues, title: 'X' });
     expect(input.favorite).toBe(false);
   });
+
+  it('carries coverImage through, and omits it when blank', () => {
+    const withCover = mapFormValuesToLeisureItemInput({
+      ...leisureItemFormDefaultValues,
+      title: 'X',
+      coverImage: 'https://x.test/cover.png',
+    });
+    expect(withCover.coverImage).toBe('https://x.test/cover.png');
+
+    const withoutCover = mapFormValuesToLeisureItemInput({
+      ...leisureItemFormDefaultValues,
+      title: 'X',
+    });
+    expect(withoutCover.coverImage).toBeUndefined();
+  });
 });
 
 describe('mapFormValuesToLeisureItemPatch', () => {
@@ -87,6 +102,24 @@ describe('mapLeisureItemToFormValues', () => {
     expect(values.type).toBe('book');
     expect(values.author).toBe('Tolkien');
     expect(values.pages).toBe(310);
+  });
+
+  it('prefills coverImage from the item, falling back to an empty string', () => {
+    const book: BookItem = {
+      id: 'book-1',
+      type: 'book',
+      title: 'O Hobbit',
+      status: 'inProgress',
+      tags: [],
+      favorite: false,
+      durationType: 'flexible',
+      coverImage: 'https://x.test/hobbit.png',
+      createdAt: '2026-08-01T00:00:00.000Z',
+      updatedAt: '2026-08-01T00:00:00.000Z',
+      book: {},
+    };
+    expect(mapLeisureItemToFormValues(book).coverImage).toBe('https://x.test/hobbit.png');
+    expect(mapLeisureItemToFormValues({ ...book, coverImage: undefined }).coverImage).toBe('');
   });
 
   it('falls back an unsorted item to "custom" instead of an invalid type', () => {
