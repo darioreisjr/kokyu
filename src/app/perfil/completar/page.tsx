@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { KokyuAuthCard } from '@/design-system/components';
 import { AuthFormPanel, AuthLayout, AuthVisualPanel } from '@/features/auth';
+import { SessionCheckError } from '@/features/navigation';
 import { onboardingText, OnboardingForm } from '@/features/onboarding';
 import { sanitizeReturnTo } from '@/features/onboarding/utils/returnTo';
 import { getCurrentUserServer } from '@/lib/api/server';
@@ -26,10 +27,13 @@ const visual = onboardingText.visual;
  * screen is thematically a continuation of that same moment.
  *
  * Server-side gate, authoritative: no session → `/login`; a session but
- * an already-complete profile → `/app` (nothing left to do here); a
- * backend failure surfaces as `status !== 'authenticated'` too, so it
- * falls into the same `/login` redirect rather than ever rendering this
- * form against data that failed to load.
+ * an already-complete profile → `/app` (nothing left to do here). A
+ * backend *failure* (as opposed to a genuinely absent session) renders
+ * `SessionCheckError` in place instead of redirecting — see
+ * `app/app/layout.tsx`'s doc comment for why redirecting a backend
+ * *error* to `/login` is the specific bug that caused a real
+ * `ERR_TOO_MANY_REDIRECTS` incident: a signed-in visitor gets bounced
+ * straight back off `/login` by `proxy.ts`.
  */
 export default async function OnboardingPage({
   searchParams,
@@ -38,8 +42,12 @@ export default async function OnboardingPage({
 }) {
   const result = await getCurrentUserServer();
 
-  if (result.status !== 'authenticated') {
+  if (result.status === 'unauthenticated') {
     redirect('/login');
+  }
+
+  if (result.status === 'error') {
+    return <SessionCheckError />;
   }
 
   if (result.currentUser.profileCompletion.completed) {

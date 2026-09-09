@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { CurrentUserProvider } from '@/features/current-user';
-import { AuthenticatedShell } from '@/features/navigation';
+import { AuthenticatedShell, SessionCheckError } from '@/features/navigation';
 import { sanitizeReturnTo } from '@/features/onboarding/utils/returnTo';
 import { getCurrentUserServer } from '@/lib/api/server';
 
@@ -18,11 +18,21 @@ import { getCurrentUserServer } from '@/lib/api/server';
  * exists, not whether the backend considers this user's profile
  * complete. This Server Component is the one place that calls `/me`
  * and decides: no session → `/login` (defense in depth alongside
- * `proxy.ts`); a session but an incomplete profile → `/perfil/completar`;
- * a backend failure → `/login` as well, since silently rendering `/app`
- * on an error we can't interpret is exactly the failure mode this gate
- * exists to prevent. `redirect()` throws, so nothing below ever renders
- * in the redirect cases — no flash of authenticated content.
+ * `proxy.ts`); a session but an incomplete profile → `/perfil/completar`.
+ * `redirect()` throws, so nothing below ever renders in the redirect
+ * cases — no flash of authenticated content.
+ *
+ * A backend *failure* (network/DNS, the backend down, a misconfigured
+ * `NEXT_PUBLIC_API_URL`, ...) is deliberately NOT a redirect to
+ * `/login` — that used to be the behavior here, and it produced a real
+ * production incident: `proxy.ts` bounces any *signed-in* visitor
+ * straight back off `/login` to `/app`, which would hit this exact
+ * same failing check again, forever (`ERR_TOO_MANY_REDIRECTS`,
+ * immediately after a real Google/email sign-in — the session is
+ * genuine, only the `/me` call itself is failing). Rendering
+ * `SessionCheckError` in place instead — no navigation at all — cannot
+ * loop, while still never silently granting access to `/app` on an
+ * error this gate can't interpret.
  *
  * The resolved `CurrentUser` is handed straight into
  * `CurrentUserProvider` as `initialCurrentUser`, so every client
@@ -32,8 +42,12 @@ import { getCurrentUserServer } from '@/lib/api/server';
 export default async function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const result = await getCurrentUserServer();
 
-  if (result.status !== 'authenticated') {
+  if (result.status === 'unauthenticated') {
     redirect('/login');
+  }
+
+  if (result.status === 'error') {
+    return <SessionCheckError />;
   }
 
   if (!result.currentUser.profileCompletion.completed) {
