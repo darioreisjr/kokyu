@@ -5,12 +5,14 @@ import { createMockLeisurePlan } from '../mocks/leisurePlan.mock';
 import { mockNotes } from '../mocks/notes.mock';
 
 /**
- * The single in-memory store every Tempo Livre service reads and
- * writes — mirrors how a real backend owns one data store, so
- * swapping these functions for real HTTP calls later means changing
- * what's *inside* each service function, not how services hand data
- * to each other. Never imported by a component directly; always go
- * through a `*Service` function.
+ * TEST-ONLY. Tempo Livre's `*Service` modules now call the real kokyu-sam
+ * backend (see leisureItemService.ts and friends) — nothing under `src/`
+ * reads or writes this store anymore. It survives as the in-memory fixture
+ * store behind `test/mocks/leisureApiFetchMock.ts`, a fake backend
+ * installed globally for tests (test/setup.ts) so the existing suite of
+ * hook/page tests (written against these fixtures, e.g. asserting on "O
+ * Hobbit") keeps working without every test individually mocking every
+ * endpoint response. Never import this from `src/` — only from `test/`.
  */
 export const leisureDb = {
   items: [...mockLeisureItems],
