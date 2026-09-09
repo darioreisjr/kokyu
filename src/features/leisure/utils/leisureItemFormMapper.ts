@@ -35,6 +35,7 @@ export function mapFormValuesToLeisureItemInput(values: LeisureItemFormValues): 
     estimatedDuration: values.durationType === 'fixed' ? values.estimatedDuration : undefined,
     minimumUsefulDuration:
       values.durationType === 'flexible' ? values.minimumUsefulDuration : undefined,
+    coverImage: values.coverImage || undefined,
     sourceUrl: values.sourceUrl || undefined,
     recommendedBy: values.recommendedBy || undefined,
     favorite: false,
@@ -73,6 +74,7 @@ export function mapLeisureItemToFormValues(item: LeisureItem): LeisureItemFormVa
     durationType: item.durationType,
     estimatedDuration: item.estimatedDuration,
     minimumUsefulDuration: item.minimumUsefulDuration,
+    coverImage: item.coverImage ?? '',
     sourceUrl: item.sourceUrl ?? '',
     recommendedBy: item.recommendedBy ?? '',
     author: (typeData?.author as string | undefined) ?? '',

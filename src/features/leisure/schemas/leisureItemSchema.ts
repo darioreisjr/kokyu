@@ -39,6 +39,7 @@ export const leisureItemSchema = z.object({
   durationType: z.enum(durationTypeValues),
   estimatedDuration: z.number().min(0).optional(),
   minimumUsefulDuration: z.number().min(0).optional(),
+  coverImage: z.string().optional(),
   sourceUrl: z.string().optional(),
   recommendedBy: z.string().optional(),
   // Type-specific, all optional — only the ones for the chosen `type` are shown/used.
@@ -59,6 +60,7 @@ export const leisureItemFormDefaultValues: LeisureItemFormValues = {
   status: 'backlog',
   tags: [],
   durationType: 'unknown',
+  coverImage: '',
   sourceUrl: '',
   recommendedBy: '',
   author: '',

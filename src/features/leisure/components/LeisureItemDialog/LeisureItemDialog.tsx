@@ -13,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { KokyuButton, KokyuTextField } from '@/design-system/components';
 
+import { CoverImageField } from '../CoverImageField/CoverImageField';
 import { contextTagDefinitions } from '../../constants/contextTags';
 import { getApplicableStatuses, getStatusLabel } from '../../constants/leisureStatuses';
 import { leisureItemTypeDefinitions } from '../../constants/leisureItemTypes';
@@ -117,6 +118,14 @@ export function LeisureItemDialog({
             error={Boolean(errors.title)}
             helperText={errors.title?.message}
             {...register('title')}
+          />
+
+          <Controller
+            control={control}
+            name="coverImage"
+            render={({ field }) => (
+              <CoverImageField value={field.value} onChange={field.onChange} />
+            )}
           />
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
