@@ -41,6 +41,40 @@ export async function getCurrentUserServer(): Promise<CurrentUserServerResult> {
 }
 
 /**
+ * Conservative fallback for `getNavigationFlagsServer()` if the backend
+ * can't be reached — only the sections we know are actually finished
+ * (matches the backend's own `feature-flags.constants.ts` today). A
+ * transient network/backend failure must never be read as "unlock
+ * everything"; it stays exactly as locked-down as a normal response
+ * that hasn't enabled a section yet. Missing keys default to locked in
+ * `applyNavigationFlags`, so this only needs the enabled ones.
+ */
+const FALLBACK_NAVIGATION_FLAGS: Record<string, boolean> = {
+  respiracao: true,
+  perfil: true,
+  'tempo-livre': true,
+};
+
+/**
+ * `GET /feature-flags/navigation` — public, no session needed. Drives
+ * which sidebar/drawer items render locked ("Em breve") and, in
+ * `app/app/layout.tsx`, which `/app/**` routes actually resolve. Falls
+ * back to `FALLBACK_NAVIGATION_FLAGS` on any error so a flaky backend
+ * degrades to "nothing new unlocks" instead of breaking navigation
+ * entirely.
+ */
+export async function getNavigationFlagsServer(): Promise<Record<string, boolean>> {
+  try {
+    const { flags } = await apiRequest<{ flags: Record<string, boolean> }>(
+      '/feature-flags/navigation',
+    );
+    return flags;
+  } catch {
+    return FALLBACK_NAVIGATION_FLAGS;
+  }
+}
+
+/**
  * Generic authenticated backend call from a Server Component/Route
  * Handler — attaches the current session's access token automatically.
  * Prefer `getCurrentUserServer()` for `/me` itself; this is for

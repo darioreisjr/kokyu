@@ -3,7 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, waitFor } from '../../../../../test/test-utils';
 import { authService } from '../../../auth';
+import { bottomNavigationItems, navigationItems } from '../../config/navigationItems';
 import { AuthenticatedShell } from './AuthenticatedShell';
+
+/** Everything unlocked — these tests exercise menu rendering/logout, not the lock feature itself. */
+const allUnlockedFlags = Object.fromEntries(
+  [...navigationItems, ...bottomNavigationItems].map((item) => [item.id, true]),
+);
 
 const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 
@@ -28,7 +34,7 @@ describe('AuthenticatedShell', () => {
 
   it('renders the menu and the page content together', () => {
     render(
-      <AuthenticatedShell>
+      <AuthenticatedShell navigationFlags={allUnlockedFlags}>
         <div>Conteúdo da página</div>
       </AuthenticatedShell>,
     );
@@ -40,7 +46,7 @@ describe('AuthenticatedShell', () => {
   it('signs out through authService and navigates to /login when "Sair" is used', async () => {
     const user = userEvent.setup();
     render(
-      <AuthenticatedShell>
+      <AuthenticatedShell navigationFlags={allUnlockedFlags}>
         <div>Conteúdo</div>
       </AuthenticatedShell>,
     );

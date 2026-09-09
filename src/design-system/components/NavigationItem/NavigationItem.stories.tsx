@@ -54,3 +54,11 @@ export const Collapsed: Story = {
 export const LogoutAction: Story = {
   args: { href: undefined, label: 'Sair', onClick: () => {} },
 };
+
+export const Locked: Story = {
+  args: { locked: true, label: 'Nutrição' },
+};
+
+export const LockedCollapsed: Story = {
+  args: { locked: true, collapsed: true, label: 'Nutrição' },
+};

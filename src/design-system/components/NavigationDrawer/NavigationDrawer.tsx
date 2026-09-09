@@ -69,7 +69,12 @@ export function NavigationDrawer({
           <KokyuLogo size="md" />
           {user ? (
             <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', minWidth: 0 }}>
-              <KokyuAvatar src={user.avatarUrl} alt={user.name} initials={user.initials} size="xs" />
+              <KokyuAvatar
+                src={user.avatarUrl}
+                alt={user.name}
+                initials={user.initials}
+                size="xs"
+              />
               <Typography
                 variant="labelLarge"
                 noWrap
@@ -92,6 +97,7 @@ export function NavigationDrawer({
                 href={item.href}
                 active={isNavigationItemActive(pathname, item.href)}
                 onClick={onClose}
+                locked={item.locked}
               />
             ))}
           </List>
@@ -108,6 +114,7 @@ export function NavigationDrawer({
                 href={item.href}
                 active={isNavigationItemActive(pathname, item.href)}
                 onClick={onClose}
+                locked={item.locked}
               />
             ))}
             <NavigationItem icon={LogoutRoundedIcon} label={logoutLabel} onClick={handleLogout} />

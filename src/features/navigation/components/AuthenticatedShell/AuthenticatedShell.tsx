@@ -12,6 +12,7 @@ import { preferencesStorage } from '@/features/settings/services/preferencesStor
 
 import { bottomNavigationItems, navigationItems } from '../../config/navigationItems';
 import { useLogout } from '../../hooks/useLogout';
+import { applyNavigationFlags } from '../../utils/applyNavigationFlags';
 
 /**
  * `CurrentUser.profile` → the shell's generic `AppShellUser` — kept
@@ -21,10 +22,15 @@ import { useLogout } from '../../hooks/useLogout';
  * user` is the one cross-cutting identity source every feature is
  * meant to read from directly.
  */
-function toAppShellUser(profile: { firstName: string; lastName: string | null; avatarUrl: string | null }): AppShellUser {
+function toAppShellUser(profile: {
+  firstName: string;
+  lastName: string | null;
+  avatarUrl: string | null;
+}): AppShellUser {
   const lastName = profile.lastName ?? '';
   const name = `${profile.firstName} ${lastName}`.trim();
-  const initials = `${profile.firstName.trim().charAt(0)}${lastName.trim().charAt(0)}`.toUpperCase();
+  const initials =
+    `${profile.firstName.trim().charAt(0)}${lastName.trim().charAt(0)}`.toUpperCase();
   return { name, initials, avatarUrl: profile.avatarUrl };
 }
 
@@ -47,7 +53,19 @@ function toAppShellUser(profile: { firstName: string; lastName: string | null; a
  * preference that reads it is actually enabled, so it stays empty
  * (and unused by `useLoginForm`) for everyone who hasn't opted in.
  */
-export function AuthenticatedShell({ children }: { children: ReactNode }) {
+export interface AuthenticatedShellProps {
+  children: ReactNode;
+  /**
+   * Server-resolved `GET /feature-flags/navigation` result (see
+   * `app/app/layout.tsx`), keyed by navigation item id — decides which
+   * sidebar/drawer items render locked ("Em breve"). Fetched
+   * server-side so there's no flash of an unlocked item before this
+   * mounts.
+   */
+  navigationFlags: Record<string, boolean>;
+}
+
+export function AuthenticatedShell({ children, navigationFlags }: AuthenticatedShellProps) {
   const { logout } = useLogout();
   const { profile } = useCurrentUser();
   const pathname = usePathname();
@@ -95,8 +113,8 @@ export function AuthenticatedShell({ children }: { children: ReactNode }) {
 
   return (
     <KokyuAppShell
-      items={navigationItems}
-      bottomItems={bottomNavigationItems}
+      items={applyNavigationFlags(navigationItems, navigationFlags)}
+      bottomItems={applyNavigationFlags(bottomNavigationItems, navigationFlags)}
       onLogout={logout}
       collapsed={collapsed}
       onToggleCollapse={toggleCollapsed}

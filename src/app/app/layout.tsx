@@ -3,9 +3,15 @@ import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { CurrentUserProvider } from '@/features/current-user';
-import { AuthenticatedShell, SessionCheckError } from '@/features/navigation';
+import {
+  AuthenticatedShell,
+  SessionCheckError,
+  bottomNavigationItems,
+  findNavigationItemForPath,
+  navigationItems,
+} from '@/features/navigation';
 import { sanitizeReturnTo } from '@/features/onboarding/utils/returnTo';
-import { getCurrentUserServer } from '@/lib/api/server';
+import { getCurrentUserServer, getNavigationFlagsServer } from '@/lib/api/server';
 
 /**
  * Shared by every route under `/app` — the authoritative profile-
@@ -38,6 +44,15 @@ import { getCurrentUserServer } from '@/lib/api/server';
  * `CurrentUserProvider` as `initialCurrentUser`, so every client
  * component under `/app` (Header, Sidebar, Home, ...) reads it from
  * `useCurrentUser()` with zero extra fetch/flash on first paint.
+ *
+ * Also the authoritative gate for sections still being built: once the
+ * profile-completion check passes, the requested path is matched against
+ * `GET /feature-flags/navigation` (`getNavigationFlagsServer`) - a
+ * locked section bounces to `/app` server-side, before any locked page
+ * ever renders, the same way a direct URL can't bypass the sidebar's
+ * lock icons. The resolved flags are then handed into `AuthenticatedShell`
+ * so the sidebar/drawer render those same lock icons instead of duplicating
+ * this logic on the client.
  */
 export default async function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const result = await getCurrentUserServer();
@@ -50,6 +65,8 @@ export default async function AuthenticatedLayout({ children }: { children: Reac
     return <SessionCheckError />;
   }
 
+  const requestedPath = (await headers()).get('x-pathname');
+
   if (!result.currentUser.profileCompletion.completed) {
     // The path this visitor actually tried to reach (set by `proxy.ts`
     // as `x-pathname`) — carried along so completing onboarding can
@@ -58,14 +75,25 @@ export default async function AuthenticatedLayout({ children }: { children: Reac
     // `sanitizeReturnTo` refuses anything that isn't a real `/app/**`
     // path, so a stray/spoofed header just falls back to no `returnTo`
     // rather than ever producing an unsafe redirect.
-    const requestedPath = (await headers()).get('x-pathname');
-    const returnTo = requestedPath && requestedPath !== '/app' ? sanitizeReturnTo(requestedPath) : null;
-    redirect(returnTo ? `/perfil/completar?returnTo=${encodeURIComponent(returnTo)}` : '/perfil/completar');
+    const returnTo =
+      requestedPath && requestedPath !== '/app' ? sanitizeReturnTo(requestedPath) : null;
+    redirect(
+      returnTo ? `/perfil/completar?returnTo=${encodeURIComponent(returnTo)}` : '/perfil/completar',
+    );
+  }
+
+  const navigationFlags = await getNavigationFlagsServer();
+
+  const requestedItem =
+    requestedPath &&
+    findNavigationItemForPath(requestedPath, [...navigationItems, ...bottomNavigationItems]);
+  if (requestedItem && navigationFlags[requestedItem.id] !== true) {
+    redirect('/app');
   }
 
   return (
     <CurrentUserProvider initialCurrentUser={result.currentUser}>
-      <AuthenticatedShell>{children}</AuthenticatedShell>
+      <AuthenticatedShell navigationFlags={navigationFlags}>{children}</AuthenticatedShell>
     </CurrentUserProvider>
   );
 }

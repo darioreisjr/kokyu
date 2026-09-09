@@ -122,6 +122,7 @@ export function Sidebar({
               href={item.href}
               active={isNavigationItemActive(pathname, item.href)}
               collapsed={collapsed}
+              locked={item.locked}
             />
           ))}
         </List>
@@ -143,7 +144,12 @@ export function Sidebar({
             >
               <Tooltip title={collapsed ? user.name : ''} placement="right">
                 <span>
-                  <KokyuAvatar src={user.avatarUrl} alt={user.name} initials={user.initials} size="xs" />
+                  <KokyuAvatar
+                    src={user.avatarUrl}
+                    alt={user.name}
+                    initials={user.initials}
+                    size="xs"
+                  />
                 </span>
               </Tooltip>
               {!collapsed ? (
@@ -168,6 +174,7 @@ export function Sidebar({
               href={item.href}
               active={isNavigationItemActive(pathname, item.href)}
               collapsed={collapsed}
+              locked={item.locked}
             />
           ))}
           <NavigationItem
