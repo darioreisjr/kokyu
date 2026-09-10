@@ -21,6 +21,11 @@ export const leisurePlanService = {
     return leisurePlanService.getLeisurePlan(date, date);
   },
 
+  /** A single entry by id — the edit page's own fetch, independent of whatever range the planner list happened to have loaded. */
+  async getPlanEntry(id: string): Promise<LeisurePlanEntry> {
+    return apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}`);
+  },
+
   async createPlanEntry(input: PlanEntryInput): Promise<LeisurePlanEntry> {
     return apiFetchClient<LeisurePlanEntry>('/leisure/plan', { method: 'POST', body: input });
   },

@@ -295,6 +295,11 @@ function handlePlan(
   }
 
   if (!sub) {
+    if (method === 'GET') {
+      if (index === -1) notFound();
+      const existing = leisureDb.planEntries[index]!;
+      return { ...existing, occurrenceDate: existing.date };
+    }
     if (method === 'PATCH') {
       if (index === -1) notFound();
       const updated = { ...leisureDb.planEntries[index]!, ...(body as Record<string, unknown>) };

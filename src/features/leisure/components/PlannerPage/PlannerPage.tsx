@@ -15,6 +15,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import { addDays, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale/pt-BR';
+import NextLink from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { EmptyState, KokyuButton } from '@/design-system/components';
@@ -22,8 +23,8 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { cardTokens } from '@/design-system/tokens/component';
 import { usePreferences } from '@/features/settings/providers/PreferencesProvider';
-import { friendlyErrorMessage } from '@/lib/api/errors';
 
+import { leisureRoutes } from '../../constants/leisureRoutes';
 import { useConfirmAction } from '../../hooks/useConfirmAction';
 import { useLeisurePlan } from '../../hooks/useLeisurePlan';
 import { leisurePlanService } from '../../services/leisurePlanService';
@@ -39,19 +40,15 @@ import {
 } from '../../utils/dateHelpers';
 import { formatDuration, formatTime } from '../../utils/durationFormat';
 import { ConfirmActionDialog } from '../ConfirmActionDialog/ConfirmActionDialog';
-import type { PlanEntryFormValues } from '../../schemas/planEntrySchema';
-import { PlanEntryDialog } from '../PlanEntryDialog/PlanEntryDialog';
 
 type ViewMode = 'day' | 'week';
 
 function PlanEntryRow({
   entry,
-  onEdit,
   onComplete,
   onRemove,
 }: {
   entry: LeisurePlanEntry;
-  onEdit: () => void;
   onComplete: () => void;
   onRemove: () => void;
 }) {
@@ -64,7 +61,12 @@ function PlanEntryRow({
         padding: 1.5,
       })}
     >
-      <Stack spacing={0.25} sx={{ minWidth: 0, cursor: 'pointer' }} onClick={onEdit}>
+      <Stack
+        component={NextLink}
+        href={leisureRoutes.planEdit(entry.id)}
+        spacing={0.25}
+        sx={{ minWidth: 0, textDecoration: 'none', color: 'inherit' }}
+      >
         <Typography variant="labelMedium" component="p" noWrap>
           {entry.title}
         </Typography>
@@ -103,7 +105,7 @@ function PlanEntryRow({
 export function PlannerPage() {
   const { preferences } = usePreferences();
   const weekStartsOn = preferences.locale.weekStartsOn;
-  const { showSuccess, showError } = useSnackbar();
+  const { showSuccess } = useSnackbar();
   const confirmAction = useConfirmAction();
 
   const [viewMode, setViewMode] = useState<ViewMode>('week');
@@ -114,11 +116,6 @@ export function PlannerPage() {
   const { status, planEntries, reload } = useLeisurePlan(
     viewMode === 'week' ? weekDays : [selectedDate],
   );
-
-  const [dialogTarget, setDialogTarget] = useState<{
-    defaultValues?: Partial<PlanEntryFormValues>;
-    id?: string;
-  } | null>(null);
 
   // Grouped by `occurrenceDate`, never `date` (the series' anchor) — a
   // daily/weekly entry is one row expanded by the backend into one
@@ -138,24 +135,10 @@ export function PlannerPage() {
 
   const daysToShow = viewMode === 'week' ? weekDays : [selectedDate];
 
-  async function handleSave(values: PlanEntryFormValues) {
-    // Left open on failure (e.g. the backend's own past-date defense-in-depth
-    // check — see `findPastPlanEntryViolation` — rejecting a value the form
-    // itself let through) so the user can correct it instead of losing it.
-    try {
-      if (dialogTarget?.id) {
-        await leisurePlanService.updatePlanEntry(dialogTarget.id, values);
-        showSuccess('Planejamento atualizado.');
-      } else {
-        await leisurePlanService.createPlanEntry(values);
-        showSuccess('Atividade planejada.');
-      }
-      setDialogTarget(null);
-      reload();
-    } catch (error) {
-      showError(friendlyErrorMessage(error, 'Não foi possível salvar o planejamento agora.'));
-    }
-  }
+  // Whichever day the CTA's own view is currently anchored to — carried to
+  // `/planejamento/nova` as `?date=` so the new page still defaults to the
+  // day being looked at, not always "today".
+  const planNewHref = `${leisureRoutes.planNew}?date=${todayOrLaterKey(viewMode === 'week' ? weekDays[0]! : selectedDate)}`;
 
   function handleComplete(entry: LeisurePlanEntry) {
     // `occurrenceDate` — completing a daily/weekly entry from one day's
@@ -198,16 +181,7 @@ export function PlannerPage() {
             Organize seu tempo livre com antecedência.
           </Typography>
         </Stack>
-        <KokyuButton
-          variant="contained"
-          onClick={() =>
-            setDialogTarget({
-              defaultValues: {
-                date: todayOrLaterKey(viewMode === 'week' ? weekDays[0]! : selectedDate),
-              },
-            })
-          }
-        >
+        <KokyuButton variant="contained" component={NextLink} href={planNewHref}>
           Planejar atividade
         </KokyuButton>
       </Stack>
@@ -283,12 +257,7 @@ export function PlannerPage() {
           icon={CalendarMonthRoundedIcon}
           title="Sua semana ainda não tem atividades planejadas."
           action={
-            <KokyuButton
-              variant="contained"
-              onClick={() =>
-                setDialogTarget({ defaultValues: { date: todayOrLaterKey(selectedDate) } })
-              }
-            >
+            <KokyuButton variant="contained" component={NextLink} href={planNewHref}>
               Planejar primeira atividade
             </KokyuButton>
           }
@@ -341,7 +310,6 @@ export function PlannerPage() {
                         <PlanEntryRow
                           key={entry.id}
                           entry={entry}
-                          onEdit={() => setDialogTarget({ id: entry.id, defaultValues: entry })}
                           onComplete={() => handleComplete(entry)}
                           onRemove={() => handleRemove(entry)}
                         />
@@ -354,14 +322,6 @@ export function PlannerPage() {
           })}
         </Box>
       ) : null}
-
-      <PlanEntryDialog
-        open={Boolean(dialogTarget)}
-        defaultValues={dialogTarget?.defaultValues}
-        mode={dialogTarget?.id ? 'edit' : 'create'}
-        onClose={() => setDialogTarget(null)}
-        onSave={handleSave}
-      />
 
       <ConfirmActionDialog
         request={confirmAction.pending}

@@ -148,7 +148,7 @@ export function PlanEntryDialog({
               sx={{ flex: 1 }}
               error={Boolean(errors.startTime)}
               helperText={errors.startTime?.message}
-              {...register('startTime')}
+              {...register('startTime', { setValueAs: (value) => (value === '' ? undefined : value) })}
             />
             <KokyuTextField
               label="Fim (opcional)"
@@ -157,7 +157,7 @@ export function PlanEntryDialog({
               sx={{ flex: 1 }}
               error={Boolean(errors.endTime)}
               helperText={errors.endTime?.message}
-              {...register('endTime')}
+              {...register('endTime', { setValueAs: (value) => (value === '' ? undefined : value) })}
             />
           </Stack>
           <KokyuTextField

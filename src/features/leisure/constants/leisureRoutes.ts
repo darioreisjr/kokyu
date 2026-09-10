@@ -9,6 +9,8 @@ export const leisureRoutes = {
   notes: '/app/tempo-livre/notas',
   history: '/app/tempo-livre/historico',
   item: (id: string) => `/app/tempo-livre/item/${id}`,
+  planNew: '/app/tempo-livre/planejamento/nova',
+  planEdit: (id: string) => `/app/tempo-livre/planejamento/${id}/editar`,
 } as const;
 
 export interface LeisureTabConfig {
