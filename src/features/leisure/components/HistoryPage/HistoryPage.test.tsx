@@ -1,4 +1,5 @@
 import userEvent from '@testing-library/user-event';
+import { format } from 'date-fns';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { render, screen, waitFor } from '../../../../../test/test-utils';
@@ -49,6 +50,17 @@ describe('HistoryPage', () => {
 
     render(<HistoryPage />);
     await waitFor(() => expect(screen.getAllByText('Parasita')).toHaveLength(2));
+  });
+
+  it('shows the time the activity was completed, alongside the date', async () => {
+    render(<HistoryPage />);
+    await waitFor(() => expect(screen.getByText('Parasita')).toBeInTheDocument());
+
+    const entries = await historyService.getHistory();
+    const parasita = entries.find((entry) => entry.title === 'Parasita');
+    const expectedTime = format(new Date(parasita!.completedAt), 'HH:mm');
+
+    expect(screen.getByText(new RegExp(`às ${expectedTime}`))).toBeInTheDocument();
   });
 
   it('shows a rating when the log entry has one', async () => {

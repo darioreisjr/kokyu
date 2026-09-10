@@ -137,7 +137,7 @@ export function HistoryPage() {
                       sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
                     >
                       {getLeisureItemTypeLabel(entry.activityType)} ·{' '}
-                      {format(new Date(entry.completedAt), "d 'de' MMMM 'de' yyyy", {
+                      {format(new Date(entry.completedAt), "d 'de' MMMM 'de' yyyy 'às' HH:mm", {
                         locale: ptBR,
                       })}
                       {entry.duration ? ` · ${formatDuration(entry.duration)}` : ''}
