@@ -37,7 +37,7 @@ import {
   toDateKey,
   todayOrLaterKey,
 } from '../../utils/dateHelpers';
-import { formatDuration } from '../../utils/durationFormat';
+import { formatDuration, formatTime } from '../../utils/durationFormat';
 import { ConfirmActionDialog } from '../ConfirmActionDialog/ConfirmActionDialog';
 import type { PlanEntryFormValues } from '../../schemas/planEntrySchema';
 import { PlanEntryDialog } from '../PlanEntryDialog/PlanEntryDialog';
@@ -57,17 +57,14 @@ function PlanEntryRow({
 }) {
   return (
     <Stack
-      direction="row"
-      spacing={1.5}
+      spacing={1}
       sx={(theme) => ({
-        alignItems: 'center',
-        justifyContent: 'space-between',
         borderRadius: 1,
         border: `1px solid ${themePalette(theme).kokyu.border.subtle}`,
         padding: 1.5,
       })}
     >
-      <Stack spacing={0.1} sx={{ minWidth: 0, flex: 1, cursor: 'pointer' }} onClick={onEdit}>
+      <Stack spacing={0.25} sx={{ minWidth: 0, cursor: 'pointer' }} onClick={onEdit}>
         <Typography variant="labelMedium" component="p" noWrap>
           {entry.title}
         </Typography>
@@ -75,11 +72,11 @@ function PlanEntryRow({
           variant="labelSmall"
           sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
         >
-          {entry.startTime ?? 'Sem horário'}
+          {entry.startTime ? formatTime(entry.startTime) : 'Sem horário'}
           {entry.duration ? ` · ${formatDuration(entry.duration)}` : ''}
         </Typography>
       </Stack>
-      <Stack direction="row" spacing={0.5}>
+      <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end' }}>
         <KokyuButton
           variant={entry.completed ? 'text' : 'outlined'}
           size="small"

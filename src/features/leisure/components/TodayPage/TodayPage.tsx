@@ -22,7 +22,7 @@ import { leisurePlanService } from '../../services/leisurePlanService';
 import { noteService } from '../../services/noteService';
 import type { LeisureItem } from '../../types/leisureItem.types';
 import type { LeisurePlanEntry } from '../../types/leisurePlan.types';
-import { formatDuration } from '../../utils/durationFormat';
+import { formatDuration, formatTime } from '../../utils/durationFormat';
 import { mapFormValuesToLeisureItemInput } from '../../utils/leisureItemFormMapper';
 import { AddMenu, type AddMenuAction } from '../AddMenu/AddMenu';
 import { LeisureItemCard } from '../LeisureItemCard/LeisureItemCard';
@@ -179,7 +179,7 @@ export function TodayPage() {
                         variant="body2"
                         sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
                       >
-                        {entry.startTime ? entry.startTime : 'Sem horário'}
+                        {entry.startTime ? formatTime(entry.startTime) : 'Sem horário'}
                         {entry.duration ? ` · ${formatDuration(entry.duration)}` : ''}
                       </Typography>
                     </Stack>

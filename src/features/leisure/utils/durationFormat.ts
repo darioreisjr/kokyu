@@ -5,3 +5,9 @@ export function formatDuration(minutes: number): string {
   const remainder = minutes % 60;
   return remainder === 0 ? `${hours}h` : `${hours}h${String(remainder).padStart(2, '0')}`;
 }
+
+/** Drops seconds from a backend "HH:mm:ss" time — display always shows "HH:mm". */
+export function formatTime(time: string): string {
+  const [hours, minutes] = time.split(':');
+  return `${hours}:${minutes}`;
+}
