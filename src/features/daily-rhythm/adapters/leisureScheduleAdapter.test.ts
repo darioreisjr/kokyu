@@ -39,5 +39,33 @@ describe('leisureScheduleAdapter', () => {
     const plans = await leisurePlanService.getPlanEntriesForDate('2026-08-31');
     expect(plans[0]!.completed).toBe(true);
   });
+
+  it('reports the occurrence day (not the series anchor) for a recurring entry viewed on a later date', async () => {
+    await leisurePlanService.createPlanEntry({
+      title: 'Alongar',
+      date: '2026-08-31',
+      recurrence: 'daily',
+    });
+
+    const [entry] = await leisureScheduleAdapter.getEntriesForDate('2026-09-02');
+    expect(entry).toBeDefined();
+    expect(entry!.date).toBe('2026-09-02');
+  });
+
+  it('completing a recurring entry on one day never completes another day of the same series', async () => {
+    await leisurePlanService.createPlanEntry({
+      title: 'Alongar',
+      date: '2026-08-31',
+      recurrence: 'daily',
+    });
+
+    const [dayTwoEntry] = await leisureScheduleAdapter.getEntriesForDate('2026-09-01');
+    await leisureScheduleAdapter.onEntryCompleted!(dayTwoEntry!);
+
+    const [dayOneAfter] = await leisureScheduleAdapter.getEntriesForDate('2026-08-31');
+    const [dayTwoAfter] = await leisureScheduleAdapter.getEntriesForDate('2026-09-01');
+    expect(dayOneAfter!.status).toBe('planned');
+    expect(dayTwoAfter!.status).toBe('completed');
+  });
 });
 

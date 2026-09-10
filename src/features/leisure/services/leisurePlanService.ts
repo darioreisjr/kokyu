@@ -3,7 +3,10 @@ import { ApiError } from '@/lib/api/errors';
 
 import type { LeisurePlanEntry } from '../types/leisurePlan.types';
 
-export type PlanEntryInput = Omit<LeisurePlanEntry, 'id' | 'createdAt' | 'completed'> & {
+export type PlanEntryInput = Omit<
+  LeisurePlanEntry,
+  'id' | 'createdAt' | 'completed' | 'occurrenceDate'
+> & {
   completed?: boolean;
 };
 
@@ -41,10 +44,12 @@ export const leisurePlanService = {
     await apiFetchClient<void>(`/leisure/plan/${id}`, { method: 'DELETE' });
   },
 
-  async completePlanEntry(id: string): Promise<LeisurePlanEntry | null> {
+  /** `occurrenceDate` picks which day of a daily/weekly series is being completed — irrelevant (and omittable) for a `'none'`/`'custom'` entry, which has only ever had one. */
+  async completePlanEntry(id: string, occurrenceDate?: string): Promise<LeisurePlanEntry | null> {
     try {
       return await apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}/complete`, {
         method: 'POST',
+        body: occurrenceDate ? { date: occurrenceDate } : undefined,
       });
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) return null;

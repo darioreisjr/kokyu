@@ -20,7 +20,10 @@ export const leisureScheduleAdapter: ScheduleSourceAdapter = {
         sourceId: plan.id,
         title: plan.title,
         description: plan.notes,
-        date: plan.date,
+        // `occurrenceDate`, not the series' anchor `date` — for a
+        // daily/weekly plan entry viewed on a day other than its anchor,
+        // `date` would report the wrong day entirely.
+        date: plan.occurrenceDate,
         startAt,
         endAt,
         duration,
@@ -61,7 +64,9 @@ export const leisureScheduleAdapter: ScheduleSourceAdapter = {
   },
 
   async onEntryCompleted(entry: ScheduleEntry): Promise<boolean> {
-    const updated = await leisurePlanService.completePlanEntry(entry.sourceId);
+    // `entry.date` is this occurrence's actual day (see `getEntriesForDate`
+    // above) — a daily/weekly source must only complete that one day.
+    const updated = await leisurePlanService.completePlanEntry(entry.sourceId, entry.date);
     return Boolean(updated);
   },
 

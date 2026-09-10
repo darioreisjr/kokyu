@@ -1,5 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { generateId, leisureDb } from '@/features/leisure/services/leisureMockDb';
+import type { LeisurePlanEntry } from '@/features/leisure/types/leisurePlan.types';
 
 /**
  * A fake kokyu-sam backend for `/leisure/*` routes, used only by tests
@@ -34,6 +35,59 @@ function parse(path: string): { segments: string[]; query: URLSearchParams } {
   return { segments, query: new URLSearchParams(search) };
 }
 
+// --- recurrence expansion (mirrors kokyu-sam's leisure-plan-recurrence.util.ts) ---
+
+function addDaysToDateKey(key: string, days: number): string {
+  const date = new Date(`${key}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function daysBetweenDateKeys(from: string, to: string): number {
+  const ms = new Date(`${to}T00:00:00.000Z`).getTime() - new Date(`${from}T00:00:00.000Z`).getTime();
+  return Math.round(ms / 86_400_000);
+}
+
+function firstOccurrenceOnOrAfter(anchor: string, start: string, stepDays: number): string {
+  if (anchor >= start) return anchor;
+  const diff = daysBetweenDateKeys(anchor, start);
+  const remainder = diff % stepDays;
+  const offset = remainder === 0 ? 0 : stepDays - remainder;
+  return addDaysToDateKey(start, offset);
+}
+
+/** Same "one row -> one occurrence per day it lands on" expansion the real backend does — see `expandPlanEntriesForRange` in kokyu-sam. */
+function expandPlanEntries(
+  entries: LeisurePlanEntry[],
+  startDate: string,
+  endDate: string,
+): LeisurePlanEntry[] {
+  const occurrences: LeisurePlanEntry[] = [];
+
+  for (const entry of entries) {
+    if (entry.recurrence === 'daily' || entry.recurrence === 'weekly') {
+      const stepDays = entry.recurrence === 'daily' ? 1 : 7;
+      for (
+        let occurrenceDate = firstOccurrenceOnOrAfter(entry.date, startDate, stepDays);
+        occurrenceDate <= endDate;
+        occurrenceDate = addDaysToDateKey(occurrenceDate, stepDays)
+      ) {
+        occurrences.push({
+          ...entry,
+          occurrenceDate,
+          completed: leisureDb.planCompletions.some(
+            (c) => c.planEntryId === entry.id && c.occurrenceDate === occurrenceDate,
+          ),
+        });
+      }
+    } else if (entry.date >= startDate && entry.date <= endDate) {
+      occurrences.push({ ...entry, occurrenceDate: entry.date });
+    }
+  }
+
+  return occurrences;
+}
+
 export async function mockLeisureApiFetchClient(path: string, init: RequestInit = {}): Promise<unknown> {
   const { segments, query } = parse(path);
   const method = (init.method ?? 'GET').toUpperCase();
@@ -56,8 +110,12 @@ function handleSummary(query: URLSearchParams): unknown {
   const date = query.get('date') ?? '';
   const itemById = new Map(leisureDb.items.map((item) => [item.id, item]));
 
-  const plannedEntry = [...leisureDb.planEntries]
-    .filter((entry) => entry.date === date && !entry.completed)
+  // Expanded, not a raw `entry.date === date` filter — a daily/weekly
+  // entry anchored on an earlier date must still count as "planned
+  // today" here, same fix as the real kokyu-sam backend's
+  // LeisureSummaryService.
+  const plannedEntry = expandPlanEntries(leisureDb.planEntries, date, date)
+    .filter((entry) => !entry.completed)
     .sort((a, b) => (a.startTime ?? '99:99').localeCompare(b.startTime ?? '99:99'))[0];
 
   const inProgressItem = leisureDb.items.find((item) => item.status === 'inProgress');
@@ -200,7 +258,7 @@ function handlePlan(
     if (method === 'GET') {
       const startDate = query.get('startDate') ?? '';
       const endDate = query.get('endDate') ?? '';
-      return leisureDb.planEntries.filter((entry) => entry.date >= startDate && entry.date <= endDate);
+      return expandPlanEntries(leisureDb.planEntries, startDate, endDate);
     }
     if (method === 'POST') {
       const entry = {
@@ -208,9 +266,9 @@ function handlePlan(
         completed: false,
         createdAt: new Date().toISOString(),
         ...(body as Record<string, unknown>),
-      };
-      leisureDb.planEntries.push(entry as (typeof leisureDb.planEntries)[number]);
-      return entry;
+      } as (typeof leisureDb.planEntries)[number];
+      leisureDb.planEntries.push(entry);
+      return { ...entry, occurrenceDate: entry.date };
     }
   }
 
@@ -218,7 +276,20 @@ function handlePlan(
 
   if (sub === 'complete' && method === 'POST') {
     if (index === -1) notFound();
-    const updated = { ...leisureDb.planEntries[index]!, completed: true };
+    const existing = leisureDb.planEntries[index]!;
+
+    if (existing.recurrence === 'daily' || existing.recurrence === 'weekly') {
+      const occurrenceDate = (body as { date?: string } | undefined)?.date ?? existing.date;
+      const alreadyCompleted = leisureDb.planCompletions.some(
+        (c) => c.planEntryId === existing.id && c.occurrenceDate === occurrenceDate,
+      );
+      if (!alreadyCompleted) {
+        leisureDb.planCompletions.push({ planEntryId: existing.id, occurrenceDate });
+      }
+      return { ...existing, occurrenceDate, completed: true };
+    }
+
+    const updated = { ...existing, completed: true, occurrenceDate: existing.date };
     leisureDb.planEntries[index] = updated;
     return updated;
   }
@@ -228,10 +299,13 @@ function handlePlan(
       if (index === -1) notFound();
       const updated = { ...leisureDb.planEntries[index]!, ...(body as Record<string, unknown>) };
       leisureDb.planEntries[index] = updated as (typeof leisureDb.planEntries)[number];
-      return updated;
+      return { ...updated, occurrenceDate: updated.date };
     }
     if (method === 'DELETE') {
       leisureDb.planEntries = leisureDb.planEntries.filter((entry) => entry.id !== id);
+      leisureDb.planCompletions = leisureDb.planCompletions.filter(
+        (completion) => completion.planEntryId !== id,
+      );
       return undefined;
     }
   }

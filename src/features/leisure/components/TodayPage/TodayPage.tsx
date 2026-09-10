@@ -21,6 +21,7 @@ import { leisureItemService } from '../../services/leisureItemService';
 import { leisurePlanService } from '../../services/leisurePlanService';
 import { noteService } from '../../services/noteService';
 import type { LeisureItem } from '../../types/leisureItem.types';
+import type { LeisurePlanEntry } from '../../types/leisurePlan.types';
 import { formatDuration } from '../../utils/durationFormat';
 import { mapFormValuesToLeisureItemInput } from '../../utils/leisureItemFormMapper';
 import { AddMenu, type AddMenuAction } from '../AddMenu/AddMenu';
@@ -105,8 +106,10 @@ export function TodayPage() {
     reload();
   }
 
-  async function handleCompletePlanEntry(id: string) {
-    await leisurePlanService.completePlanEntry(id);
+  async function handleCompletePlanEntry(entry: LeisurePlanEntry) {
+    // `occurrenceDate` — a daily/weekly entry's "hoje" row must only
+    // complete today's occurrence, never the whole series.
+    await leisurePlanService.completePlanEntry(entry.id, entry.occurrenceDate);
     showSuccess('Planejamento concluído.');
     reload();
   }
@@ -184,7 +187,7 @@ export function TodayPage() {
                       variant={entry.completed ? 'text' : 'outlined'}
                       size="small"
                       disabled={entry.completed}
-                      onClick={() => handleCompletePlanEntry(entry.id)}
+                      onClick={() => handleCompletePlanEntry(entry)}
                     >
                       {entry.completed ? 'Concluído' : 'Concluir'}
                     </KokyuButton>

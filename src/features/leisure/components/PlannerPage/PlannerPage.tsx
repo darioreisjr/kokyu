@@ -123,13 +123,16 @@ export function PlannerPage() {
     id?: string;
   } | null>(null);
 
+  // Grouped by `occurrenceDate`, never `date` (the series' anchor) — a
+  // daily/weekly entry is one row expanded by the backend into one
+  // occurrence per day it lands on, and each belongs on its own day here.
   const entriesByDate = useMemo(() => {
     const map = new Map<string, LeisurePlanEntry[]>();
     for (const entry of planEntries) {
-      const list = map.get(entry.date) ?? [];
+      const list = map.get(entry.occurrenceDate) ?? [];
       list.push(entry);
       map.set(
-        entry.date,
+        entry.occurrenceDate,
         [...list].sort((a, b) => (a.startTime ?? '').localeCompare(b.startTime ?? '')),
       );
     }
@@ -157,8 +160,10 @@ export function PlannerPage() {
     }
   }
 
-  function handleComplete(id: string) {
-    leisurePlanService.completePlanEntry(id).then(() => {
+  function handleComplete(entry: LeisurePlanEntry) {
+    // `occurrenceDate` — completing a daily/weekly entry from one day's
+    // row must never mark any other day of the series as done.
+    leisurePlanService.completePlanEntry(entry.id, entry.occurrenceDate).then(() => {
       showSuccess('Planejamento concluído.');
       reload();
     });
@@ -340,7 +345,7 @@ export function PlannerPage() {
                           key={entry.id}
                           entry={entry}
                           onEdit={() => setDialogTarget({ id: entry.id, defaultValues: entry })}
-                          onComplete={() => handleComplete(entry.id)}
+                          onComplete={() => handleComplete(entry)}
                           onRemove={() => handleRemove(entry)}
                         />
                       ))}

@@ -14,9 +14,16 @@ import { mockNotes } from '../mocks/notes.mock';
  * Hobbit") keeps working without every test individually mocking every
  * endpoint response. Never import this from `src/` — only from `test/`.
  */
+export interface MockPlanEntryCompletion {
+  planEntryId: string;
+  occurrenceDate: string;
+}
+
 export const leisureDb = {
   items: [...mockLeisureItems],
   planEntries: createMockLeisurePlan(),
+  /** Per-occurrence completions for `recurrence: 'daily'`/`'weekly'` plan entries — mirrors kokyu-sam's `leisure_plan_entry_completions` table. See `leisureApiFetchMock.ts`. */
+  planCompletions: [] as MockPlanEntryCompletion[],
   logEntries: createMockLeisureLog(),
   notes: [...mockNotes],
   collections: [...mockCollections],
@@ -34,6 +41,7 @@ export function generateId(prefix: string): string {
 export function resetLeisureDb(): void {
   leisureDb.items = [...mockLeisureItems];
   leisureDb.planEntries = createMockLeisurePlan();
+  leisureDb.planCompletions = [];
   leisureDb.logEntries = createMockLeisureLog();
   leisureDb.notes = [...mockNotes];
   leisureDb.collections = [...mockCollections];

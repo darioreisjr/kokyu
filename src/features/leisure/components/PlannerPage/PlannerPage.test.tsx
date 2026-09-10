@@ -75,4 +75,41 @@ describe('PlannerPage', () => {
 
     await waitFor(() => expect(screen.getByText(/ de /).textContent).not.toBe(initialHeading));
   });
+
+  it('a daily activity appears every day from today onward, and completing one day never completes the others', async () => {
+    const user = userEvent.setup();
+    render(<PlannerPage />);
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Planejar atividade' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Planejar atividade' });
+    await user.type(within(dialog).getByLabelText('Título'), 'Alongar');
+    await user.click(within(dialog).getByLabelText('Recorrência'));
+    await user.click(screen.getByRole('option', { name: 'Diariamente' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+    await waitFor(() => expect(screen.getByText('Atividade planejada.')).toBeInTheDocument());
+    await waitFor(() => expect(dialog).not.toBeInTheDocument());
+
+    // "Hoje" — the series' anchor day.
+    await user.click(screen.getByRole('button', { name: 'Hoje' }));
+    await waitFor(() => expect(screen.getByText('Alongar')).toBeInTheDocument());
+    const todayRow = screen.getByText('Alongar').closest('div')!.parentElement as HTMLElement;
+    await user.click(within(todayRow).getByRole('button', { name: 'Concluir' }));
+    await waitFor(() => expect(screen.getByText('Planejamento concluído.')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        within(screen.getByText('Alongar').closest('div')!.parentElement as HTMLElement).getByRole(
+          'button',
+          { name: 'Concluído' },
+        ),
+      ).toBeInTheDocument(),
+    );
+
+    // Tomorrow — still the same recurring series, but a fresh, unfinished occurrence.
+    await user.click(screen.getByRole('button', { name: 'Próximo dia' }));
+    await waitFor(() => expect(screen.getByText('Alongar')).toBeInTheDocument());
+    const tomorrowRow = screen.getByText('Alongar').closest('div')!.parentElement as HTMLElement;
+    expect(within(tomorrowRow).getByRole('button', { name: 'Concluir' })).toBeInTheDocument();
+    expect(within(tomorrowRow).queryByRole('button', { name: 'Concluído' })).not.toBeInTheDocument();
+  });
 });
