@@ -22,6 +22,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { cardTokens } from '@/design-system/tokens/component';
 import { usePreferences } from '@/features/settings/providers/PreferencesProvider';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { useConfirmAction } from '../../hooks/useConfirmAction';
 import { useLeisurePlan } from '../../hooks/useLeisurePlan';
@@ -34,6 +35,7 @@ import {
   getWeekStart,
   isToday,
   toDateKey,
+  todayOrLaterKey,
 } from '../../utils/dateHelpers';
 import { formatDuration } from '../../utils/durationFormat';
 import { ConfirmActionDialog } from '../ConfirmActionDialog/ConfirmActionDialog';
@@ -104,7 +106,7 @@ function PlanEntryRow({
 export function PlannerPage() {
   const { preferences } = usePreferences();
   const weekStartsOn = preferences.locale.weekStartsOn;
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
   const confirmAction = useConfirmAction();
 
   const [viewMode, setViewMode] = useState<ViewMode>('week');
@@ -137,15 +139,22 @@ export function PlannerPage() {
   const daysToShow = viewMode === 'week' ? weekDays : [selectedDate];
 
   async function handleSave(values: PlanEntryFormValues) {
-    if (dialogTarget?.id) {
-      await leisurePlanService.updatePlanEntry(dialogTarget.id, values);
-      showSuccess('Planejamento atualizado.');
-    } else {
-      await leisurePlanService.createPlanEntry(values);
-      showSuccess('Atividade planejada.');
+    // Left open on failure (e.g. the backend's own past-date defense-in-depth
+    // check — see `findPastPlanEntryViolation` — rejecting a value the form
+    // itself let through) so the user can correct it instead of losing it.
+    try {
+      if (dialogTarget?.id) {
+        await leisurePlanService.updatePlanEntry(dialogTarget.id, values);
+        showSuccess('Planejamento atualizado.');
+      } else {
+        await leisurePlanService.createPlanEntry(values);
+        showSuccess('Atividade planejada.');
+      }
+      setDialogTarget(null);
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar o planejamento agora.'));
     }
-    setDialogTarget(null);
-    reload();
   }
 
   function handleComplete(id: string) {
@@ -191,7 +200,9 @@ export function PlannerPage() {
           variant="contained"
           onClick={() =>
             setDialogTarget({
-              defaultValues: { date: toDateKey(viewMode === 'week' ? weekDays[0]! : selectedDate) },
+              defaultValues: {
+                date: todayOrLaterKey(viewMode === 'week' ? weekDays[0]! : selectedDate),
+              },
             })
           }
         >
@@ -272,7 +283,9 @@ export function PlannerPage() {
           action={
             <KokyuButton
               variant="contained"
-              onClick={() => setDialogTarget({ defaultValues: { date: toDateKey(selectedDate) } })}
+              onClick={() =>
+                setDialogTarget({ defaultValues: { date: todayOrLaterKey(selectedDate) } })
+              }
             >
               Planejar primeira atividade
             </KokyuButton>

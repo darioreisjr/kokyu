@@ -50,3 +50,17 @@ export function isSameDay(a: Date, b: Date): boolean {
 export function isToday(date: Date): boolean {
   return isSameDayFns(date, new Date());
 }
+
+/**
+ * The date key to prefill a *new* plan entry with — never a day already
+ * in the past. A week/day view can itself be showing a past date (e.g.
+ * the current week's first day before today, or after navigating back),
+ * and "Planejar atividade" must never hand the dialog a default that its
+ * own "not in the past" rule (`buildPlanEntrySchema`) would immediately
+ * reject.
+ */
+export function todayOrLaterKey(date: Date): string {
+  const key = toDateKey(date);
+  const todayKey = toDateKey(new Date());
+  return key < todayKey ? todayKey : key;
+}

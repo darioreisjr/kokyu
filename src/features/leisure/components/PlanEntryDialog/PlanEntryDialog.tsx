@@ -9,14 +9,15 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import Switch from '@mui/material/Switch';
-import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { format } from 'date-fns';
+import { useEffect, useMemo } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton, KokyuDateField, KokyuTextField } from '@/design-system/components';
 
 import {
+  buildPlanEntrySchema,
   planEntryDefaultValues,
-  planEntrySchema,
   type PlanEntryFormValues,
 } from '../../schemas/planEntrySchema';
 import { fromDateKey, toDateKey } from '../../utils/dateHelpers';
@@ -54,6 +55,15 @@ export function PlanEntryDialog({
   onSave,
   isSubmitting,
 }: PlanEntryDialogProps) {
+  // In `edit`, the entry's own date/time when the dialog opened — new picks
+  // are held to "not in the past", but this lets an already-past plan stay
+  // editable (title, notes, ...) without forcing a fresh date. `create` has
+  // no reference, so every value counts as a fresh pick (see schema).
+  const pastReference =
+    mode === 'edit'
+      ? { date: defaultValues?.date, startTime: defaultValues?.startTime, endTime: defaultValues?.endTime }
+      : undefined;
+
   const {
     control,
     register,
@@ -61,7 +71,7 @@ export function PlanEntryDialog({
     reset,
     formState: { errors },
   } = useForm<PlanEntryFormValues>({
-    resolver: zodResolver(planEntrySchema),
+    resolver: zodResolver(buildPlanEntrySchema(pastReference)),
     defaultValues: { ...planEntryDefaultValues, ...defaultValues },
   });
 
@@ -69,6 +79,22 @@ export function PlanEntryDialog({
     if (open) reset({ ...planEntryDefaultValues, ...defaultValues });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resetting only when the dialog opens, not on every defaultValues identity change
   }, [open]);
+
+  // Keeps an already-past date pickable (so `mode === 'edit'` entries stay
+  // visible/selected in the calendar) while still refusing any new date
+  // earlier than today.
+  const today = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }, []);
+  const referenceDate = pastReference?.date ? fromDateKey(pastReference.date) : undefined;
+  const minDate = referenceDate && referenceDate < today ? referenceDate : today;
+
+  // The time inputs only need a floor when the selected day is today —
+  // any future day accepts any time.
+  const selectedDate = useWatch({ control, name: 'date' });
+  const minTime = selectedDate === toDateKey(new Date()) ? format(new Date(), 'HH:mm') : undefined;
 
   function handleClose() {
     onClose();
@@ -108,6 +134,7 @@ export function PlanEntryDialog({
                 label="Dia"
                 value={field.value ? fromDateKey(field.value) : null}
                 onChange={(value) => field.onChange(value ? toDateKey(value) : '')}
+                minDate={minDate}
                 error={Boolean(errors.date)}
                 helperText={errors.date?.message}
               />
@@ -117,15 +144,19 @@ export function PlanEntryDialog({
             <KokyuTextField
               label="Início (opcional)"
               type="time"
-              slotProps={{ inputLabel: { shrink: true } }}
+              slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
               sx={{ flex: 1 }}
+              error={Boolean(errors.startTime)}
+              helperText={errors.startTime?.message}
               {...register('startTime')}
             />
             <KokyuTextField
               label="Fim (opcional)"
               type="time"
-              slotProps={{ inputLabel: { shrink: true } }}
+              slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
               sx={{ flex: 1 }}
+              error={Boolean(errors.endTime)}
+              helperText={errors.endTime?.message}
               {...register('endTime')}
             />
           </Stack>

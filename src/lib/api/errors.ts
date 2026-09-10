@@ -12,6 +12,7 @@ export type ApiErrorCode =
   | 'LEISURE_ITEM_NOT_FOUND'
   | 'LEISURE_ITEM_DETAILS_INVALID'
   | 'LEISURE_PLAN_ENTRY_NOT_FOUND'
+  | 'LEISURE_PLAN_ENTRY_DATE_INVALID'
   | 'LEISURE_NOTE_NOT_FOUND'
   | 'LEISURE_COLLECTION_NOT_FOUND'
   | (string & {});
@@ -67,6 +68,7 @@ const FRIENDLY_ERROR_MESSAGES: Partial<Record<string, string>> = {
   LEISURE_ITEM_NOT_FOUND: 'Este item não foi encontrado.',
   LEISURE_ITEM_DETAILS_INVALID: 'Alguns dados desse item são inválidos. Revise e tente novamente.',
   LEISURE_PLAN_ENTRY_NOT_FOUND: 'Este planejamento não foi encontrado.',
+  LEISURE_PLAN_ENTRY_DATE_INVALID: 'A data e o horário do planejamento não podem estar no passado.',
   LEISURE_NOTE_NOT_FOUND: 'Esta nota não foi encontrada.',
   LEISURE_COLLECTION_NOT_FOUND: 'Esta coleção não foi encontrada.',
 };
