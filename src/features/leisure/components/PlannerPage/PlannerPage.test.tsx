@@ -39,12 +39,29 @@ describe('PlannerPage', () => {
     );
   });
 
-  it('links a plan entry to its own edit page', async () => {
+  it('opens a read-only detail dialog when a plan entry card is clicked, with an Editar link to the edit page', async () => {
+    const user = userEvent.setup();
     render(<PlannerPage />);
     await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
 
-    const link = screen.getByRole('link', { name: /O Hobbit/ });
-    expect(link.getAttribute('href')).toBe('/app/tempo-livre/planejamento/plan-hobbit-hoje/editar');
+    await user.click(screen.getByRole('button', { name: /Ver detalhes de O Hobbit/ }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'O Hobbit' });
+    expect(within(dialog).getByText('Dia')).toBeInTheDocument();
+    const editLink = within(dialog).getByRole('link', { name: 'Editar' });
+    expect(editLink.getAttribute('href')).toBe('/app/tempo-livre/planejamento/plan-hobbit-hoje/editar');
+
+    await user.click(within(dialog).getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('has no delete action on a plan entry card', async () => {
+    render(<PlannerPage />);
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+
+    expect(
+      screen.queryByRole('button', { name: 'Remover planejamento' }),
+    ).not.toBeInTheDocument();
   });
 
   it('completes a plan entry', async () => {
@@ -52,24 +69,10 @@ describe('PlannerPage', () => {
     render(<PlannerPage />);
     await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
 
-    const row = screen.getByText('O Hobbit').closest('a')!.parentElement as HTMLElement;
+    const row = screen.getByText('O Hobbit').closest('button')!.parentElement as HTMLElement;
     await user.click(within(row).getByRole('button', { name: 'Concluir' }));
 
     await waitFor(() => expect(screen.getByText('Planejamento concluído.')).toBeInTheDocument());
-  });
-
-  it('removes a plan entry after confirming', async () => {
-    const user = userEvent.setup();
-    render(<PlannerPage />);
-    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
-
-    const row = screen.getByText('O Hobbit').closest('a')!.parentElement as HTMLElement;
-    await user.click(within(row).getByRole('button', { name: 'Remover planejamento' }));
-
-    const confirmDialog = await screen.findByRole('dialog', { name: 'Remover planejamento?' });
-    await user.click(within(confirmDialog).getByRole('button', { name: 'Remover' }));
-
-    await waitFor(() => expect(screen.getByText('Planejamento removido.')).toBeInTheDocument());
   });
 
   it('navigates to the next/previous week, changing the visible range heading', async () => {
@@ -100,22 +103,21 @@ describe('PlannerPage', () => {
     // "Hoje" — the series' anchor day.
     await user.click(screen.getByRole('button', { name: 'Hoje' }));
     await waitFor(() => expect(screen.getByText('Alongar')).toBeInTheDocument());
-    const todayRow = screen.getByText('Alongar').closest('a')!.parentElement as HTMLElement;
+    const todayRow = screen.getByText('Alongar').closest('button')!.parentElement as HTMLElement;
     await user.click(within(todayRow).getByRole('button', { name: 'Concluir' }));
     await waitFor(() => expect(screen.getByText('Planejamento concluído.')).toBeInTheDocument());
     await waitFor(() =>
       expect(
-        within(screen.getByText('Alongar').closest('a')!.parentElement as HTMLElement).getByRole(
-          'button',
-          { name: 'Concluído' },
-        ),
+        within(
+          screen.getByText('Alongar').closest('button')!.parentElement as HTMLElement,
+        ).getByRole('button', { name: 'Concluído' }),
       ).toBeInTheDocument(),
     );
 
     // Tomorrow — still the same recurring series, but a fresh, unfinished occurrence.
     await user.click(screen.getByRole('button', { name: 'Próximo dia' }));
     await waitFor(() => expect(screen.getByText('Alongar')).toBeInTheDocument());
-    const tomorrowRow = screen.getByText('Alongar').closest('a')!.parentElement as HTMLElement;
+    const tomorrowRow = screen.getByText('Alongar').closest('button')!.parentElement as HTMLElement;
     expect(within(tomorrowRow).getByRole('button', { name: 'Concluir' })).toBeInTheDocument();
     expect(within(tomorrowRow).queryByRole('button', { name: 'Concluído' })).not.toBeInTheDocument();
   });

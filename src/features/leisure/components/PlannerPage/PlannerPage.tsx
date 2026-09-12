@@ -1,11 +1,11 @@
 'use client';
 
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+import ButtonBase from '@mui/material/ButtonBase';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Skeleton from '@mui/material/Skeleton';
@@ -25,7 +25,6 @@ import { cardTokens } from '@/design-system/tokens/component';
 import { usePreferences } from '@/features/settings/providers/PreferencesProvider';
 
 import { leisureRoutes } from '../../constants/leisureRoutes';
-import { useConfirmAction } from '../../hooks/useConfirmAction';
 import { useLeisurePlan } from '../../hooks/useLeisurePlan';
 import { leisurePlanService } from '../../services/leisurePlanService';
 import type { LeisurePlanEntry } from '../../types/leisurePlan.types';
@@ -39,18 +38,18 @@ import {
   todayOrLaterKey,
 } from '../../utils/dateHelpers';
 import { formatDuration, formatTime } from '../../utils/durationFormat';
-import { ConfirmActionDialog } from '../ConfirmActionDialog/ConfirmActionDialog';
+import { PlanEntryDetailDialog } from '../PlanEntryDetailDialog/PlanEntryDetailDialog';
 
 type ViewMode = 'day' | 'week';
 
 function PlanEntryRow({
   entry,
   onComplete,
-  onRemove,
+  onOpenDetails,
 }: {
   entry: LeisurePlanEntry;
   onComplete: () => void;
-  onRemove: () => void;
+  onOpenDetails: () => void;
 }) {
   return (
     <Stack
@@ -61,13 +60,20 @@ function PlanEntryRow({
         padding: 1.5,
       })}
     >
-      <Stack
-        component={NextLink}
-        href={leisureRoutes.planEdit(entry.id)}
-        spacing={0.25}
-        sx={{ minWidth: 0, textDecoration: 'none', color: 'inherit' }}
+      <ButtonBase
+        onClick={onOpenDetails}
+        aria-label={`Ver detalhes de ${entry.title}`}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          width: '100%',
+          minWidth: 0,
+          borderRadius: 1,
+          textAlign: 'left',
+        }}
       >
-        <Typography variant="labelMedium" component="p" noWrap>
+        <Typography variant="labelMedium" component="p" noWrap sx={{ width: '100%' }}>
           {entry.title}
         </Typography>
         <Typography
@@ -77,7 +83,7 @@ function PlanEntryRow({
           {entry.startTime ? formatTime(entry.startTime) : 'Sem horário'}
           {entry.duration ? ` · ${formatDuration(entry.duration)}` : ''}
         </Typography>
-      </Stack>
+      </ButtonBase>
       <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end' }}>
         <KokyuButton
           variant={entry.completed ? 'text' : 'outlined'}
@@ -87,9 +93,6 @@ function PlanEntryRow({
         >
           {entry.completed ? 'Concluído' : 'Concluir'}
         </KokyuButton>
-        <IconButton aria-label="Remover planejamento" size="small" onClick={onRemove}>
-          <DeleteOutlineRoundedIcon fontSize="small" />
-        </IconButton>
       </Stack>
     </Stack>
   );
@@ -106,8 +109,8 @@ export function PlannerPage() {
   const { preferences } = usePreferences();
   const weekStartsOn = preferences.locale.weekStartsOn;
   const { showSuccess } = useSnackbar();
-  const confirmAction = useConfirmAction();
 
+  const [detailEntry, setDetailEntry] = useState<LeisurePlanEntry | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('week');
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date(), weekStartsOn));
@@ -146,20 +149,6 @@ export function PlannerPage() {
     leisurePlanService.completePlanEntry(entry.id, entry.occurrenceDate).then(() => {
       showSuccess('Planejamento concluído.');
       reload();
-    });
-  }
-
-  function handleRemove(entry: LeisurePlanEntry) {
-    confirmAction.request({
-      title: 'Remover planejamento?',
-      description: `"${entry.title}" será removido do seu planejamento.`,
-      confirmLabel: 'Remover',
-      onConfirm: () => {
-        leisurePlanService.deletePlanEntry(entry.id).then(() => {
-          showSuccess('Planejamento removido.');
-          reload();
-        });
-      },
     });
   }
 
@@ -311,7 +300,7 @@ export function PlannerPage() {
                           key={entry.id}
                           entry={entry}
                           onComplete={() => handleComplete(entry)}
-                          onRemove={() => handleRemove(entry)}
+                          onOpenDetails={() => setDetailEntry(entry)}
                         />
                       ))}
                     </Stack>
@@ -323,11 +312,7 @@ export function PlannerPage() {
         </Box>
       ) : null}
 
-      <ConfirmActionDialog
-        request={confirmAction.pending}
-        onConfirm={confirmAction.confirm}
-        onCancel={confirmAction.cancel}
-      />
+      <PlanEntryDetailDialog entry={detailEntry} onClose={() => setDetailEntry(null)} />
     </Stack>
   );
 }
