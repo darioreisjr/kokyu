@@ -74,6 +74,7 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
   const router = useRouter();
   const { showSuccess, showError } = useSnackbar();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
   // In `edit`, the entry's own date/time when the page opened - new picks
   // are held to "not in the past", but this lets an already-past plan stay
@@ -88,7 +89,7 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
     control,
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useForm<PlanEntryFormValues>({
     resolver: zodResolver(buildPlanEntrySchema(pastReference)),
     mode: 'onChange',
@@ -134,6 +135,20 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
       showError(friendlyErrorMessage(error, 'Não foi possível salvar o planejamento agora.'));
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function handleArchive() {
+    if (!initialEntry) return;
+    setIsArchiving(true);
+    try {
+      await leisurePlanService.archivePlanEntry(initialEntry.id);
+      showSuccess('Planejamento arquivado. Você pode desarquivá-lo em Planejamento → Arquivados.');
+      router.push(leisureRoutes.planner);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível arquivar agora.'));
+    } finally {
+      setIsArchiving(false);
     }
   }
 
@@ -232,18 +247,29 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
           />
         </Stack>
 
-        <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'flex-end' }}>
-          <KokyuButton variant="text" onClick={() => router.push(leisureRoutes.planner)}>
-            Cancelar
-          </KokyuButton>
-          <KokyuButton
-            type="submit"
-            variant="contained"
-            loading={isSubmitting}
-            disabled={!isValid || isSubmitting}
-          >
-            Salvar
-          </KokyuButton>
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{ justifyContent: mode === 'edit' ? 'space-between' : 'flex-end' }}
+        >
+          {mode === 'edit' ? (
+            <KokyuButton variant="text" color="error" loading={isArchiving} onClick={handleArchive}>
+              Arquivar
+            </KokyuButton>
+          ) : null}
+          <Stack direction="row" spacing={1.5}>
+            <KokyuButton variant="text" onClick={() => router.push(leisureRoutes.planner)}>
+              Cancelar
+            </KokyuButton>
+            <KokyuButton
+              type="submit"
+              variant="contained"
+              loading={isSubmitting}
+              disabled={!isValid || isSubmitting || (mode === 'edit' && !isDirty)}
+            >
+              Salvar
+            </KokyuButton>
+          </Stack>
         </Stack>
       </Stack>
     </Stack>

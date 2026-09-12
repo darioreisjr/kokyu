@@ -37,10 +37,21 @@ describe('leisurePlanService', () => {
     expect(updated?.startTime).toBe('20:00');
   });
 
-  it('deletes a plan entry', async () => {
+  it('archives a plan entry — it disappears from the normal calendar view and shows up as archived', async () => {
     const entry = await leisurePlanService.createPlanEntry({ title: 'Filme', date: '2030-06-11' });
-    await leisurePlanService.deletePlanEntry(entry.id);
+    const archived = await leisurePlanService.archivePlanEntry(entry.id);
+    expect(archived?.archived).toBe(true);
     expect(await leisurePlanService.getPlanEntriesForDate('2030-06-11')).toHaveLength(0);
+    const archivedList = await leisurePlanService.getArchivedPlanEntries();
+    expect(archivedList.map((item) => item.id)).toContain(entry.id);
+  });
+
+  it('unarchives a plan entry — it reappears in the normal calendar view', async () => {
+    const entry = await leisurePlanService.createPlanEntry({ title: 'Filme', date: '2030-06-11' });
+    await leisurePlanService.archivePlanEntry(entry.id);
+    const unarchived = await leisurePlanService.unarchivePlanEntry(entry.id);
+    expect(unarchived?.archived).toBe(false);
+    expect(await leisurePlanService.getPlanEntriesForDate('2030-06-11')).toHaveLength(1);
   });
 
   it('marks a plan entry as completed', async () => {

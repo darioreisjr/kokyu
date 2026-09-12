@@ -70,9 +70,13 @@ export const leisureScheduleAdapter: ScheduleSourceAdapter = {
     return Boolean(updated);
   },
 
+  // Leisure plan entries are never hard-deleted — "delete" from the Daily
+  // Rhythm timeline archives the underlying plan entry instead (reversible
+  // from Planejamento → Arquivados), same rule as everywhere else in Tempo
+  // Livre.
   async onEntryDeleted(entry: ScheduleEntry): Promise<boolean> {
-    await leisurePlanService.deletePlanEntry(entry.sourceId);
-    return true;
+    const archived = await leisurePlanService.archivePlanEntry(entry.sourceId);
+    return Boolean(archived);
   },
 };
 

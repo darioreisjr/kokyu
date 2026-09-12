@@ -5,7 +5,7 @@ import type { LeisurePlanEntry } from '../types/leisurePlan.types';
 
 export type PlanEntryInput = Omit<
   LeisurePlanEntry,
-  'id' | 'createdAt' | 'completed' | 'occurrenceDate'
+  'id' | 'createdAt' | 'completed' | 'occurrenceDate' | 'archived' | 'archivedAt'
 > & {
   completed?: boolean;
 };
@@ -45,8 +45,32 @@ export const leisurePlanService = {
     }
   },
 
-  async deletePlanEntry(id: string): Promise<void> {
-    await apiFetchClient<void>(`/leisure/plan/${id}`, { method: 'DELETE' });
+  /** Plan entries are never hard-deleted — archive (reversible) is the only removal path; the backend has no `DELETE` route left to call. */
+  async archivePlanEntry(id: string): Promise<LeisurePlanEntry | null> {
+    try {
+      return await apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}/archive`, {
+        method: 'POST',
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
+  },
+
+  async unarchivePlanEntry(id: string): Promise<LeisurePlanEntry | null> {
+    try {
+      return await apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}/unarchive`, {
+        method: 'POST',
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
+  },
+
+  /** Every archived entry for the current user, flat (no recurrence expansion — an archived series is just shown once, by its own anchor date). */
+  async getArchivedPlanEntries(): Promise<LeisurePlanEntry[]> {
+    return apiFetchClient<LeisurePlanEntry[]>('/leisure/plan/archived');
   },
 
   /** `occurrenceDate` picks which day of a daily/weekly series is being completed — irrelevant (and omittable) for a `'none'`/`'custom'` entry, which has only ever had one. */

@@ -151,4 +151,56 @@ describe('PlannerPage', () => {
     expect(within(todayRow).getByRole('button', { name: 'Concluir' })).toBeInTheDocument();
   });
 
+  it('shows "Nenhum planejamento arquivado." in the Arquivados tab when there is nothing archived', async () => {
+    const user = userEvent.setup();
+    render(<PlannerPage />);
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Arquivados' }));
+    await waitFor(() =>
+      expect(screen.getByText('Nenhum planejamento arquivado.')).toBeInTheDocument(),
+    );
+  });
+
+  it('archiving a card removes it from the week view and lists it under Arquivados, and Desarquivar brings it back', async () => {
+    const user = userEvent.setup();
+    render(<PlannerPage />);
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+
+    // Archive "O Hobbit" from its detail dialog's Editar page isn't
+    // exercised here (that's PlanEntryFormPage's own test) — seed the
+    // archive directly through the service, same as the real "Arquivar"
+    // button would have done, and check what this page does with it.
+    await leisurePlanService.archivePlanEntry('plan-hobbit-hoje');
+
+    await user.click(screen.getByRole('button', { name: 'Arquivados' }));
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Desarquivar' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Desarquivar' }));
+    await waitFor(() => expect(screen.getByText('Planejamento desarquivado.')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('Nenhum planejamento arquivado.')).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Semana' }));
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+  });
+
+  it('opens the detail dialog from the Arquivados tab, with Desarquivar instead of Editar', async () => {
+    const user = userEvent.setup();
+    await leisurePlanService.archivePlanEntry('plan-hobbit-hoje');
+    render(<PlannerPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Arquivados' }));
+    await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: /Ver detalhes de O Hobbit/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'O Hobbit' });
+    expect(within(dialog).getByText('Arquivado')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('link', { name: 'Editar' })).not.toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: 'Desarquivar' }));
+    await waitFor(() => expect(screen.getByText('Planejamento desarquivado.')).toBeInTheDocument());
+  });
 });

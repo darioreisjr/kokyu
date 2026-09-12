@@ -41,14 +41,18 @@ export interface PlanEntryDetailDialogProps {
   /** `null` keeps the dialog closed — no separate `open` prop, so there's never a stale entry visible mid-close animation. */
   entry: LeisurePlanEntry | null;
   onClose: () => void;
+  /** Required when `entry` can be archived (the Arquivados list) — omit from a context that only ever shows active entries. */
+  onUnarchive?: (entry: LeisurePlanEntry) => void;
 }
 
 /**
  * Read-only "what is this?" view for a planner card — clicking a card
  * opens this, never the edit page directly, so a glance doesn't risk an
- * accidental change. Editing still lives at `/planejamento/:id/editar`.
+ * accidental change. An archived entry swaps "Editar" for "Desarquivar"
+ * instead — editing is never offered for something archived, only
+ * bringing it back first.
  */
-export function PlanEntryDetailDialog({ entry, onClose }: PlanEntryDetailDialogProps) {
+export function PlanEntryDetailDialog({ entry, onClose, onUnarchive }: PlanEntryDetailDialogProps) {
   return (
     <Dialog
       open={Boolean(entry)}
@@ -75,14 +79,21 @@ export function PlanEntryDetailDialog({ entry, onClose }: PlanEntryDetailDialogP
           {entry?.duration ? <DetailRow label="Duração" value={formatDuration(entry.duration)} /> : null}
           <DetailRow label="Recorrência" value={recurrenceLabels[entry?.recurrence ?? 'none']} />
           {entry?.notes ? <DetailRow label="Notas" value={entry.notes} /> : null}
-          <DetailRow label="Status" value={entry?.completed ? 'Concluído' : 'Pendente'} />
+          <DetailRow
+            label="Status"
+            value={entry?.archived ? 'Arquivado' : entry?.completed ? 'Concluído' : 'Pendente'}
+          />
         </Stack>
       </DialogContent>
       <DialogActions>
         <KokyuButton variant="text" onClick={onClose}>
           Fechar
         </KokyuButton>
-        {entry ? (
+        {entry?.archived ? (
+          <KokyuButton variant="contained" onClick={() => onUnarchive?.(entry)}>
+            Desarquivar
+          </KokyuButton>
+        ) : entry ? (
           <KokyuButton
             variant="contained"
             component={NextLink}

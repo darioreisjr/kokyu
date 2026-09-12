@@ -52,6 +52,22 @@ describe('leisureScheduleAdapter', () => {
     expect(entry!.date).toBe('2026-09-02');
   });
 
+  it('"deleting" from the timeline archives the plan entry instead of removing it', async () => {
+    await leisurePlanService.createPlanEntry({
+      title: 'Assistir Documentário',
+      date: '2026-08-31',
+    });
+
+    const [entry] = await leisureScheduleAdapter.getEntriesForDate('2026-08-31');
+    expect(entry).toBeDefined();
+
+    await leisureScheduleAdapter.onEntryDeleted!(entry!);
+
+    expect(await leisureScheduleAdapter.getEntriesForDate('2026-08-31')).toHaveLength(0);
+    const archived = await leisurePlanService.getArchivedPlanEntries();
+    expect(archived.map((item) => item.id)).toContain(entry!.sourceId);
+  });
+
   it('completing a recurring entry on one day never completes another day of the same series', async () => {
     await leisurePlanService.createPlanEntry({
       title: 'Alongar',

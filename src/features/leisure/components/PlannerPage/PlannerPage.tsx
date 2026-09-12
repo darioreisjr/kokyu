@@ -26,12 +26,14 @@ import { usePreferences } from '@/features/settings/providers/PreferencesProvide
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { leisureRoutes } from '../../constants/leisureRoutes';
+import { useArchivedPlanEntries } from '../../hooks/useArchivedPlanEntries';
 import { useLeisurePlan } from '../../hooks/useLeisurePlan';
 import { leisurePlanService } from '../../services/leisurePlanService';
 import type { LeisurePlanEntry } from '../../types/leisurePlan.types';
 import {
   formatDateHeading,
   formatWeekRangeHeading,
+  fromDateKey,
   getWeekDays,
   getWeekStart,
   isToday,
@@ -41,7 +43,7 @@ import {
 import { formatDuration, formatTime } from '../../utils/durationFormat';
 import { PlanEntryDetailDialog } from '../PlanEntryDetailDialog/PlanEntryDetailDialog';
 
-type ViewMode = 'day' | 'week';
+type ViewMode = 'day' | 'week' | 'archived';
 
 function PlanEntryRow({
   entry,
@@ -105,6 +107,58 @@ function PlanEntryRow({
   );
 }
 
+function ArchivedEntryRow({
+  entry,
+  onUnarchive,
+  onOpenDetails,
+}: {
+  entry: LeisurePlanEntry;
+  onUnarchive: () => void;
+  onOpenDetails: () => void;
+}) {
+  return (
+    <Stack
+      direction="row"
+      spacing={1.5}
+      sx={(theme) => ({
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderRadius: 1,
+        border: `1px solid ${themePalette(theme).kokyu.border.subtle}`,
+        padding: 1.5,
+      })}
+    >
+      <ButtonBase
+        onClick={onOpenDetails}
+        aria-label={`Ver detalhes de ${entry.title}`}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          minWidth: 0,
+          flex: 1,
+          borderRadius: 1,
+          textAlign: 'left',
+        }}
+      >
+        <Typography variant="labelMedium" component="p" noWrap sx={{ width: '100%' }}>
+          {entry.title}
+        </Typography>
+        <Typography
+          variant="labelSmall"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+        >
+          {formatDateHeading(fromDateKey(entry.date))}
+          {entry.startTime ? ` · ${formatTime(entry.startTime)}` : ''}
+        </Typography>
+      </ButtonBase>
+      <KokyuButton variant="outlined" size="small" onClick={onUnarchive}>
+        Desarquivar
+      </KokyuButton>
+    </Stack>
+  );
+}
+
 /**
  * `/app/tempo-livre/planejamento` — Hoje/Semana, using the same
  * locale/timezone/week-start as the rest of Kokyu (Settings), never a
@@ -124,8 +178,13 @@ export function PlannerPage() {
   const weekDays = useMemo(() => getWeekDays(weekStart, weekStartsOn), [weekStart, weekStartsOn]);
 
   const { status, planEntries, reload } = useLeisurePlan(
-    viewMode === 'week' ? weekDays : [selectedDate],
+    viewMode === 'week' ? weekDays : viewMode === 'day' ? [selectedDate] : [],
   );
+  const {
+    status: archivedStatus,
+    archivedEntries,
+    reload: reloadArchived,
+  } = useArchivedPlanEntries(viewMode === 'archived');
 
   // Grouped by `occurrenceDate`, never `date` (the series' anchor) — a
   // daily/weekly entry is one row expanded by the backend into one
@@ -165,6 +224,19 @@ export function PlannerPage() {
         // the backend has the last word (see `LeisurePlanService.complete`).
         showError(friendlyErrorMessage(error, 'Não foi possível concluir agora.'));
         reload();
+      });
+  }
+
+  function handleUnarchive(entry: LeisurePlanEntry) {
+    leisurePlanService
+      .unarchivePlanEntry(entry.id)
+      .then(() => {
+        showSuccess('Planejamento desarquivado.');
+        setDetailEntry(null);
+        reloadArchived();
+      })
+      .catch((error) => {
+        showError(friendlyErrorMessage(error, 'Não foi possível desarquivar agora.'));
       });
   }
 
@@ -209,6 +281,9 @@ export function PlannerPage() {
           <ToggleButton value="week" sx={{ textTransform: 'none' }}>
             Semana
           </ToggleButton>
+          <ToggleButton value="archived" sx={{ textTransform: 'none' }}>
+            Arquivados
+          </ToggleButton>
         </ToggleButtonGroup>
 
         {viewMode === 'week' ? (
@@ -229,7 +304,7 @@ export function PlannerPage() {
               <ChevronRightRoundedIcon fontSize="small" />
             </IconButton>
           </Stack>
-        ) : (
+        ) : viewMode === 'day' ? (
           <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
             <IconButton
               aria-label="Dia anterior"
@@ -247,88 +322,125 @@ export function PlannerPage() {
               <ChevronRightRoundedIcon fontSize="small" />
             </IconButton>
           </Stack>
-        )}
+        ) : null}
       </Stack>
 
-      {status === 'loading' ? <Skeleton variant="rounded" height={280} /> : null}
-      {status === 'error' ? (
-        <Alert severity="error">
-          Não foi possível carregar o planejamento agora. Tente novamente.
-        </Alert>
-      ) : null}
+      {viewMode === 'archived' ? (
+        <>
+          {archivedStatus === 'loading' ? <Skeleton variant="rounded" height={280} /> : null}
+          {archivedStatus === 'error' ? (
+            <Alert severity="error">
+              Não foi possível carregar os planejamentos arquivados agora. Tente novamente.
+            </Alert>
+          ) : null}
+          {archivedStatus === 'ready' && archivedEntries.length === 0 ? (
+            <Typography
+              variant="body2"
+              sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+            >
+              Nenhum planejamento arquivado.
+            </Typography>
+          ) : null}
+          {archivedStatus === 'ready' && archivedEntries.length > 0 ? (
+            <Stack spacing={1}>
+              {archivedEntries.map((entry) => (
+                <ArchivedEntryRow
+                  key={entry.id}
+                  entry={entry}
+                  onUnarchive={() => handleUnarchive(entry)}
+                  onOpenDetails={() => setDetailEntry(entry)}
+                />
+              ))}
+            </Stack>
+          ) : null}
+        </>
+      ) : (
+        <>
+          {status === 'loading' ? <Skeleton variant="rounded" height={280} /> : null}
+          {status === 'error' ? (
+            <Alert severity="error">
+              Não foi possível carregar o planejamento agora. Tente novamente.
+            </Alert>
+          ) : null}
 
-      {status === 'ready' && planEntries.length === 0 ? (
-        <EmptyState
-          icon={CalendarMonthRoundedIcon}
-          title="Sua semana ainda não tem atividades planejadas."
-          action={
-            <KokyuButton variant="contained" component={NextLink} href={planNewHref}>
-              Planejar primeira atividade
-            </KokyuButton>
-          }
-        />
-      ) : null}
+          {status === 'ready' && planEntries.length === 0 ? (
+            <EmptyState
+              icon={CalendarMonthRoundedIcon}
+              title="Sua semana ainda não tem atividades planejadas."
+              action={
+                <KokyuButton variant="contained" component={NextLink} href={planNewHref}>
+                  Planejar primeira atividade
+                </KokyuButton>
+              }
+            />
+          ) : null}
 
-      {status === 'ready' && planEntries.length > 0 ? (
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns:
-              viewMode === 'week'
-                ? { xs: '1fr', sm: 'repeat(auto-fill, minmax(220px, 1fr))' }
-                : '1fr',
-            gap: 2,
-          }}
-        >
-          {daysToShow.map((day) => {
-            const dateKey = toDateKey(day);
-            const dayEntries = entriesByDate.get(dateKey) ?? [];
-            return (
-              <Paper
-                key={dateKey}
-                elevation={0}
-                sx={(theme) => ({
-                  borderRadius: cardTokens.radius,
-                  border: `1px solid ${isToday(day) ? themePalette(theme).kokyu.border.focus : themePalette(theme).kokyu.border.subtle}`,
-                  padding: 2,
-                })}
-              >
-                <Stack spacing={1.5}>
-                  {viewMode === 'week' ? (
-                    <Typography variant="labelLarge">
-                      {format(day, 'EEEE', { locale: ptBR }).replace(/^./, (letter) =>
-                        letter.toUpperCase(),
+          {status === 'ready' && planEntries.length > 0 ? (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns:
+                  viewMode === 'week'
+                    ? { xs: '1fr', sm: 'repeat(auto-fill, minmax(220px, 1fr))' }
+                    : '1fr',
+                gap: 2,
+              }}
+            >
+              {daysToShow.map((day) => {
+                const dateKey = toDateKey(day);
+                const dayEntries = entriesByDate.get(dateKey) ?? [];
+                return (
+                  <Paper
+                    key={dateKey}
+                    elevation={0}
+                    sx={(theme) => ({
+                      borderRadius: cardTokens.radius,
+                      border: `1px solid ${isToday(day) ? themePalette(theme).kokyu.border.focus : themePalette(theme).kokyu.border.subtle}`,
+                      padding: 2,
+                    })}
+                  >
+                    <Stack spacing={1.5}>
+                      {viewMode === 'week' ? (
+                        <Typography variant="labelLarge">
+                          {format(day, 'EEEE', { locale: ptBR }).replace(/^./, (letter) =>
+                            letter.toUpperCase(),
+                          )}
+                          , {format(day, 'd')}
+                        </Typography>
+                      ) : null}
+                      {dayEntries.length === 0 ? (
+                        <Typography
+                          variant="body2"
+                          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+                        >
+                          Nada planejado.
+                        </Typography>
+                      ) : (
+                        <Stack spacing={1}>
+                          {dayEntries.map((entry) => (
+                            <PlanEntryRow
+                              key={entry.id}
+                              entry={entry}
+                              onComplete={() => handleComplete(entry)}
+                              onOpenDetails={() => setDetailEntry(entry)}
+                            />
+                          ))}
+                        </Stack>
                       )}
-                      , {format(day, 'd')}
-                    </Typography>
-                  ) : null}
-                  {dayEntries.length === 0 ? (
-                    <Typography
-                      variant="body2"
-                      sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
-                    >
-                      Nada planejado.
-                    </Typography>
-                  ) : (
-                    <Stack spacing={1}>
-                      {dayEntries.map((entry) => (
-                        <PlanEntryRow
-                          key={entry.id}
-                          entry={entry}
-                          onComplete={() => handleComplete(entry)}
-                          onOpenDetails={() => setDetailEntry(entry)}
-                        />
-                      ))}
                     </Stack>
-                  )}
-                </Stack>
-              </Paper>
-            );
-          })}
-        </Box>
-      ) : null}
+                  </Paper>
+                );
+              })}
+            </Box>
+          ) : null}
+        </>
+      )}
 
-      <PlanEntryDetailDialog entry={detailEntry} onClose={() => setDetailEntry(null)} />
+      <PlanEntryDetailDialog
+        entry={detailEntry}
+        onClose={() => setDetailEntry(null)}
+        onUnarchive={handleUnarchive}
+      />
     </Stack>
   );
 }

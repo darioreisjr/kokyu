@@ -254,16 +254,29 @@ function handlePlan(
   const id = segments[2];
   const sub = segments[3];
 
+  // `GET /leisure/plan/archived` — a literal path segment, checked before
+  // the `:id`-based branches below treat it as an entry id.
+  if (id === 'archived' && !sub && method === 'GET') {
+    return leisureDb.planEntries
+      .filter((entry) => entry.archived)
+      .map((entry) => ({ ...entry, occurrenceDate: entry.date }));
+  }
+
   if (!id) {
     if (method === 'GET') {
       const startDate = query.get('startDate') ?? '';
       const endDate = query.get('endDate') ?? '';
-      return expandPlanEntries(leisureDb.planEntries, startDate, endDate);
+      return expandPlanEntries(
+        leisureDb.planEntries.filter((entry) => !entry.archived),
+        startDate,
+        endDate,
+      );
     }
     if (method === 'POST') {
       const entry = {
         id: generateId('plan'),
         completed: false,
+        archived: false,
         createdAt: new Date().toISOString(),
         ...(body as Record<string, unknown>),
       } as (typeof leisureDb.planEntries)[number];
@@ -273,6 +286,22 @@ function handlePlan(
   }
 
   const index = leisureDb.planEntries.findIndex((entry) => entry.id === id);
+
+  if (sub === 'archive' && method === 'POST') {
+    if (index === -1) notFound();
+    const existing = leisureDb.planEntries[index]!;
+    const updated = { ...existing, archived: true, archivedAt: new Date().toISOString() };
+    leisureDb.planEntries[index] = updated;
+    return { ...updated, occurrenceDate: updated.date };
+  }
+
+  if (sub === 'unarchive' && method === 'POST') {
+    if (index === -1) notFound();
+    const existing = leisureDb.planEntries[index]!;
+    const updated = { ...existing, archived: false, archivedAt: null };
+    leisureDb.planEntries[index] = updated;
+    return { ...updated, occurrenceDate: updated.date };
+  }
 
   if (sub === 'complete' && method === 'POST') {
     if (index === -1) notFound();
@@ -306,13 +335,8 @@ function handlePlan(
       leisureDb.planEntries[index] = updated as (typeof leisureDb.planEntries)[number];
       return { ...updated, occurrenceDate: updated.date };
     }
-    if (method === 'DELETE') {
-      leisureDb.planEntries = leisureDb.planEntries.filter((entry) => entry.id !== id);
-      leisureDb.planCompletions = leisureDb.planCompletions.filter(
-        (completion) => completion.planEntryId !== id,
-      );
-      return undefined;
-    }
+    // No `DELETE` here — plan entries are never hard-deleted, archive/unarchive
+    // (above) is the only removal path, mirroring the real backend.
   }
 
   throw new Error(`mockLeisureApiFetchClient: unhandled plan route ${method} ${segments.join('/')}`);

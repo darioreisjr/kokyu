@@ -25,6 +25,7 @@ function buildEntry(overrides: Partial<LeisurePlanEntry> = {}): LeisurePlanEntry
     endTime: '19:45',
     duration: 45,
     completed: false,
+    archived: false,
     createdAt: '2030-01-01T00:00:00.000Z',
     ...overrides,
   };
@@ -108,19 +109,21 @@ describe('PlanEntryFormPage', () => {
     expect(updated.title).toBe('Violão (aula avançada)');
   });
 
-  it('saves an entry whose notes came back as `null` from the API, unchanged', async () => {
+  it('saves an entry whose notes came back as `null` from the API, once a real change is made', async () => {
     // The real backend sends `null` (a nullable DB column), never
     // `undefined`, for an unset notes - the frontend type says
     // `string | undefined`, but the runtime value can still be `null`.
-    // Saving without touching the field must not trip the form's
-    // `.optional()` (not `.nullable()`) zod schema. `notes` is the only
-    // field this still applies to — startTime/endTime/duration are
-    // required now, covered by the "legacy entry" test below instead.
+    // A small edit (below) must not trip the form's `.optional()` (not
+    // `.nullable()`) zod schema. `notes` is the only field this still
+    // applies to — startTime/endTime/duration are required now, covered
+    // by the "legacy entry" test below instead.
     const user = userEvent.setup();
     const entryWithNullNotes = buildEntry({ notes: null } as unknown as Partial<LeisurePlanEntry>);
     render(<PlanEntryFormPage mode="edit" initialEntry={entryWithNullNotes} />);
     await waitFor(() => expect(screen.getByLabelText('Título')).toHaveValue('Violão'));
 
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+    await user.type(screen.getByLabelText('Título'), ' (aula avançada)');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled());
     await user.click(screen.getByRole('button', { name: 'Salvar' }));
 
@@ -154,5 +157,33 @@ describe('PlanEntryFormPage', () => {
     await user.click(screen.getByRole('button', { name: 'Cancelar' }));
 
     expect(mockPush).toHaveBeenCalledWith(leisureRoutes.planner);
+  });
+
+  it('keeps Salvar disabled in edit mode until something actually changes', async () => {
+    const user = userEvent.setup();
+    render(<PlanEntryFormPage mode="edit" initialEntry={buildEntry()} />);
+    await waitFor(() => expect(screen.getByLabelText('Título')).toHaveValue('Violão'));
+
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+
+    await user.type(screen.getByLabelText('Notas (opcional)'), 'Praticar escalas.');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled());
+  });
+
+  it('does not show an Arquivar button in create mode', () => {
+    render(<PlanEntryFormPage mode="create" />);
+    expect(screen.queryByRole('button', { name: 'Arquivar' })).not.toBeInTheDocument();
+  });
+
+  it('archives the entry and navigates back to the planner', async () => {
+    const user = userEvent.setup();
+    render(<PlanEntryFormPage mode="edit" initialEntry={buildEntry()} />);
+    await waitFor(() => expect(screen.getByLabelText('Título')).toHaveValue('Violão'));
+
+    await user.click(screen.getByRole('button', { name: 'Arquivar' }));
+
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith(leisureRoutes.planner));
+    const archived = await leisurePlanService.getArchivedPlanEntries();
+    expect(archived.map((entry) => entry.id)).toContain('plan-violao-hoje');
   });
 });

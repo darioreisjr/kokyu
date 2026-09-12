@@ -31,6 +31,7 @@ export function createMockLeisurePlan(referenceDate: Date = new Date()): Leisure
       startTime: '21:00',
       duration: 30,
       completed: false,
+      archived: false,
       createdAt,
     },
     {
@@ -43,6 +44,7 @@ export function createMockLeisurePlan(referenceDate: Date = new Date()): Leisure
       duration: 45,
       recurrence: 'weekly',
       completed: false,
+      archived: false,
       createdAt,
     },
     {
@@ -54,6 +56,7 @@ export function createMockLeisurePlan(referenceDate: Date = new Date()): Leisure
       startTime: '20:00',
       duration: 169,
       completed: false,
+      archived: false,
       createdAt,
     },
     {
@@ -64,6 +67,7 @@ export function createMockLeisurePlan(referenceDate: Date = new Date()): Leisure
       occurrenceDate: '2026-09-12',
       startTime: '20:00',
       completed: false,
+      archived: false,
       createdAt,
     },
   ];

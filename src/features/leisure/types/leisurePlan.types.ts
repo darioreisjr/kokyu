@@ -31,5 +31,8 @@ export interface LeisurePlanEntry {
   reminder?: boolean;
   /** For a `'daily'`/`'weekly'` entry, reflects `occurrenceDate` specifically — completing one day never affects any other. */
   completed: boolean;
+  /** Plan entries are never hard-deleted — this is the only removal state, and it's reversible (see `leisurePlanService.archivePlanEntry`/`unarchivePlanEntry`). An archived entry never appears in the normal calendar view. */
+  archived: boolean;
+  archivedAt?: string | null;
   createdAt: string;
 }
