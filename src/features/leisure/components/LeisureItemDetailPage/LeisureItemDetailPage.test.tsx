@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -128,6 +129,17 @@ describe('LeisureItemDetailPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Planejar' }));
     const dialog = await screen.findByRole('dialog', { name: 'Planejar atividade' });
+    // A future date so the "not in the past" rule can't make startTime/
+    // endTime flaky depending on what time of day this test happens to run.
+    const dayGroup = within(dialog).getByRole('group', { name: 'Dia' });
+    await user.click(dayGroup.querySelector('[aria-label="Day"]') as HTMLElement);
+    await user.paste('01/01/2030');
+    fireEvent.change(within(dialog).getByLabelText('Início'), { target: { value: '19:00' } });
+    fireEvent.change(within(dialog).getByLabelText('Fim'), { target: { value: '20:00' } });
+    await user.type(within(dialog).getByLabelText('Duração em minutos'), '60');
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Salvar' })).toBeEnabled(),
+    );
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     await waitFor(() => expect(screen.getByText('Atividade planejada.')).toBeInTheDocument());

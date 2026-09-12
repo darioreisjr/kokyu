@@ -88,9 +88,10 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
     control,
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<PlanEntryFormValues>({
     resolver: zodResolver(buildPlanEntrySchema(pastReference)),
+    mode: 'onChange',
     defaultValues: {
       ...planEntryDefaultValues,
       ...(initialEntry
@@ -137,106 +138,113 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
   }
 
   return (
-    <Stack
-      component="form"
-      spacing={3}
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      sx={{ maxWidth: 480 }}
-    >
+    <Stack component="form" spacing={3} onSubmit={handleSubmit(onSubmit)} noValidate>
       <Typography variant="displaySmall" component="h1">
         {mode === 'edit' ? 'Editar planejamento' : 'Planejar atividade'}
       </Typography>
 
-      <Stack spacing={2.5}>
-        <KokyuTextField
-          label="Título"
-          error={Boolean(errors.title)}
-          helperText={errors.title?.message}
-          {...register('title')}
-        />
-        <Controller
-          control={control}
-          name="date"
-          render={({ field }) => (
-            <KokyuDateField
-              label="Dia"
-              value={field.value ? fromDateKey(field.value) : null}
-              onChange={(value) => field.onChange(value ? toDateKey(value) : '')}
-              minDate={minDate}
-              error={Boolean(errors.date)}
-              helperText={errors.date?.message}
-            />
-          )}
-        />
-        <Stack direction="row" spacing={2}>
+      {/*
+        `alignSelf` (not `mx: 'auto'`) centers this box: the parent form
+        Stack's own children-margin-reset rule (`> :not(style):not(style)
+        { margin: 0 }`) outranks a plain `margin-left/right: auto` class
+        on specificity, so an auto-margin approach silently loses to it.
+      */}
+      <Stack spacing={3} sx={{ width: '100%', maxWidth: 480, alignSelf: 'center' }}>
+        <Stack spacing={2.5}>
           <KokyuTextField
-            label="Início (opcional)"
-            type="time"
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
-            sx={{ flex: 1 }}
-            error={Boolean(errors.startTime)}
-            helperText={errors.startTime?.message}
-            {...register('startTime', { setValueAs: (value) => (value === '' ? undefined : value) })}
+            label="Título"
+            error={Boolean(errors.title)}
+            helperText={errors.title?.message}
+            {...register('title')}
           />
+          <Controller
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <KokyuDateField
+                label="Dia"
+                value={field.value ? fromDateKey(field.value) : null}
+                onChange={(value) => field.onChange(value ? toDateKey(value) : '')}
+                minDate={minDate}
+                error={Boolean(errors.date)}
+                helperText={errors.date?.message}
+              />
+            )}
+          />
+          <Stack direction="row" spacing={2}>
+            <KokyuTextField
+              label="Início"
+              type="time"
+              slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
+              sx={{ flex: 1 }}
+              error={Boolean(errors.startTime)}
+              helperText={errors.startTime?.message}
+              {...register('startTime')}
+            />
+            <KokyuTextField
+              label="Fim"
+              type="time"
+              slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
+              sx={{ flex: 1 }}
+              error={Boolean(errors.endTime)}
+              helperText={errors.endTime?.message}
+              {...register('endTime')}
+            />
+          </Stack>
           <KokyuTextField
-            label="Fim (opcional)"
-            type="time"
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
-            sx={{ flex: 1 }}
-            error={Boolean(errors.endTime)}
-            helperText={errors.endTime?.message}
-            {...register('endTime', { setValueAs: (value) => (value === '' ? undefined : value) })}
+            label="Duração em minutos"
+            type="number"
+            slotProps={{ htmlInput: { min: 1 } }}
+            error={Boolean(errors.duration)}
+            helperText={errors.duration?.message}
+            {...register('duration', {
+              setValueAs: (value) => (value === '' ? undefined : Number(value)),
+            })}
+          />
+          <Controller
+            control={control}
+            name="recurrence"
+            render={({ field }) => (
+              <KokyuTextField select label="Recorrência" {...field}>
+                {recurrenceOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </KokyuTextField>
+            )}
+          />
+          <KokyuTextField label="Notas (opcional)" multiline minRows={2} {...register('notes')} />
+          <Controller
+            control={control}
+            name="reminder"
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={Boolean(field.value)}
+                    onChange={(event) => field.onChange(event.target.checked)}
+                  />
+                }
+                label="Lembrete"
+              />
+            )}
           />
         </Stack>
-        <KokyuTextField
-          label="Duração em minutos (opcional)"
-          type="number"
-          slotProps={{ htmlInput: { min: 0 } }}
-          error={Boolean(errors.duration)}
-          helperText={errors.duration?.message}
-          {...register('duration', {
-            setValueAs: (value) => (value === '' ? undefined : Number(value)),
-          })}
-        />
-        <Controller
-          control={control}
-          name="recurrence"
-          render={({ field }) => (
-            <KokyuTextField select label="Recorrência" {...field}>
-              {recurrenceOptions.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </KokyuTextField>
-          )}
-        />
-        <KokyuTextField label="Notas (opcional)" multiline minRows={2} {...register('notes')} />
-        <Controller
-          control={control}
-          name="reminder"
-          render={({ field }) => (
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={Boolean(field.value)}
-                  onChange={(event) => field.onChange(event.target.checked)}
-                />
-              }
-              label="Lembrete"
-            />
-          )}
-        />
-      </Stack>
 
-      <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'flex-end' }}>
-        <KokyuButton variant="text" onClick={() => router.push(leisureRoutes.planner)}>
-          Cancelar
-        </KokyuButton>
-        <KokyuButton type="submit" variant="contained" loading={isSubmitting}>
-          Salvar
-        </KokyuButton>
+        <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'flex-end' }}>
+          <KokyuButton variant="text" onClick={() => router.push(leisureRoutes.planner)}>
+            Cancelar
+          </KokyuButton>
+          <KokyuButton
+            type="submit"
+            variant="contained"
+            loading={isSubmitting}
+            disabled={!isValid || isSubmitting}
+          >
+            Salvar
+          </KokyuButton>
+        </Stack>
       </Stack>
     </Stack>
   );

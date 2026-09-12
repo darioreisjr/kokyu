@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -15,7 +16,13 @@ describe('PlanEntryDialog', () => {
       <PlanEntryDialog
         open
         mode="edit"
-        defaultValues={{ title: 'Violão', date: '2030-01-01' }}
+        defaultValues={{
+          title: 'Violão',
+          date: '2030-01-01',
+          startTime: '19:00',
+          endTime: '19:45',
+          duration: 45,
+        }}
         onClose={vi.fn()}
         onSave={vi.fn()}
       />,
@@ -37,14 +44,30 @@ describe('PlanEntryDialog', () => {
   });
 
   it('rejects saving with no title or date', async () => {
+    render(<PlanEntryDialog open onClose={vi.fn()} onSave={vi.fn()} />);
+
+    expect(await screen.findByRole('button', { name: 'Salvar' })).toBeDisabled();
+  });
+
+  it('keeps Salvar disabled until every required field is filled, then enables it', async () => {
     const user = userEvent.setup();
-    const onSave = vi.fn();
-    render(<PlanEntryDialog open onClose={vi.fn()} onSave={onSave} />);
+    render(
+      <PlanEntryDialog
+        open
+        defaultValues={{ date: '2030-06-10' }}
+        onClose={vi.fn()}
+        onSave={vi.fn()}
+      />,
+    );
 
-    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
 
-    expect(await screen.findByText('Informe um título')).toBeInTheDocument();
-    expect(onSave).not.toHaveBeenCalled();
+    await user.type(screen.getByLabelText('Título'), 'Ler O Hobbit');
+    fireEvent.change(screen.getByLabelText('Início'), { target: { value: '19:00' } });
+    fireEvent.change(screen.getByLabelText('Fim'), { target: { value: '20:00' } });
+    await user.type(screen.getByLabelText('Duração em minutos'), '60');
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled());
   });
 
   it('saves a valid entry', async () => {
@@ -53,12 +76,19 @@ describe('PlanEntryDialog', () => {
     render(
       <PlanEntryDialog
         open
-        defaultValues={{ title: 'Ler O Hobbit', date: '2030-06-10' }}
+        defaultValues={{
+          title: 'Ler O Hobbit',
+          date: '2030-06-10',
+          startTime: '19:00',
+          endTime: '20:00',
+          duration: 60,
+        }}
         onClose={vi.fn()}
         onSave={onSave}
       />,
     );
     await waitFor(() => expect(screen.getByLabelText('Título')).toHaveValue('Ler O Hobbit'));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled());
 
     await user.click(screen.getByRole('button', { name: 'Salvar' }));
 

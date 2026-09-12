@@ -16,9 +16,18 @@ const recurrenceValues = ['none', 'daily', 'weekly', 'custom'] as const;
 const planEntryFieldsSchema = z.object({
   title: z.string().min(1, 'Informe um título'),
   date: z.string().min(1, 'Informe uma data'),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  duration: z.number().min(0, 'Informe uma duração válida').optional(),
+  startTime: z.string().min(1, 'Informe o horário de início'),
+  endTime: z.string().min(1, 'Informe o horário de término'),
+  // Kept `.optional()` (not required) purely so an empty number field can
+  // hold `undefined` as its RHF default — see the comment above this
+  // schema. "Required" is enforced below in `superRefine` instead, the
+  // same place the rest of this schema's cross-field/custom rules live.
+  duration: z
+    .number()
+    .int('A duração deve ser um número inteiro')
+    .positive('Informe uma duração válida')
+    .max(100_000, 'Duração muito longa')
+    .optional(),
   recurrence: z.enum(recurrenceValues).optional(),
   notes: z.string().optional(),
   reminder: z.boolean().optional(),
@@ -76,6 +85,10 @@ export function buildPlanEntrySchema(reference?: PlanEntryPastReference) {
           message: 'O horário de término não pode estar no passado',
         });
       }
+    }
+
+    if (values.duration === undefined) {
+      ctx.addIssue({ code: 'custom', path: ['duration'], message: 'Informe uma duração' });
     }
   });
 }

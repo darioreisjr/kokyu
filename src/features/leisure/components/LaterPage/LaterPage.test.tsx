@@ -1,5 +1,6 @@
+import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { leisureItemService } from '../../services/leisureItemService';
@@ -9,6 +10,10 @@ import { LaterPage } from './LaterPage';
 describe('LaterPage', () => {
   beforeEach(() => {
     resetLeisureDb();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('shows the empty state when there is nothing unsorted', async () => {
@@ -73,7 +78,12 @@ describe('LaterPage', () => {
   });
 
   it('plans an item directly from the row menu, with a usable default date', async () => {
-    const user = userEvent.setup();
+    // Fixed, well-into-the-morning "now" so the dialog's default date
+    // (today) stays usable as-is, and Início/Fim below are deterministically
+    // "later today" regardless of the real wall-clock time this test runs at.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2030-01-01T08:00:00'));
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     await leisureItemService.createLeisureItem({
       title: 'Sessão de leitura',
       type: 'unsorted',
@@ -90,6 +100,12 @@ describe('LaterPage', () => {
     await user.click(screen.getByRole('button', { name: 'Mais ações' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Planejar' }));
     const dialog = await screen.findByRole('dialog', { name: 'Planejar atividade' });
+    fireEvent.change(within(dialog).getByLabelText('Início'), { target: { value: '20:00' } });
+    fireEvent.change(within(dialog).getByLabelText('Fim'), { target: { value: '21:00' } });
+    await user.type(within(dialog).getByLabelText('Duração em minutos'), '60');
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Salvar' })).toBeEnabled(),
+    );
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     await waitFor(() => expect(screen.getByText('Atividade planejada.')).toBeInTheDocument());

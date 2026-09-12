@@ -69,9 +69,10 @@ export function PlanEntryDialog({
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<PlanEntryFormValues>({
     resolver: zodResolver(buildPlanEntrySchema(pastReference)),
+    mode: 'onChange',
     defaultValues: { ...planEntryDefaultValues, ...defaultValues },
   });
 
@@ -142,28 +143,28 @@ export function PlanEntryDialog({
           />
           <Stack direction="row" spacing={2}>
             <KokyuTextField
-              label="Início (opcional)"
+              label="Início"
               type="time"
               slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
               sx={{ flex: 1 }}
               error={Boolean(errors.startTime)}
               helperText={errors.startTime?.message}
-              {...register('startTime', { setValueAs: (value) => (value === '' ? undefined : value) })}
+              {...register('startTime')}
             />
             <KokyuTextField
-              label="Fim (opcional)"
+              label="Fim"
               type="time"
               slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minTime } }}
               sx={{ flex: 1 }}
               error={Boolean(errors.endTime)}
               helperText={errors.endTime?.message}
-              {...register('endTime', { setValueAs: (value) => (value === '' ? undefined : value) })}
+              {...register('endTime')}
             />
           </Stack>
           <KokyuTextField
-            label="Duração em minutos (opcional)"
+            label="Duração em minutos"
             type="number"
-            slotProps={{ htmlInput: { min: 0 } }}
+            slotProps={{ htmlInput: { min: 1 } }}
             error={Boolean(errors.duration)}
             helperText={errors.duration?.message}
             {...register('duration', {
@@ -210,6 +211,7 @@ export function PlanEntryDialog({
           form="plan-entry-form"
           variant="contained"
           loading={isSubmitting}
+          disabled={!isValid || Boolean(isSubmitting)}
         >
           Salvar
         </KokyuButton>
