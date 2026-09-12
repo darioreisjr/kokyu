@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { leisurePlanService } from '../../services/leisurePlanService';
@@ -10,6 +10,10 @@ import { PlannerPage } from './PlannerPage';
 describe('PlannerPage', () => {
   beforeEach(() => {
     resetLeisureDb();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("shows the header and this week's plan by default", async () => {
@@ -114,11 +118,37 @@ describe('PlannerPage', () => {
       ).toBeInTheDocument(),
     );
 
-    // Tomorrow — still the same recurring series, but a fresh, unfinished occurrence.
+    // Tomorrow — still the same recurring series, a fresh unfinished
+    // occurrence, but not completable from here: only today's row gets a
+    // Concluir button.
     await user.click(screen.getByRole('button', { name: 'Próximo dia' }));
     await waitFor(() => expect(screen.getByText('Alongar')).toBeInTheDocument());
     const tomorrowRow = screen.getByText('Alongar').closest('button')!.parentElement as HTMLElement;
-    expect(within(tomorrowRow).getByRole('button', { name: 'Concluir' })).toBeInTheDocument();
+    expect(within(tomorrowRow).queryByRole('button', { name: 'Concluir' })).not.toBeInTheDocument();
     expect(within(tomorrowRow).queryByRole('button', { name: 'Concluído' })).not.toBeInTheDocument();
   });
+
+  it('only shows Concluir on the card whose occurrence date is today', async () => {
+    // Fixed mid-week "now" — the mock's "upcoming Saturday" for
+    // Interestelar would otherwise jump into next week whenever this
+    // suite happens to run on a Saturday, taking the card off-screen.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.setSystemTime(new Date('2026-06-17T10:00:00'));
+    resetLeisureDb();
+
+    render(<PlannerPage />);
+    await waitFor(() => expect(screen.getByText('Interestelar')).toBeInTheDocument());
+
+    // "Interestelar" is planned for the upcoming Saturday (see
+    // `createMockLeisurePlan`) — never today's own row in this suite.
+    const futureRow = screen.getByText('Interestelar').closest('button')!
+      .parentElement as HTMLElement;
+    expect(within(futureRow).queryByRole('button', { name: 'Concluir' })).not.toBeInTheDocument();
+    expect(within(futureRow).queryByRole('button', { name: 'Concluído' })).not.toBeInTheDocument();
+
+    // "O Hobbit" is today's own occurrence — still completable.
+    const todayRow = screen.getByText('O Hobbit').closest('button')!.parentElement as HTMLElement;
+    expect(within(todayRow).getByRole('button', { name: 'Concluir' })).toBeInTheDocument();
+  });
+
 });

@@ -23,6 +23,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { cardTokens } from '@/design-system/tokens/component';
 import { usePreferences } from '@/features/settings/providers/PreferencesProvider';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { leisureRoutes } from '../../constants/leisureRoutes';
 import { useLeisurePlan } from '../../hooks/useLeisurePlan';
@@ -84,16 +85,22 @@ function PlanEntryRow({
           {entry.duration ? ` · ${formatDuration(entry.duration)}` : ''}
         </Typography>
       </ButtonBase>
-      <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end' }}>
-        <KokyuButton
-          variant={entry.completed ? 'text' : 'outlined'}
-          size="small"
-          disabled={entry.completed}
-          onClick={onComplete}
-        >
-          {entry.completed ? 'Concluído' : 'Concluir'}
-        </KokyuButton>
-      </Stack>
+      {/* Only today's occurrence is completable — a future/past card would
+          be an easy accidental tap, and the backend rejects it anyway (see
+          `LeisurePlanService.complete`). A completed one still shows its
+          "Concluído" state regardless of day, so history stays visible. */}
+      {entry.completed || entry.occurrenceDate === toDateKey(new Date()) ? (
+        <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end' }}>
+          <KokyuButton
+            variant={entry.completed ? 'text' : 'outlined'}
+            size="small"
+            disabled={entry.completed}
+            onClick={onComplete}
+          >
+            {entry.completed ? 'Concluído' : 'Concluir'}
+          </KokyuButton>
+        </Stack>
+      ) : null}
     </Stack>
   );
 }
@@ -108,7 +115,7 @@ function PlanEntryRow({
 export function PlannerPage() {
   const { preferences } = usePreferences();
   const weekStartsOn = preferences.locale.weekStartsOn;
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
 
   const [detailEntry, setDetailEntry] = useState<LeisurePlanEntry | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('week');
@@ -146,10 +153,19 @@ export function PlannerPage() {
   function handleComplete(entry: LeisurePlanEntry) {
     // `occurrenceDate` — completing a daily/weekly entry from one day's
     // row must never mark any other day of the series as done.
-    leisurePlanService.completePlanEntry(entry.id, entry.occurrenceDate).then(() => {
-      showSuccess('Planejamento concluído.');
-      reload();
-    });
+    leisurePlanService
+      .completePlanEntry(entry.id, entry.occurrenceDate)
+      .then(() => {
+        showSuccess('Planejamento concluído.');
+        reload();
+      })
+      .catch((error) => {
+        // Reachable if the day rolls over between this card rendering and
+        // the click — the button is only shown for today's occurrence, but
+        // the backend has the last word (see `LeisurePlanService.complete`).
+        showError(friendlyErrorMessage(error, 'Não foi possível concluir agora.'));
+        reload();
+      });
   }
 
   return (
