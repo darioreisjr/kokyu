@@ -26,6 +26,8 @@ export interface LeisurePlanEntry {
   endTime?: string;
   duration?: number;
   recurrence?: LeisureRecurrence;
+  /** Explicit set of "YYYY-MM-DD" days for a `recurrence: 'custom'` entry — undefined/empty for `none`/`daily`/`weekly`. */
+  customDates?: string[];
   notes?: string;
   /** Prepared only — reuses Settings → Notificações, never a second notification system. No browser permission is ever requested from here. */
   reminder?: boolean;

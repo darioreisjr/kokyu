@@ -29,6 +29,7 @@ const planEntryFieldsSchema = z.object({
     .max(100_000, 'Duração muito longa')
     .optional(),
   recurrence: z.enum(recurrenceValues).optional(),
+  customDates: z.array(z.string()).optional(),
   notes: z.string().optional(),
   reminder: z.boolean().optional(),
 });
@@ -47,6 +48,7 @@ export interface PlanEntryPastReference {
   date?: string;
   startTime?: string;
   endTime?: string;
+  customDates?: string[];
 }
 
 /**
@@ -59,15 +61,36 @@ export function buildPlanEntrySchema(reference?: PlanEntryPastReference) {
     const now = new Date();
     const todayKey = toDateKey(now);
     const nowTime = format(now, 'HH:mm');
+    const isCustomRecurrence = values.recurrence === 'custom';
 
+    // "Personalizado" hides the single `date` field (it becomes just an
+    // internal anchor, derived from `customDates` on submit) — never
+    // user-facing, so it must never be held to "not in the past" itself;
+    // `customDates`'s own check below already covers that.
     const dateChanged = values.date !== reference?.date;
-    if (dateChanged && values.date < todayKey) {
+    if (!isCustomRecurrence && dateChanged && values.date < todayKey) {
       ctx.addIssue({ code: 'custom', path: ['date'], message: 'A data não pode estar no passado' });
     }
 
-    const isToday = values.date === todayKey;
+    // Whether "now" is a meaningful floor for startTime/endTime: for every
+    // other recurrence that's simply "is the picked date today", but for
+    // "custom" the hidden `date` field says nothing about which of the
+    // marked dates the user actually picked — it's today only if today
+    // itself is one of them.
+    const isToday = isCustomRecurrence
+      ? (values.customDates ?? []).includes(todayKey)
+      : values.date === todayKey;
+    // Same "only a fresh pick counts" spirit as `dateChanged` above, but
+    // for "custom" there's no single date to compare — today counts as a
+    // fresh pick only when it wasn't already one of the entry's marked
+    // dates before this edit (an unrelated field change must not suddenly
+    // re-validate a startTime that was already fine when the day opened).
+    const timeDateChanged = isCustomRecurrence
+      ? isToday && !(reference?.customDates ?? []).includes(todayKey)
+      : dateChanged;
+
     if (isToday && values.startTime) {
-      const startChanged = dateChanged || values.startTime !== reference?.startTime;
+      const startChanged = timeDateChanged || values.startTime !== reference?.startTime;
       if (startChanged && values.startTime < nowTime) {
         ctx.addIssue({
           code: 'custom',
@@ -77,7 +100,7 @@ export function buildPlanEntrySchema(reference?: PlanEntryPastReference) {
       }
     }
     if (isToday && values.endTime) {
-      const endChanged = dateChanged || values.endTime !== reference?.endTime;
+      const endChanged = timeDateChanged || values.endTime !== reference?.endTime;
       if (endChanged && values.endTime < nowTime) {
         ctx.addIssue({
           code: 'custom',
@@ -90,6 +113,33 @@ export function buildPlanEntrySchema(reference?: PlanEntryPastReference) {
     if (values.duration === undefined) {
       ctx.addIssue({ code: 'custom', path: ['duration'], message: 'Informe uma duração' });
     }
+
+    // "Personalizado" has no computable pattern — it's only ever the
+    // explicit dates the user marked, so at least one is required. Only
+    // newly-added dates are held to "not in the past" (same spirit as
+    // `date`'s own `dateChanged` check above), so an already-past date
+    // already in the series when the form opened stays there untouched.
+    if (values.recurrence === 'custom') {
+      if (!values.customDates || values.customDates.length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['customDates'],
+          message: 'Marque ao menos uma data',
+        });
+      } else {
+        const previousDates = new Set(reference?.customDates ?? []);
+        const hasNewPastDate = values.customDates.some(
+          (day) => !previousDates.has(day) && day < todayKey,
+        );
+        if (hasNewPastDate) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['customDates'],
+            message: 'Nenhuma data marcada pode estar no passado',
+          });
+        }
+      }
+    }
   });
 }
 
@@ -101,6 +151,7 @@ export const planEntryDefaultValues: PlanEntryFormValues = {
   startTime: '',
   endTime: '',
   recurrence: 'none',
+  customDates: [],
   notes: '',
   reminder: false,
 };

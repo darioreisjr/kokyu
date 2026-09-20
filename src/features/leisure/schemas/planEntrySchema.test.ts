@@ -136,6 +136,132 @@ describe('planEntrySchema — not in the past (create, no reference)', () => {
   });
 });
 
+describe('planEntrySchema — recurrence "custom"', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-15T14:30:00'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('accepts a custom entry with one or more future dates', () => {
+    const result = planEntrySchema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2026-06-20', '2026-07-01'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects a custom entry with no customDates at all', () => {
+    const result = planEntrySchema.safeParse({ ...validPayload, recurrence: 'custom' });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0]!.path).toEqual(['customDates']);
+  });
+
+  it('rejects a custom entry with an empty customDates array', () => {
+    const result = planEntrySchema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: [],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects a custom entry with a past date among customDates', () => {
+    const result = planEntrySchema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2026-06-20', '2026-06-01'],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0]!.path).toEqual(['customDates']);
+  });
+
+  it('does not require customDates for other recurrences', () => {
+    const result = planEntrySchema.safeParse({ ...validPayload, recurrence: 'daily' });
+    expect(result.success).toBe(true);
+  });
+
+  it('allows keeping an already-past customDate unchanged on edit', () => {
+    const schema = buildPlanEntrySchema({ customDates: ['2020-01-01'] });
+    const result = schema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2020-01-01'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects adding a new past customDate on edit', () => {
+    const schema = buildPlanEntrySchema({ customDates: ['2020-01-01'] });
+    const result = schema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2020-01-01', '2020-02-01'],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0]!.path).toEqual(['customDates']);
+  });
+
+  // Regression: the hidden `date` field defaults to today (it's only ever
+  // derived from customDates on submit, see PlanEntryFormPage), so a
+  // startTime/endTime "not in the past" check keyed off `date` instead of
+  // `customDates` used to fire even when none of the marked dates were
+  // actually today.
+  it('accepts a startTime earlier than now when today is not among the marked dates', () => {
+    const result = planEntrySchema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2026-06-16'],
+      startTime: '10:00',
+      endTime: '11:00',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('still rejects a startTime earlier than now when today is among the marked dates', () => {
+    const result = planEntrySchema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2026-06-15'],
+      startTime: '10:00',
+      endTime: '11:00',
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues[0]!.path).toEqual(['startTime']);
+  });
+
+  it('accepts a startTime later than now when today is among several marked dates', () => {
+    const result = planEntrySchema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2026-06-15', '2026-06-16'],
+      startTime: '18:00',
+      endTime: '19:00',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('allows keeping an already-past startTime when today was already a marked date', () => {
+    const schema = buildPlanEntrySchema({
+      customDates: ['2026-06-15'],
+      startTime: '10:00',
+      endTime: '11:00',
+    });
+    const result = schema.safeParse({
+      ...validPayload,
+      recurrence: 'custom',
+      customDates: ['2026-06-15'],
+      startTime: '10:00',
+      endTime: '11:00',
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
 describe('buildPlanEntrySchema — edit leniency (with reference)', () => {
   beforeEach(() => {
     vi.useFakeTimers();

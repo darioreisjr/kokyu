@@ -150,6 +150,41 @@ describe('PlanEntryFormPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled());
   });
 
+  it('swaps the single Dia field for the custom dates picker when Personalizado is selected', async () => {
+    const user = userEvent.setup();
+    render(<PlanEntryFormPage mode="create" />);
+    expect(screen.getByRole('group', { name: 'Dia' })).toBeInTheDocument();
+    expect(screen.queryByText('Datas')).not.toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('Recorrência'));
+    await user.click(screen.getByRole('option', { name: 'Personalizado' }));
+
+    expect(screen.queryByRole('group', { name: 'Dia' })).not.toBeInTheDocument();
+    expect(screen.getByText('Datas')).toBeInTheDocument();
+  });
+
+  it('creates a custom entry anchored to the earliest marked date', async () => {
+    const user = userEvent.setup();
+    render(<PlanEntryFormPage mode="create" />);
+    const todayLabel = String(new Date().getDate());
+    const todayKey = new Date().toISOString().slice(0, 10);
+
+    await fillRequiredFields(user);
+    await user.click(screen.getByLabelText('Recorrência'));
+    await user.click(screen.getByRole('option', { name: 'Personalizado' }));
+    fireEvent.click(screen.getByRole('gridcell', { name: todayLabel }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled());
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith(leisureRoutes.planner));
+    const entries = await leisurePlanService.getLeisurePlan(todayKey, todayKey);
+    const created = entries.find((entry) => entry.title === 'Ler O Hobbit');
+    expect(created?.recurrence).toBe('custom');
+    expect(created?.customDates).toEqual([todayKey]);
+    expect(created?.date).toBe(todayKey);
+  });
+
   it('navigates back to the planner via Cancelar', async () => {
     const user = userEvent.setup();
     render(<PlanEntryFormPage mode="create" />);

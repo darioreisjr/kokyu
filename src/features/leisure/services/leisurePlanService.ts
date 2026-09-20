@@ -73,7 +73,7 @@ export const leisurePlanService = {
     return apiFetchClient<LeisurePlanEntry[]>('/leisure/plan/archived');
   },
 
-  /** `occurrenceDate` picks which day of a daily/weekly series is being completed — irrelevant (and omittable) for a `'none'`/`'custom'` entry, which has only ever had one. */
+  /** `occurrenceDate` picks which day of a daily/weekly/custom series is being completed — irrelevant (and omittable) only for a `'none'` entry, which has only ever had one. */
   async completePlanEntry(id: string, occurrenceDate?: string): Promise<LeisurePlanEntry | null> {
     try {
       return await apiFetchClient<LeisurePlanEntry>(`/leisure/plan/${id}/complete`, {

@@ -80,6 +80,18 @@ function expandPlanEntries(
           ),
         });
       }
+    } else if (entry.recurrence === 'custom' && entry.customDates) {
+      for (const occurrenceDate of entry.customDates) {
+        if (occurrenceDate >= startDate && occurrenceDate <= endDate) {
+          occurrences.push({
+            ...entry,
+            occurrenceDate,
+            completed: leisureDb.planCompletions.some(
+              (c) => c.planEntryId === entry.id && c.occurrenceDate === occurrenceDate,
+            ),
+          });
+        }
+      }
     } else if (entry.date >= startDate && entry.date <= endDate) {
       occurrences.push({ ...entry, occurrenceDate: entry.date });
     }
@@ -307,7 +319,11 @@ function handlePlan(
     if (index === -1) notFound();
     const existing = leisureDb.planEntries[index]!;
 
-    if (existing.recurrence === 'daily' || existing.recurrence === 'weekly') {
+    if (
+      existing.recurrence === 'daily' ||
+      existing.recurrence === 'weekly' ||
+      existing.recurrence === 'custom'
+    ) {
       const occurrenceDate = (body as { date?: string } | undefined)?.date ?? existing.date;
       const alreadyCompleted = leisureDb.planCompletions.some(
         (c) => c.planEntryId === existing.id && c.occurrenceDate === occurrenceDate,

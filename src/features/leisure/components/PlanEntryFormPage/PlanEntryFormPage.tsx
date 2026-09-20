@@ -13,6 +13,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton, KokyuDateField, KokyuTextField } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
+import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { leisureRoutes } from '../../constants/leisureRoutes';
@@ -24,6 +25,7 @@ import {
 import { leisurePlanService } from '../../services/leisurePlanService';
 import type { LeisurePlanEntry } from '../../types/leisurePlan.types';
 import { fromDateKey, toDateKey, todayOrLaterKey } from '../../utils/dateHelpers';
+import { CustomDatesPicker } from '../CustomDatesPicker/CustomDatesPicker';
 
 const recurrenceOptions = [
   { id: 'none', label: 'Não repetir' },
@@ -49,6 +51,7 @@ function mapEntryToFormValues(entry: LeisurePlanEntry): Partial<PlanEntryFormVal
     endTime: entry.endTime ?? undefined,
     duration: entry.duration ?? undefined,
     recurrence: entry.recurrence,
+    customDates: entry.customDates ?? [],
     notes: entry.notes ?? undefined,
     reminder: entry.reminder,
   };
@@ -82,7 +85,12 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
   // no reference, so every value counts as a fresh pick (see schema).
   const pastReference =
     mode === 'edit' && initialEntry
-      ? { date: initialEntry.date, startTime: initialEntry.startTime, endTime: initialEntry.endTime }
+      ? {
+          date: initialEntry.date,
+          startTime: initialEntry.startTime,
+          endTime: initialEntry.endTime,
+          customDates: initialEntry.customDates,
+        }
       : undefined;
 
   const {
@@ -117,14 +125,25 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
   const selectedDate = useWatch({ control, name: 'date' });
   const minTime = selectedDate === toDateKey(new Date()) ? format(new Date(), 'HH:mm') : undefined;
 
+  const recurrence = useWatch({ control, name: 'recurrence' });
+  const isCustomRecurrence = recurrence === 'custom';
+
   async function onSubmit(values: PlanEntryFormValues) {
+    // The API's `date` is the series' anchor — for "custom" that's always
+    // the earliest marked date, so the single-date field the rest of the
+    // form/API still relies on stays in sync with whatever was picked here.
+    const payload =
+      values.recurrence === 'custom' && values.customDates && values.customDates.length > 0
+        ? { ...values, date: [...values.customDates].sort()[0]! }
+        : values;
+
     setIsSubmitting(true);
     try {
       if (mode === 'edit' && initialEntry) {
-        await leisurePlanService.updatePlanEntry(initialEntry.id, values);
+        await leisurePlanService.updatePlanEntry(initialEntry.id, payload);
         showSuccess('Planejamento atualizado.');
       } else {
-        await leisurePlanService.createPlanEntry(values);
+        await leisurePlanService.createPlanEntry(payload);
         showSuccess('Atividade planejada.');
       }
       router.push(leisureRoutes.planner);
@@ -166,26 +185,61 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
       */}
       <Stack spacing={3} sx={{ width: '100%', maxWidth: 480, alignSelf: 'center' }}>
         <Stack spacing={2.5}>
+          <Controller
+            control={control}
+            name="recurrence"
+            render={({ field }) => (
+              <KokyuTextField select label="Recorrência" {...field}>
+                {recurrenceOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </KokyuTextField>
+            )}
+          />
           <KokyuTextField
             label="Título"
             error={Boolean(errors.title)}
             helperText={errors.title?.message}
             {...register('title')}
           />
-          <Controller
-            control={control}
-            name="date"
-            render={({ field }) => (
-              <KokyuDateField
-                label="Dia"
-                value={field.value ? fromDateKey(field.value) : null}
-                onChange={(value) => field.onChange(value ? toDateKey(value) : '')}
-                minDate={minDate}
-                error={Boolean(errors.date)}
-                helperText={errors.date?.message}
-              />
-            )}
-          />
+          {isCustomRecurrence ? (
+            <Controller
+              control={control}
+              name="customDates"
+              render={({ field }) => (
+                <CustomDatesPicker
+                  value={field.value ?? []}
+                  onChange={field.onChange}
+                  minDate={minDate}
+                />
+              )}
+            />
+          ) : (
+            <Controller
+              control={control}
+              name="date"
+              render={({ field }) => (
+                <KokyuDateField
+                  label="Dia"
+                  value={field.value ? fromDateKey(field.value) : null}
+                  onChange={(value) => field.onChange(value ? toDateKey(value) : '')}
+                  minDate={minDate}
+                  error={Boolean(errors.date)}
+                  helperText={errors.date?.message}
+                />
+              )}
+            />
+          )}
+          {isCustomRecurrence && errors.customDates ? (
+            <Typography
+              variant="labelSmall"
+              sx={(theme) => ({ color: themePalette(theme).kokyu.feedback.error })}
+            >
+              {errors.customDates.message}
+            </Typography>
+          ) : null}
           <Stack direction="row" spacing={2}>
             <KokyuTextField
               label="Início"
@@ -215,19 +269,6 @@ export function PlanEntryFormPage({ mode, initialEntry, defaultDate }: PlanEntry
             {...register('duration', {
               setValueAs: (value) => (value === '' ? undefined : Number(value)),
             })}
-          />
-          <Controller
-            control={control}
-            name="recurrence"
-            render={({ field }) => (
-              <KokyuTextField select label="Recorrência" {...field}>
-                {recurrenceOptions.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </KokyuTextField>
-            )}
           />
           <KokyuTextField label="Notas (opcional)" multiline minRows={2} {...register('notes')} />
           <Controller
