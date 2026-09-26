@@ -32,6 +32,27 @@ describe('LeisureItemDialog', () => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ title: 'Duna', type: 'movie' }));
   });
 
+  it('saves a tag typed without Enter, lower-cased (regression: tags were silently dropped)', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    render(<LeisureItemDialog open onClose={vi.fn()} onSave={onSave} />);
+
+    await user.type(screen.getByLabelText('Título'), 'Duna');
+    await user.type(screen.getByLabelText('Tags (opcional)'), 'Ficção Científica');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ tags: ['ficção científica'] }));
+  });
+
+  it('suggests the context tags', async () => {
+    const user = userEvent.setup();
+    render(<LeisureItemDialog open onClose={vi.fn()} onSave={vi.fn()} />);
+
+    await user.click(screen.getByLabelText('Tags (opcional)'));
+
+    expect(await screen.findByRole('option', { name: 'em-casa' })).toBeInTheDocument();
+  });
+
   it('shows author/pages fields only for a book', async () => {
     const user = userEvent.setup();
     render(<LeisureItemDialog open onClose={vi.fn()} onSave={vi.fn()} />);

@@ -1,18 +1,17 @@
 'use client';
 
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import Chip from '@mui/material/Chip';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
 import { Controller, type Control, type UseFormRegister, type UseFormWatch } from 'react-hook-form';
 
-import { KokyuTextField } from '@/design-system/components';
+import { KokyuTagsField, KokyuTextField } from '@/design-system/components';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
 
 import { goalPriorityOptions } from '../../constants/goalPriorities';
 import type { GoalFormValues } from '../../schemas/goalSchema';
+import { goalService } from '../../services/goalService';
 
 export interface DetailsStepProps {
   control: Control<GoalFormValues>;
@@ -38,8 +37,13 @@ function getQualityHints(values: GoalFormValues): string[] {
 }
 
 /** Última etapa — prioridade, frequência de check-in, tags, motivação e critério de sucesso, com um indicador de qualidade que só orienta, nunca bloqueia (ver a spec: "não bloquear criação se Meta não for perfeitamente SMART"). */
+async function loadGoalTags(): Promise<string[]> {
+  const goals = await goalService.getGoals();
+  return goals.flatMap((goal) => goal.tags);
+}
+
 export function DetailsStep({ control, register, watch }: DetailsStepProps) {
-  const [tagInput, setTagInput] = useState('');
+  const tagSuggestions = useTagSuggestions(loadGoalTags);
   const values = watch();
 
   return (
@@ -83,36 +87,12 @@ export function DetailsStep({ control, register, watch }: DetailsStepProps) {
         control={control}
         name="tags"
         render={({ field }) => (
-          <Stack spacing={1}>
-            <KokyuTextField
-              label="Tags (opcional)"
-              value={tagInput}
-              onChange={(event) => setTagInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && tagInput.trim()) {
-                  event.preventDefault();
-                  if (!field.value.includes(tagInput.trim()))
-                    field.onChange([...field.value, tagInput.trim()]);
-                  setTagInput('');
-                }
-              }}
-            />
-            {field.value.length > 0 ? (
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                {field.value.map((tag) => (
-                  <Chip
-                    key={tag}
-                    label={tag}
-                    size="small"
-                    onDelete={() =>
-                      field.onChange(field.value.filter((candidate) => candidate !== tag))
-                    }
-                    deleteIcon={<CloseRoundedIcon />}
-                  />
-                ))}
-              </Stack>
-            ) : null}
-          </Stack>
+          <KokyuTagsField
+            value={field.value ?? []}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            suggestions={tagSuggestions}
+          />
         )}
       />
 

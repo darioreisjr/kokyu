@@ -41,3 +41,11 @@ export {
   type KokyuTrendChartProps,
   type TrendChartPoint,
 } from './KokyuTrendChart/KokyuTrendChart';
+export { KokyuTagsField, type KokyuTagsFieldProps } from './KokyuTagsField/KokyuTagsField';
+export {
+  normalizeTag,
+  normalizeTags,
+  toTagSuggestions,
+  TAG_MAX_LENGTH,
+  TAGS_MAX_COUNT,
+} from './KokyuTagsField/normalizeTags';

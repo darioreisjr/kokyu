@@ -38,8 +38,17 @@ describe('DetailsStep', () => {
     expect(screen.getByText('leitura')).toBeInTheDocument();
     expect(tagField).toHaveValue('');
 
-    await user.click(screen.getByTestId('CloseRoundedIcon'));
+    const chip = screen.getByRole('button', { name: 'leitura' });
+    await user.click(chip.querySelector('svg') as SVGElement);
     expect(screen.queryByText('leitura')).not.toBeInTheDocument();
+  });
+
+  it('keeps a tag typed without Enter when leaving the field, lower-cased', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.type(screen.getByLabelText('Tags (opcional)'), 'Leitura Diária');
+    await user.click(screen.getByLabelText(/Por que isso importa/));
+    expect(screen.getByRole('button', { name: 'leitura diária' })).toBeInTheDocument();
   });
 
   it('never adds a duplicate tag', async () => {

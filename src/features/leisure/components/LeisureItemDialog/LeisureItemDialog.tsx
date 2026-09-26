@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -11,10 +10,11 @@ import Stack from '@mui/material/Stack';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { KokyuButton, KokyuTextField } from '@/design-system/components';
+import { KokyuButton, KokyuTagsField, KokyuTextField } from '@/design-system/components';
+import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
 
 import { CoverImageField } from '../CoverImageField/CoverImageField';
-import { contextTagDefinitions } from '../../constants/contextTags';
+import { contextTagIds } from '../../constants/contextTags';
 import { getApplicableStatuses, getStatusLabel } from '../../constants/leisureStatuses';
 import { leisureItemTypeDefinitions } from '../../constants/leisureItemTypes';
 import { placeCategoryDefinitions } from '../../constants/placeCategories';
@@ -23,6 +23,7 @@ import {
   leisureItemSchema,
   type LeisureItemFormValues,
 } from '../../schemas/leisureItemSchema';
+import { leisureItemService } from '../../services/leisureItemService';
 import type { LeisureItemType } from '../../types/leisureItem.types';
 
 export interface LeisureItemDialogProps {
@@ -55,6 +56,11 @@ const priorityOptions = [
  * so this never becomes the "hundreds of optional fields" screen the
  * spec explicitly warns against.
  */
+async function loadLeisureItemTags(): Promise<string[]> {
+  const items = await leisureItemService.getLeisureItems();
+  return items.flatMap((item) => item.tags);
+}
+
 export function LeisureItemDialog({
   open,
   defaultValues,
@@ -63,6 +69,10 @@ export function LeisureItemDialog({
   onSave,
   isSubmitting,
 }: LeisureItemDialogProps) {
+  const tagSuggestions = useTagSuggestions(loadLeisureItemTags, {
+    enabled: open,
+    fixedTags: contextTagIds,
+  });
   const {
     control,
     register,
@@ -271,19 +281,12 @@ export function LeisureItemDialog({
             control={control}
             name="tags"
             render={({ field }) => (
-              <Autocomplete
-                multiple
-                freeSolo
-                options={contextTagDefinitions.map((tag) => tag.id)}
-                value={field.value}
-                onChange={(_event, value) => field.onChange(value)}
-                renderInput={(params) => (
-                  <KokyuTextField
-                    {...params}
-                    label="Tags (opcional)"
-                    placeholder="curto, relaxar..."
-                  />
-                )}
+              <KokyuTagsField
+                value={field.value ?? []}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                suggestions={tagSuggestions}
+                placeholder="curto, relaxar..."
               />
             )}
           />

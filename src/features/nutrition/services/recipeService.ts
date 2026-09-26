@@ -1,3 +1,5 @@
+import { normalizeTags } from '@/design-system/components';
+
 import type { Recipe, RecipeIngredient, RecipeStep } from '../types/recipe.types';
 import { generateId, nutritionDb } from './nutritionMockDb';
 
@@ -37,7 +39,7 @@ export const recipeService = {
       description: input.description,
       imageUrl: input.imageUrl,
       category: input.category,
-      tags: input.tags,
+      tags: normalizeTags(input.tags),
       preparationTime: input.preparationTime,
       cookingTime: input.cookingTime,
       servings: input.servings,
@@ -62,7 +64,7 @@ export const recipeService = {
       description: input.description,
       imageUrl: input.imageUrl,
       category: input.category,
-      tags: input.tags,
+      tags: normalizeTags(input.tags),
       preparationTime: input.preparationTime,
       cookingTime: input.cookingTime,
       servings: input.servings,

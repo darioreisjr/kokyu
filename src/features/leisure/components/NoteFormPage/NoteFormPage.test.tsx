@@ -157,4 +157,33 @@ describe('NoteFormPage', () => {
     expect(mockPush).not.toHaveBeenCalled();
     deleteSpy.mockRestore();
   });
+
+  it('saves a tag typed without Enter, lower-cased (regression: tags were silently dropped)', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi.spyOn(noteService, 'createNote');
+    render(<NoteFormPage mode="create" />);
+
+    await user.type(screen.getByLabelText('Conteúdo'), 'Comprar cordas novas.');
+    await user.type(screen.getByLabelText('Tags (opcional)'), 'Música, Violão');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(createSpy).toHaveBeenCalled());
+    expect(createSpy.mock.calls[0]![0].tags).toEqual(['música', 'violão']);
+    createSpy.mockRestore();
+  });
+
+  it('shows the saved tags as chips in edit mode and saves removals', async () => {
+    const user = userEvent.setup();
+    const updateSpy = vi.spyOn(noteService, 'updateNote');
+    render(<NoteFormPage mode="edit" initialNote={buildNote({ tags: ['série', 'dica'] })} />);
+
+    const chip = screen.getByRole('button', { name: 'série' });
+    expect(screen.getByRole('button', { name: 'dica' })).toBeInTheDocument();
+    await user.click(chip.querySelector('svg') as SVGElement);
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(updateSpy).toHaveBeenCalled());
+    expect(updateSpy.mock.calls[0]![1].tags).toEqual(['dica']);
+    updateSpy.mockRestore();
+  });
 });

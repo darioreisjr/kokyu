@@ -14,9 +14,10 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
-import { KokyuButton, KokyuTextField } from '@/design-system/components';
+import { KokyuButton, KokyuTagsField, KokyuTextField } from '@/design-system/components';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { cardTokens } from '@/design-system/tokens/component';
+import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
 
 import { recipeCategoryDefinitions } from '../../constants/recipeCategories';
 import { unitDefinitions } from '../../constants/units';
@@ -25,6 +26,7 @@ import {
   recipeSchema,
   type RecipeFormValues,
 } from '../../schemas/recipeSchema';
+import { recipeService } from '../../services/recipeService';
 import type { Ingredient } from '../../types/ingredient.types';
 
 export interface RecipeFormProps {
@@ -33,6 +35,11 @@ export interface RecipeFormProps {
   submitLabel: string;
   onSubmit: (values: RecipeFormValues) => void;
   isSubmitting?: boolean;
+}
+
+async function loadRecipeTags(): Promise<string[]> {
+  const recipes = await recipeService.getRecipes();
+  return recipes.flatMap((recipe) => recipe.tags);
 }
 
 /**
@@ -49,6 +56,7 @@ export function RecipeForm({
   onSubmit,
   isSubmitting,
 }: RecipeFormProps) {
+  const tagSuggestions = useTagSuggestions(loadRecipeTags);
   const {
     control,
     register,
@@ -124,19 +132,12 @@ export function RecipeForm({
           control={control}
           name="tags"
           render={({ field }) => (
-            <Autocomplete
-              multiple
-              freeSolo
-              options={[]}
-              value={field.value}
-              onChange={(_event, value) => field.onChange(value)}
-              renderInput={(params) => (
-                <KokyuTextField
-                  {...params}
-                  label="Tags (opcional)"
-                  placeholder="rápido, marmita..."
-                />
-              )}
+            <KokyuTagsField
+              value={field.value ?? []}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              suggestions={tagSuggestions}
+              placeholder="rápido, marmita..."
             />
           )}
         />

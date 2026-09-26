@@ -4,15 +4,16 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
-import Autocomplete from '@mui/material/Autocomplete';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import type { Dispatch, SetStateAction } from 'react';
 
-import { KokyuButton, KokyuTextField } from '@/design-system/components';
+import { KokyuButton, KokyuTagsField, KokyuTextField } from '@/design-system/components';
+import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
 
+import { noteService } from '../../services/noteService';
 import type { ChecklistNoteItem, NoteType } from '../../types/note.types';
 
 export interface NoteDraft {
@@ -42,6 +43,11 @@ export function canSubmitNoteDraft(draft: NoteDraft): boolean {
     : Boolean(draft.content.trim()) || Boolean(draft.title.trim());
 }
 
+async function loadNoteTags(): Promise<string[]> {
+  const notes = await noteService.getNotes();
+  return notes.flatMap((note) => note.tags);
+}
+
 function makeChecklistItem(): ChecklistNoteItem {
   return {
     id: `check-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -58,6 +64,8 @@ export interface NoteFieldsProps {
 
 /** The text/checklist/link/idea note fields — shared by `NoteDialog` and `NoteFormPage`, so both edit the exact same shape. */
 export function NoteFields({ draft, setDraft, autoFocus }: NoteFieldsProps) {
+  const tagSuggestions = useTagSuggestions(loadNoteTags);
+
   function updateItem(id: string, patch: Partial<ChecklistNoteItem>) {
     setDraft((current) => ({
       ...current,
@@ -191,15 +199,10 @@ export function NoteFields({ draft, setDraft, autoFocus }: NoteFieldsProps) {
         </Stack>
       )}
 
-      <Autocomplete
-        multiple
-        freeSolo
-        options={[]}
+      <KokyuTagsField
         value={draft.tags}
-        onChange={(_event, value) =>
-          setDraft((current) => ({ ...current, tags: value as string[] }))
-        }
-        renderInput={(params) => <KokyuTextField {...params} label="Tags (opcional)" />}
+        onChange={(tags) => setDraft((current) => ({ ...current, tags }))}
+        suggestions={tagSuggestions}
       />
     </Stack>
   );
