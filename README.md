@@ -164,6 +164,18 @@ Detalhes completos — filosofia, cada camada de token, semântica das famílias
 Demon Slayer, como criar um token ou componente novo — estão em
 [`docs/design-system.md`](docs/design-system.md).
 
+## Branches e ambientes
+
+| Branch    | Ambiente        | URL                                                      | API                  | Banco (Supabase)   |
+| --------- | --------------- | -------------------------------------------------------- | -------------------- | ------------------ |
+| `develop` | Desenvolvimento | https://kokyu-git-develop-projetosdarioreisjr.vercel.app | `kokyu-sam` develop  | `kokyu-staging`    |
+| `main`    | Produção        | domínio de produção                                      | `kokyu-sam` produção | `kokyu-production` |
+
+- Toda branch nova sai da `develop` (branch padrão do repositório): `feat/...`, `fix/...`, `chore/...`.
+- `develop` só recebe PR, com o CI verde. Sem push direto.
+- `main` só recebe PR **vindo da `develop`** (release), com o CI verde, via merge commit — o check `Release source` recusa qualquer outra origem.
+- O Dependabot abre os PRs contra a `develop`.
+
 ## Convenções
 
 - Componentes: `PascalCase`. Hooks: `useNome`. Tipos: `PascalCase`, sem prefixo `I`.
