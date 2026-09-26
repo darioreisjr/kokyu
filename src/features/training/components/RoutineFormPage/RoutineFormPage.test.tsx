@@ -23,7 +23,7 @@ describe('RoutineFormPage — create', () => {
 
     expect(screen.getByRole('heading', { name: 'Novo treino' })).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText(/^nome/i), 'Treino de teste');
+    await user.type(screen.getByRole('textbox', { name: /^nome/i }), 'Treino de teste');
 
     await user.click(screen.getByRole('button', { name: 'Adicionar exercício' }));
     await user.type(screen.getByLabelText('Buscar exercício'), 'Supino reto');
@@ -46,7 +46,7 @@ describe('RoutineFormPage — edit', () => {
     render(<RoutineFormPage mode="edit" routineId="routine-push-a" />);
 
     expect(await screen.findByRole('heading', { name: 'Editar Push A' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/^nome/i)).toHaveValue('Push A');
+    expect(screen.getByRole('textbox', { name: /^nome/i })).toHaveValue('Push A');
     expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
   });
 
