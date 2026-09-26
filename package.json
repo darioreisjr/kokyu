@@ -18,7 +18,8 @@
     "test:e2e:ui": "playwright test --ui",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "check": "pnpm lint && pnpm typecheck && pnpm test"
+    "check": "pnpm lint && pnpm typecheck && pnpm test",
+    "prepare": "node -e \"try{require('husky')}catch(e){process.exit(0)}\" && husky || true"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",
@@ -58,12 +59,23 @@
     "eslint-config-next": "16.3.3",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-storybook": "10.5.10",
+    "husky": "9.1.7",
     "jsdom": "30.0.1",
+    "lint-staged": "17.6.0",
     "prettier": "3.9.6",
     "storybook": "10.5.10",
     "typescript": "5.9.3",
     "vite": "8.2.2",
     "vitest": "4.1.11"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "packageManager": "pnpm@10.28.2"
 }
