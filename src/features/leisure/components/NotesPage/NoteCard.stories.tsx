@@ -46,10 +46,8 @@ const meta = {
   ],
   args: {
     note: textNote,
-    onEdit: fn(),
+    onOpenDetails: fn(),
     onTogglePin: fn(),
-    onArchive: fn(),
-    onDelete: fn(),
     onToggleChecklistItem: fn(),
   },
 } satisfies Meta<typeof NoteCard>;

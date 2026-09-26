@@ -39,6 +39,10 @@ export const noteService = {
     return noteService.updateNote(id, { archived: true });
   },
 
+  async unarchiveNote(id: string): Promise<Note | null> {
+    return noteService.updateNote(id, { archived: false });
+  },
+
   async deleteNote(id: string): Promise<void> {
     await apiFetchClient<void>(`/leisure/notes/${id}`, { method: 'DELETE' });
   },

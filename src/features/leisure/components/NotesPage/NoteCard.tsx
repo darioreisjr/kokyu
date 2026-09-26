@@ -1,7 +1,5 @@
 'use client';
 
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import Checkbox from '@mui/material/Checkbox';
@@ -26,10 +24,9 @@ const typeLabel: Record<Note['type'], string> = {
 export interface NoteCardProps {
   note: Note;
   relatedItemTitle?: string;
-  onEdit: () => void;
-  onTogglePin: () => void;
-  onArchive: () => void;
-  onDelete: () => void;
+  onOpenDetails: () => void;
+  /** Omitted for an archived note — pinning something archived means nothing. */
+  onTogglePin?: () => void;
   onToggleChecklistItem: (checklistItemId: string) => void;
 }
 
@@ -37,10 +34,8 @@ export interface NoteCardProps {
 export function NoteCard({
   note,
   relatedItemTitle,
-  onEdit,
+  onOpenDetails,
   onTogglePin,
-  onArchive,
-  onDelete,
   onToggleChecklistItem,
 }: NoteCardProps) {
   return (
@@ -50,6 +45,11 @@ export function NoteCard({
         borderRadius: cardTokens.radius,
         border: `1px solid ${note.pinned ? themePalette(theme).kokyu.border.focus : themePalette(theme).kokyu.border.subtle}`,
         padding: 2,
+        // Fills the grid row so every card in a row ends at the same line —
+        // the tags below are pushed to that bottom edge.
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       })}
     >
       <Stack spacing={1}>
@@ -65,7 +65,7 @@ export function NoteCard({
                 component="p"
                 noWrap
                 sx={{ cursor: 'pointer' }}
-                onClick={onEdit}
+                onClick={onOpenDetails}
               >
                 {note.title}
               </Typography>
@@ -76,32 +76,34 @@ export function NoteCard({
                 color: themePalette(theme).kokyu.text.secondary,
                 cursor: 'pointer',
               })}
-              onClick={onEdit}
+              onClick={onOpenDetails}
             >
               {typeLabel[note.type]}
               {relatedItemTitle ? ` · ${relatedItemTitle}` : ''}
             </Typography>
           </Stack>
-          <IconButton
-            aria-label={note.pinned ? 'Desafixar nota' : 'Fixar nota'}
-            size="small"
-            onClick={onTogglePin}
-          >
-            {note.pinned ? (
-              <PushPinIcon
-                fontSize="small"
-                sx={(theme) => ({ color: themePalette(theme).kokyu.feedback.warning })}
-              />
-            ) : (
-              <PushPinOutlinedIcon fontSize="small" />
-            )}
-          </IconButton>
+          {onTogglePin ? (
+            <IconButton
+              aria-label={note.pinned ? 'Desafixar nota' : 'Fixar nota'}
+              size="small"
+              onClick={onTogglePin}
+            >
+              {note.pinned ? (
+                <PushPinIcon
+                  fontSize="small"
+                  sx={(theme) => ({ color: themePalette(theme).kokyu.feedback.warning })}
+                />
+              ) : (
+                <PushPinOutlinedIcon fontSize="small" />
+              )}
+            </IconButton>
+          ) : null}
         </Stack>
 
         {note.type === 'checklist' ? (
           <Stack spacing={0.5}>
             {note.content ? (
-              <Typography variant="body2" sx={{ cursor: 'pointer' }} onClick={onEdit}>
+              <Typography variant="body2" sx={{ cursor: 'pointer' }} onClick={onOpenDetails}>
                 {note.content}
               </Typography>
             ) : null}
@@ -110,6 +112,7 @@ export function NoteCard({
                 <Checkbox
                   size="small"
                   checked={item.checked}
+                  disabled={note.archived}
                   onChange={() => onToggleChecklistItem(item.id)}
                   slotProps={{ input: { 'aria-label': `Marcar ${item.text} como concluído` } }}
                 />
@@ -133,28 +136,23 @@ export function NoteCard({
             {note.linkUrl}
           </Typography>
         ) : (
-          <Typography variant="body2" sx={{ cursor: 'pointer' }} onClick={onEdit}>
+          <Typography variant="body2" sx={{ cursor: 'pointer' }} onClick={onOpenDetails}>
             {note.content}
           </Typography>
         )}
-
-        {note.tags.length > 0 ? (
-          <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
-            {note.tags.map((tag) => (
-              <Chip key={tag} size="small" label={tag} />
-            ))}
-          </Stack>
-        ) : null}
-
-        <Stack direction="row" spacing={0.5} sx={{ justifyContent: 'flex-end' }}>
-          <IconButton aria-label="Arquivar nota" size="small" onClick={onArchive}>
-            <ArchiveOutlinedIcon fontSize="small" />
-          </IconButton>
-          <IconButton aria-label="Excluir nota" size="small" onClick={onDelete}>
-            <DeleteOutlineRoundedIcon fontSize="small" />
-          </IconButton>
-        </Stack>
       </Stack>
+
+      {note.tags.length > 0 ? (
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ flexWrap: 'wrap', rowGap: 0.5, marginTop: 'auto', paddingTop: 1 }}
+        >
+          {note.tags.map((tag) => (
+            <Chip key={tag} size="small" label={tag} />
+          ))}
+        </Stack>
+      ) : null}
     </Paper>
   );
 }

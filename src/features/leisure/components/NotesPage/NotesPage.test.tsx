@@ -1,13 +1,21 @@
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
+import { leisureRoutes } from '../../constants/leisureRoutes';
 import { resetLeisureDb } from '../../services/leisureMockDb';
+import { noteService } from '../../services/noteService';
 import { NotesPage } from './NotesPage';
+
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 
 describe('NotesPage', () => {
   beforeEach(() => {
     resetLeisureDb();
+    mockPush.mockClear();
   });
 
   it('shows the header and existing notes, pinned first', async () => {
@@ -24,7 +32,7 @@ describe('NotesPage', () => {
     await waitFor(() => expect(screen.getByText(/Texto · Interestelar/)).toBeInTheDocument());
   });
 
-  it('creates a new note', async () => {
+  it('navigates to the new-note page instead of opening a dialog', async () => {
     const user = userEvent.setup();
     render(<NotesPage />);
     await waitFor(() =>
@@ -32,12 +40,9 @@ describe('NotesPage', () => {
     );
 
     await user.click(screen.getByRole('button', { name: 'Nova nota' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Nova nota' });
-    await user.type(within(dialog).getByLabelText('Conteúdo'), 'Comprar cordas novas.');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
-    await waitFor(() => expect(screen.getByText('Nota salva.')).toBeInTheDocument());
-    expect(screen.getByText('Comprar cordas novas.')).toBeInTheDocument();
+    expect(mockPush).toHaveBeenCalledWith(leisureRoutes.noteNew);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('pins and unpins a note', async () => {
@@ -69,42 +74,82 @@ describe('NotesPage', () => {
     );
   });
 
-  it('edits an existing note', async () => {
+  it('opens a detail popup when a note is clicked, with Fechar and Editar', async () => {
     const user = userEvent.setup();
     render(<NotesPage />);
     await waitFor(() => expect(screen.getByText('Recomendação do João')).toBeInTheDocument());
 
     await user.click(screen.getByText('Recomendação do João'));
-    const dialog = await screen.findByRole('dialog', { name: 'Editar nota' });
-    expect(within(dialog).getByLabelText('Título (opcional)')).toHaveValue('Recomendação do João');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
-    await waitFor(() => expect(screen.getByText('Nota atualizada.')).toBeInTheDocument());
+    const dialog = await screen.findByRole('dialog', { name: 'Recomendação do João' });
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(
+      within(dialog).getByText('Ele disse que o restaurante novo do centro vale muito a pena.'),
+    ).toBeInTheDocument();
+    expect(within(dialog).getByRole('link', { name: 'Editar' })).toHaveAttribute(
+      'href',
+      leisureRoutes.noteEdit('note-recomendacao-joao'),
+    );
+
+    await user.click(within(dialog).getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('archives a note, removing it from the visible list', async () => {
+  it('toggles a checklist item from inside the detail popup', async () => {
     const user = userEvent.setup();
+    render(<NotesPage />);
+    await waitFor(() =>
+      expect(screen.getByText('Coisas para levar para a praia')).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByText('Coisas para levar para a praia'));
+    const dialog = await screen.findByRole('dialog', { name: 'Coisas para levar para a praia' });
+    const checkbox = within(dialog).getByRole('checkbox', {
+      name: 'Marcar Cadeira como concluído',
+    });
+    expect(checkbox).not.toBeChecked();
+
+    await user.click(checkbox);
+
+    await waitFor(() =>
+      expect(
+        within(dialog).getByRole('checkbox', { name: 'Marcar Cadeira como concluído' }),
+      ).toBeChecked(),
+    );
+  });
+
+  it('no longer shows archive/delete buttons on the card', async () => {
     render(<NotesPage />);
     await waitFor(() => expect(screen.getByText('Recomendação do João')).toBeInTheDocument());
 
-    const card = screen.getByText('Recomendação do João').closest('.MuiPaper-root') as HTMLElement;
-    await user.click(within(card).getByRole('button', { name: 'Arquivar nota' }));
+    expect(screen.queryByRole('button', { name: 'Arquivar nota' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Excluir nota' })).not.toBeInTheDocument();
+  });
 
-    await waitFor(() => expect(screen.getByText('Nota arquivada.')).toBeInTheDocument());
+  it('shows archived notes only in the Arquivadas view and unarchives from the popup', async () => {
+    const user = userEvent.setup();
+    await noteService.archiveNote('note-recomendacao-joao');
+    render(<NotesPage />);
+    await waitFor(() =>
+      expect(screen.getByText('Coisas para levar para a praia')).toBeInTheDocument(),
+    );
     expect(screen.queryByText('Recomendação do João')).not.toBeInTheDocument();
-  });
 
-  it('deletes a note after confirming', async () => {
-    const user = userEvent.setup();
-    render(<NotesPage />);
-    await waitFor(() => expect(screen.getByText('Recomendação do João')).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: 'Arquivadas' }));
+    expect(screen.getByText('Recomendação do João')).toBeInTheDocument();
+    expect(screen.queryByText('Coisas para levar para a praia')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /fixar nota/i })).not.toBeInTheDocument();
 
-    const card = screen.getByText('Recomendação do João').closest('.MuiPaper-root') as HTMLElement;
-    await user.click(within(card).getByRole('button', { name: 'Excluir nota' }));
+    await user.click(screen.getByText('Recomendação do João'));
+    const dialog = await screen.findByRole('dialog', { name: 'Recomendação do João' });
+    expect(within(dialog).queryByRole('link', { name: 'Editar' })).not.toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Desarquivar' }));
 
-    const confirmDialog = await screen.findByRole('dialog', { name: 'Excluir nota?' });
-    await user.click(within(confirmDialog).getByRole('button', { name: 'Excluir' }));
+    await waitFor(() => expect(screen.getByText('Nota desarquivada.')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Nenhuma nota arquivada.')).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-    await waitFor(() => expect(screen.getByText('Nota excluída.')).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: 'Ativas' }));
+    expect(screen.getByText('Recomendação do João')).toBeInTheDocument();
   });
 });
