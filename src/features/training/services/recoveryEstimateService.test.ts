@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { muscleGroupOptions } from '../constants/muscleGroups';
+import { toDateKey } from '../utils/dateHelpers';
 import { recoveryEstimateService } from './recoveryEstimateService';
 import { resetTrainingDb, trainingDb } from './trainingMockDb';
 
@@ -48,8 +49,11 @@ describe('recoveryEstimateService', () => {
   });
 
   it('submitRecoveryCheckIn adds a new check-in that becomes the latest', async () => {
+    // Today, not a fixed date: the mock check-ins are relative to today
+    // (yesterday, 4 days ago), so a hard-coded date stops being the latest
+    // as soon as the calendar moves past it.
     const submitted = await recoveryEstimateService.submitRecoveryCheckIn({
-      date: '2026-08-29',
+      date: toDateKey(new Date()),
       energyLevel: 5,
       disposition: 5,
       muscleSoreness: 1,
