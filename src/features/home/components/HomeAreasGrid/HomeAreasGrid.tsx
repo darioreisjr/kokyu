@@ -1,5 +1,7 @@
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { useId } from 'react';
 import type {
   GoalHomeProjection,
   HabitHomeProjection,
@@ -38,9 +40,11 @@ export function HomeAreasGrid({
   isLoading = false,
   onOpen,
 }: HomeAreasGridProps) {
+  const headingId = useId();
+
   return (
-    <>
-      <Typography variant="h6" component="h2" sx={{ mb: 1.5 }}>
+    <Box component="section" aria-labelledby={headingId}>
+      <Typography id={headingId} variant="h6" component="h2" sx={{ mb: 1.5 }}>
         Áreas de hoje
       </Typography>
       <Grid container spacing={2}>
@@ -87,6 +91,6 @@ export function HomeAreasGrid({
           />
         </Grid>
       </Grid>
-    </>
+    </Box>
   );
 }
