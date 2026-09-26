@@ -46,7 +46,8 @@ export function useHomeSnapshot(): UseHomeSnapshotResult {
   ]);
 
   useEffect(() => {
-    load();
+    // Deferred: the loader sets its loading state synchronously.
+    queueMicrotask(() => void load());
   }, [load]);
 
   return { snapshot, isLoading, refresh: load };

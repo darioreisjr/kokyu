@@ -11,7 +11,7 @@ import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton, KokyuTextField } from '@/design-system/components';
 import { missionAreaDefinitions } from '../../constants/missionAreas';
@@ -46,13 +46,13 @@ export function MissionForm({
   submitLabel = 'Salvar missão',
 }: MissionFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { control, handleSubmit, watch } = useForm<MissionFormValues>({
+  const { control, handleSubmit } = useForm<MissionFormValues>({
     resolver: zodResolver(missionSchema),
     defaultValues: { ...missionFormDefaultValues, ...defaultValues },
     mode: 'onChange',
   });
 
-  const splittable = watch('splittable');
+  const splittable = useWatch({ control, name: 'splittable' });
 
   async function submit(values: MissionFormValues) {
     setIsSubmitting(true);

@@ -7,11 +7,11 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import type { ScheduleConflict } from '@/shared/scheduling/types';
+import type { ScheduleConflict, ScheduleConflictResolution } from '@/shared/scheduling/types';
 
 export interface ConflictBannerProps {
   conflicts: ScheduleConflict[];
-  onResolve?: (conflictId: string, resolution: any) => void;
+  onResolve?: (conflictId: string, resolution: ScheduleConflictResolution) => void;
 }
 
 export function ConflictBanner({ conflicts, onResolve }: ConflictBannerProps) {

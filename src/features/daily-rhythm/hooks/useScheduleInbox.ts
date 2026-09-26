@@ -23,7 +23,8 @@ export function useScheduleInbox() {
   }, []);
 
   useEffect(() => {
-    loadItems();
+    // Deferred: the loader sets its loading state synchronously.
+    queueMicrotask(() => void loadItems());
   }, [loadItems]);
 
   const addItem = useCallback(async (input: ScheduleInboxItemInput) => {

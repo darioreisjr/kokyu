@@ -19,7 +19,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import { zodResolver } from '@hookform/resolvers/zod';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton } from '@/design-system/components';
 import { habitRoutes } from '../../constants/habitRoutes';
@@ -46,9 +46,9 @@ export function RoutineFormPage() {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = form;
+  const timeOfDay = useWatch({ control: form.control, name: 'timeOfDay' });
 
   const toggleHabit = (id: string) => {
     const next = selectedHabitIds.includes(id)
@@ -127,7 +127,7 @@ export function RoutineFormPage() {
                 <FormControl fullWidth>
                   <FormLabel sx={{ mb: 1 }}>Período do dia</FormLabel>
                   <Select
-                    value={watch('timeOfDay')}
+                    value={timeOfDay}
                     onChange={(e) =>
                       setValue(
                         'timeOfDay',

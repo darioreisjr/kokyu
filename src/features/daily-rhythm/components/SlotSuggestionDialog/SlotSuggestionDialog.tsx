@@ -38,14 +38,17 @@ export function SlotSuggestionDialog({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isApplying, setIsApplying] = useState<boolean>(false);
 
+  const slotDate = slot?.date;
+  const slotDuration = slot?.duration;
+
   useEffect(() => {
-    if (open && slot) {
-      setIsLoading(true);
-      getCandidatesForAvailableTime(slot.duration, slot.date)
+    if (open && slotDate && slotDuration) {
+      queueMicrotask(() => setIsLoading(true));
+      getCandidatesForAvailableTime(slotDuration, slotDate)
         .then((items) => setCandidates(items))
         .finally(() => setIsLoading(false));
     }
-  }, [open, slot?.date, slot?.duration]);
+  }, [open, slotDate, slotDuration]);
 
   if (!slot) return null;
 

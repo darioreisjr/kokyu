@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { describe, expect, it } from 'vitest';
 
 import { render, screen } from '../../../../../test/test-utils';
@@ -7,13 +7,14 @@ import { goalFormDefaultValues, type GoalFormValues } from '../../schemas/goalSc
 import { TimelineStep } from './TimelineStep';
 
 function Harness() {
-  const { control, watch } = useForm<GoalFormValues>({
+  const { control } = useForm<GoalFormValues>({
     defaultValues: { ...goalFormDefaultValues, startDate: '2026-01-01' },
   });
+  const targetDate = useWatch({ control, name: 'targetDate' });
   return (
     <>
       <TimelineStep control={control} />
-      <output data-testid="target-date">{watch('targetDate')}</output>
+      <output data-testid="target-date">{targetDate}</output>
     </>
   );
 }

@@ -18,7 +18,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import { zodResolver } from '@hookform/resolvers/zod';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton } from '@/design-system/components';
 import { habitAreaDefinitions } from '../../constants/habitAreas';
@@ -52,10 +52,10 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
     register,
     handleSubmit,
     reset,
-    watch,
     setValue,
     formState: { errors },
   } = form;
+  const [area, trackingType] = useWatch({ control: form.control, name: ['area', 'trackingType'] });
 
   useEffect(() => {
     if (habit) {
@@ -223,7 +223,7 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
                 <FormControl fullWidth>
                   <FormLabel sx={{ mb: 1 }}>Área</FormLabel>
                   <Select
-                    value={watch('area')}
+                    value={area}
                     onChange={(e) => setValue('area', e.target.value as HabitArea)}
                   >
                     {habitAreaDefinitions.map((areaDef) => (
@@ -234,7 +234,7 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
                   </Select>
                 </FormControl>
 
-                {watch('trackingType') === 'quantity' && (
+                {trackingType === 'quantity' && (
                   <TextField
                     fullWidth
                     type="number"
@@ -243,7 +243,7 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
                   />
                 )}
 
-                {watch('trackingType') === 'duration' && (
+                {trackingType === 'duration' && (
                   <TextField
                     fullWidth
                     type="number"

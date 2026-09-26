@@ -29,7 +29,8 @@ export function useMonthlyRhythm(initialDate?: Date) {
   }, []);
 
   useEffect(() => {
-    loadDay(selectedDay);
+    // Deferred: the loader sets its loading state synchronously.
+    queueMicrotask(() => void loadDay(selectedDay));
   }, [selectedDay, loadDay]);
 
   const goToPreviousMonth = useCallback(() => {

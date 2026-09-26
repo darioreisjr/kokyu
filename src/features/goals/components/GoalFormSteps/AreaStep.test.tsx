@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { describe, expect, it } from 'vitest';
 
 import { render, screen } from '../../../../../test/test-utils';
@@ -7,11 +7,12 @@ import { goalFormDefaultValues, type GoalFormValues } from '../../schemas/goalSc
 import { AreaStep } from './AreaStep';
 
 function Harness() {
-  const { control, watch } = useForm<GoalFormValues>({ defaultValues: goalFormDefaultValues });
+  const { control } = useForm<GoalFormValues>({ defaultValues: goalFormDefaultValues });
+  const area = useWatch({ control, name: 'area' });
   return (
     <>
       <AreaStep control={control} />
-      <output data-testid="area-value">{watch('area')}</output>
+      <output data-testid="area-value">{area}</output>
     </>
   );
 }

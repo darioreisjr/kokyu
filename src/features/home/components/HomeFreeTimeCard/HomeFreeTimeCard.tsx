@@ -36,16 +36,19 @@ export function HomeFreeTimeCard({
   const [suggestions, setSuggestions] = useState<HomeSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const freeSlotDate = freeSlot?.date;
+  const freeSlotDuration = freeSlot?.duration;
+
   useEffect(() => {
-    if (!freeSlot) {
-      setSuggestions([]);
+    if (!freeSlotDate || !freeSlotDuration) {
+      queueMicrotask(() => setSuggestions([]));
       return;
     }
-    setIsLoading(true);
-    getHomeSuggestions(freeSlot.duration, freeSlot.date)
+    queueMicrotask(() => setIsLoading(true));
+    getHomeSuggestions(freeSlotDuration, freeSlotDate)
       .then(setSuggestions)
       .finally(() => setIsLoading(false));
-  }, [freeSlot?.date, freeSlot?.duration]);
+  }, [freeSlotDate, freeSlotDuration]);
 
   if (!freeSlot) return null;
 

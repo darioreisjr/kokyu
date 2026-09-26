@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton, KokyuTagsField, KokyuTextField } from '@/design-system/components';
 import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
@@ -77,7 +77,6 @@ export function LeisureItemDialog({
     control,
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm<LeisureItemFormValues>({
@@ -99,8 +98,7 @@ export function LeisureItemDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- resetting only when the dialog opens
   }, [open]);
 
-  const type = watch('type');
-  const durationType = watch('durationType');
+  const [type, durationType] = useWatch({ control, name: ['type', 'durationType'] });
   const applicableStatuses = getApplicableStatuses(type);
 
   return (

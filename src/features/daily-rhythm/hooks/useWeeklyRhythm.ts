@@ -30,7 +30,8 @@ export function useWeeklyRhythm(initialDate?: Date) {
   }, [currentWeekStart, weekStartsOn]);
 
   useEffect(() => {
-    loadWeekly();
+    // Deferred: the loader sets its loading state synchronously.
+    queueMicrotask(() => void loadWeekly());
   }, [loadWeekly]);
 
   const goToPreviousWeek = useCallback(() => {

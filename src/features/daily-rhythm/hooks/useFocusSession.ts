@@ -10,11 +10,13 @@ export function useFocusSession() {
 
   // Load active session from storage on mount
   useEffect(() => {
-    const loaded = focusStorage.loadActiveSession();
-    setActiveSession(loaded);
-    if (loaded) {
-      setElapsedSeconds(calculateElapsedSeconds(loaded));
-    }
+    queueMicrotask(() => {
+      const loaded = focusStorage.loadActiveSession();
+      setActiveSession(loaded);
+      if (loaded) {
+        setElapsedSeconds(calculateElapsedSeconds(loaded));
+      }
+    });
   }, []);
 
   // Update timer display every second

@@ -38,7 +38,7 @@ export function ReplanDialog({ open, onClose, date, onReplanApplied }: ReplanDia
 
   useEffect(() => {
     if (open) {
-      setIsLoading(true);
+      queueMicrotask(() => setIsLoading(true));
       const currentTime = format(new Date(), 'HH:mm');
 
       dailyRhythmService.getDaySchedule(date).then(({ entries }) => {

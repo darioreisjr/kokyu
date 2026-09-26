@@ -14,7 +14,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton } from '@/design-system/components';
 import { habitReviewSchema, type HabitReviewFormValues } from '../../schemas/reviewSchema';
@@ -43,7 +43,8 @@ export function HabitReviewDialog({ open, onClose, onSuccess }: HabitReviewDialo
     },
   });
 
-  const { register, handleSubmit, setValue, watch } = form;
+  const { register, handleSubmit, setValue } = form;
+  const reviewType = useWatch({ control: form.control, name: 'type' });
 
   const onSubmit = async (values: HabitReviewFormValues) => {
     setIsSubmitting(true);
@@ -87,7 +88,7 @@ export function HabitReviewDialog({ open, onClose, onSuccess }: HabitReviewDialo
             <FormControl fullWidth>
               <FormLabel sx={{ mb: 1 }}>Tipo de período</FormLabel>
               <Select
-                value={watch('type')}
+                value={reviewType}
                 onChange={(e) => setValue('type', e.target.value as 'weekly' | 'monthly')}
               >
                 <MenuItem value="weekly">Semanal</MenuItem>

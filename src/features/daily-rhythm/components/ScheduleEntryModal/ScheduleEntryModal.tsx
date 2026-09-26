@@ -51,25 +51,28 @@ export function ScheduleEntryModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (entryToEdit) {
-      setTitle(entryToEdit.title);
-      setDescription(entryToEdit.description || '');
-      setDate(entryToEdit.date);
-      setStartAt(entryToEdit.startAt || '09:00');
-      setDuration(entryToEdit.duration);
-      setSourceType(entryToEdit.sourceType);
-      setLocked(entryToEdit.locked ?? false);
-      setPriority(entryToEdit.priority || 'medium');
-    } else {
-      setTitle('');
-      setDescription('');
-      setDate(initialDate);
-      setStartAt('09:00');
-      setDuration(60);
-      setSourceType('manual');
-      setLocked(false);
-      setPriority('medium');
-    }
+    // Resets the form whenever it (re)opens; deferred like NoteDialog's reset.
+    queueMicrotask(() => {
+      if (entryToEdit) {
+        setTitle(entryToEdit.title);
+        setDescription(entryToEdit.description || '');
+        setDate(entryToEdit.date);
+        setStartAt(entryToEdit.startAt || '09:00');
+        setDuration(entryToEdit.duration);
+        setSourceType(entryToEdit.sourceType);
+        setLocked(entryToEdit.locked ?? false);
+        setPriority(entryToEdit.priority || 'medium');
+      } else {
+        setTitle('');
+        setDescription('');
+        setDate(initialDate);
+        setStartAt('09:00');
+        setDuration(60);
+        setSourceType('manual');
+        setLocked(false);
+        setPriority('medium');
+      }
+    });
   }, [entryToEdit, initialDate, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,7 +174,7 @@ export function ScheduleEntryModal({
                   labelId="entry-source-label"
                   label="Tipo de entrada"
                   value={sourceType}
-                  onChange={(e) => setSourceType(e.target.value as any)}
+                  onChange={(e) => setSourceType(e.target.value as ScheduleSourceType)}
                 >
                   <MenuItem value="manual">Compromisso Manual</MenuItem>
                   <MenuItem value="focus">Bloco de Foco</MenuItem>
@@ -187,7 +190,9 @@ export function ScheduleEntryModal({
                   labelId="entry-priority-label"
                   label="Prioridade"
                   value={priority}
-                  onChange={(e) => setPriority(e.target.value as any)}
+                  onChange={(e) =>
+                    setPriority(e.target.value as 'low' | 'medium' | 'high' | 'focus')
+                  }
                 >
                   <MenuItem value="low">Baixa</MenuItem>
                   <MenuItem value="medium">Média</MenuItem>

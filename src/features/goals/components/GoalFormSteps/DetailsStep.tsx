@@ -3,7 +3,7 @@
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Controller, type Control, type UseFormRegister, type UseFormWatch } from 'react-hook-form';
+import { Controller, type Control, type UseFormRegister, useWatch } from 'react-hook-form';
 
 import { KokyuTagsField, KokyuTextField } from '@/design-system/components';
 import { themePalette } from '@/design-system/theme/useThemePalette';
@@ -16,12 +16,18 @@ import { goalService } from '../../services/goalService';
 export interface DetailsStepProps {
   control: Control<GoalFormValues>;
   register: UseFormRegister<GoalFormValues>;
-  watch: UseFormWatch<GoalFormValues>;
 }
 
-function getQualityHints(values: GoalFormValues): string[] {
+type QualityHintValues = Partial<
+  Pick<
+    GoalFormValues,
+    'title' | 'progressMode' | 'targetValue' | 'type' | 'targetDate' | 'motivation'
+  >
+>;
+
+function getQualityHints(values: QualityHintValues): string[] {
   const hints: string[] = [];
-  if (values.title.trim().length > 0) hints.push('Título específico definido.');
+  if (values.title?.trim()) hints.push('Título específico definido.');
   if (
     values.progressMode === 'automatic' ||
     typeof values.targetValue === 'number' ||
@@ -42,9 +48,9 @@ async function loadGoalTags(): Promise<string[]> {
   return goals.flatMap((goal) => goal.tags);
 }
 
-export function DetailsStep({ control, register, watch }: DetailsStepProps) {
+export function DetailsStep({ control, register }: DetailsStepProps) {
   const tagSuggestions = useTagSuggestions(loadGoalTags);
-  const values = watch();
+  const values = useWatch({ control });
 
   return (
     <Stack spacing={2}>

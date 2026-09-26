@@ -50,11 +50,12 @@ export function useDailyPlanning(targetDate: string, onCompleted?: () => void) {
   }, [targetDate]);
 
   useEffect(() => {
-    loadInitialData();
+    // Deferred: the loader sets its loading state synchronously.
+    queueMicrotask(() => void loadInitialData());
   }, [loadInitialData]);
 
   const addPriority = useCallback(
-    async (item: { sourceType: any; sourceId: string; title: string }) => {
+    async (item: Pick<DailyPriority, 'sourceType' | 'sourceId' | 'title'>) => {
       if (priorities.length >= 3) return;
       const created = await dailyPlanningService.setDailyPriority(targetDate, {
         sourceType: item.sourceType,

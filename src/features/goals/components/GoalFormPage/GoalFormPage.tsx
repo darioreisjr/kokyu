@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
@@ -87,7 +87,6 @@ export function GoalFormPage({ mode, initialGoal }: GoalFormPageProps) {
     control,
     register,
     handleSubmit,
-    watch,
     setValue,
     trigger,
     formState: { errors },
@@ -98,9 +97,10 @@ export function GoalFormPage({ mode, initialGoal }: GoalFormPageProps) {
       : { ...goalFormDefaultValues, startDate: toDateKey(new Date()) },
   });
 
-  const type = watch('type');
-  const progressMode = watch('progressMode');
-  const sourceModule = watch('sourceModule');
+  const [type, progressMode, sourceModule] = useWatch({
+    control,
+    name: ['type', 'progressMode', 'sourceModule'],
+  });
 
   function handleSelectTypeOption(option: GoalTypeOptionDefinition) {
     setSelectedTypeOptionId(option.id);
@@ -186,9 +186,7 @@ export function GoalFormPage({ mode, initialGoal }: GoalFormPageProps) {
           setValue={setValue}
         />
       ) : null}
-      {step === 'details' ? (
-        <DetailsStep control={control} register={register} watch={watch} />
-      ) : null}
+      {step === 'details' ? <DetailsStep control={control} register={register} /> : null}
 
       <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'space-between' }}>
         <KokyuButton variant="text" onClick={goBack} disabled={stepIndex === 0}>

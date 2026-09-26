@@ -56,7 +56,7 @@ export function DailyReviewDialog({
 
   useEffect(() => {
     if (open) {
-      setIsLoading(true);
+      queueMicrotask(() => setIsLoading(true));
       dailyReviewService
         .getDailyReviewData(date)
         .then((res) => {
@@ -197,7 +197,7 @@ export function DailyReviewDialog({
                           onChange={(e) =>
                             setResolutions((prev) => ({
                               ...prev,
-                              [p.id]: e.target.value as any,
+                              [p.id]: e.target.value as 'tomorrow' | 'inbox' | 'discard',
                             }))
                           }
                         >

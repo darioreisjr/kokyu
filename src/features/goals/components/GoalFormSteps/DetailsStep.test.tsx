@@ -7,10 +7,10 @@ import { goalFormDefaultValues, type GoalFormValues } from '../../schemas/goalSc
 import { DetailsStep } from './DetailsStep';
 
 function Harness({ defaultValues }: { defaultValues?: Partial<GoalFormValues> } = {}) {
-  const { control, register, watch } = useForm<GoalFormValues>({
+  const { control, register } = useForm<GoalFormValues>({
     defaultValues: { ...goalFormDefaultValues, ...defaultValues },
   });
-  return <DetailsStep control={control} register={register} watch={watch} />;
+  return <DetailsStep control={control} register={register} />;
 }
 
 describe('DetailsStep', () => {

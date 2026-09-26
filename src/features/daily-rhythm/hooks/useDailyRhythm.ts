@@ -31,7 +31,8 @@ export function useDailyRhythm(initialDate?: string) {
   }, [selectedDate, preferences.routine.dayStartsAt, preferences.routine.dayEndsAt, sourceFilter]);
 
   useEffect(() => {
-    loadSchedule();
+    // Deferred: the loader sets its loading state synchronously.
+    queueMicrotask(() => void loadSchedule());
   }, [loadSchedule]);
 
   const goToToday = useCallback(() => {

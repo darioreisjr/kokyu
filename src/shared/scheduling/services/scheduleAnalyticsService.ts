@@ -6,6 +6,7 @@ import type {
   RescheduleRate,
   ScheduleAnalytics,
   ScheduleEntry,
+  ScheduleSourceType,
   TimeByArea,
   TimeBySource,
 } from '../types';
@@ -64,7 +65,7 @@ export const scheduleAnalyticsService = {
     }
 
     // 2. Time by Source
-    const sourceMinutesMap = new Map<string, number>();
+    const sourceMinutesMap = new Map<ScheduleSourceType, number>();
     let totalSourceMinutes = 0;
 
     for (const e of entries) {
@@ -81,7 +82,7 @@ export const scheduleAnalyticsService = {
         const percentage =
           totalSourceMinutes > 0 ? Math.round((minutes / totalSourceMinutes) * 100) : 0;
         return {
-          sourceType: sourceType as any,
+          sourceType,
           label: meta?.label ?? sourceType,
           minutes,
           percentage,
