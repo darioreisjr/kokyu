@@ -38,15 +38,10 @@ export function replanRemainingDay(
       ? options.dayStartsAt
       : currentTime;
 
-  const preview = generateDailySchedulePlan(
-    date,
-    preservedEntries,
-    replanCandidates,
-    {
-      ...options,
-      dayStartsAt: effectiveStartsAt,
-    },
-  );
+  const preview = generateDailySchedulePlan(date, preservedEntries, replanCandidates, {
+    ...options,
+    dayStartsAt: effectiveStartsAt,
+  });
 
   const unresolvedCount = preview.items.filter((i) => !i.startAt).length;
 
@@ -57,4 +52,3 @@ export function replanRemainingDay(
     preview,
   };
 }
-

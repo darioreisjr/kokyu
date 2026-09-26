@@ -28,7 +28,8 @@ export interface ProjectDetailPageProps {
 }
 
 export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
-  const { project, sections, missions, progress, nextAction, isLoading, refresh } = useMissionProject(projectId);
+  const { project, sections, missions, progress, nextAction, isLoading, refresh } =
+    useMissionProject(projectId);
   const [view, setView] = useState<'list' | 'board'>('list');
   const [confirmComplete, setConfirmComplete] = useState(false);
 
@@ -73,7 +74,9 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
           project={project}
           progress={progress}
           nextActionTitle={nextAction?.title}
-          onComplete={() => (openMissionsCount > 0 ? setConfirmComplete(true) : completeProjectWithAction('keep'))}
+          onComplete={() =>
+            openMissionsCount > 0 ? setConfirmComplete(true) : completeProjectWithAction('keep')
+          }
           onArchive={handleArchive}
         />
 
@@ -122,10 +125,17 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
           <KokyuButton variant="text" onClick={() => setConfirmComplete(false)}>
             Cancelar
           </KokyuButton>
-          <KokyuButton variant="outlined" onClick={() => completeProjectWithAction('moveToBacklog')}>
+          <KokyuButton
+            variant="outlined"
+            onClick={() => completeProjectWithAction('moveToBacklog')}
+          >
             Mover abertas para o backlog
           </KokyuButton>
-          <KokyuButton variant="outlined" color="error" onClick={() => completeProjectWithAction('cancel')}>
+          <KokyuButton
+            variant="outlined"
+            color="error"
+            onClick={() => completeProjectWithAction('cancel')}
+          >
             Cancelar abertas
           </KokyuButton>
           <KokyuButton variant="contained" onClick={() => completeProjectWithAction('keep')}>

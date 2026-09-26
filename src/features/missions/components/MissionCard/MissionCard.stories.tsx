@@ -33,7 +33,10 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = { args: { mission: buildMission() } };
 
 export const WithProject: Story = {
-  args: { mission: buildMission({ projectId: 'project-portfolio' }), projectName: 'Lançar meu site' },
+  args: {
+    mission: buildMission({ projectId: 'project-portfolio' }),
+    projectName: 'Lançar meu site',
+  },
 };
 
 export const WithGoal: Story = {

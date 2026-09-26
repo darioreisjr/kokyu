@@ -30,12 +30,7 @@ export interface HabitTimerDialogProps {
   onComplete: (loggedMinutes: number, note?: string) => Promise<void> | void;
 }
 
-export function HabitTimerDialog({
-  open,
-  habit,
-  onClose,
-  onComplete,
-}: HabitTimerDialogProps) {
+export function HabitTimerDialog({ open, habit, onClose, onComplete }: HabitTimerDialogProps) {
   const {
     isRunning,
     isPaused,

@@ -6,13 +6,7 @@ import { DailyPlanningDialog } from './DailyPlanningDialog';
 describe('DailyPlanningDialog', () => {
   it('renders planning wizard and allows advancing steps', async () => {
     const onClose = vi.fn();
-    render(
-      <DailyPlanningDialog
-        open={true}
-        onClose={onClose}
-        targetDate="2026-08-31"
-      />,
-    );
+    render(<DailyPlanningDialog open={true} onClose={onClose} targetDate="2026-08-31" />);
 
     expect(screen.getByText(/Planejar o Dia/)).toBeInTheDocument();
     expect(await screen.findByText('Definir Prioridades')).toBeInTheDocument();
@@ -23,4 +17,3 @@ describe('DailyPlanningDialog', () => {
     expect(await screen.findByText('Ajustar Alocações')).toBeInTheDocument();
   });
 });
-

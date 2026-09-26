@@ -67,7 +67,13 @@ export function DailyPlanningDialog({
   const formattedDate = format(fromDateKey(targetDate), 'dd/MM/yyyy');
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth aria-labelledby="daily-planning-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      aria-labelledby="daily-planning-title"
+    >
       <DialogTitle
         id="daily-planning-title"
         sx={{
@@ -85,7 +91,8 @@ export function DailyPlanningDialog({
             variant="caption"
             sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
           >
-            Defina até 3 focos prioritários e organize os blocos de forma inteligente e sem conflitos.
+            Defina até 3 focos prioritários e organize os blocos de forma inteligente e sem
+            conflitos.
           </Typography>
         </Box>
 
@@ -126,7 +133,8 @@ export function DailyPlanningDialog({
                     variant="body2"
                     sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 2 })}
                   >
-                    Selecione as principais missões, treinos ou hábitos que farão seu dia valer a pena se concluídos.
+                    Selecione as principais missões, treinos ou hábitos que farão seu dia valer a
+                    pena se concluídos.
                   </Typography>
 
                   {priorities.length === 0 ? (
@@ -251,7 +259,8 @@ export function DailyPlanningDialog({
                   variant="caption"
                   sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
                 >
-                  O algoritmo preserva compromissos fixos e encaixa prioridades nos horários de maior energia.
+                  O algoritmo preserva compromissos fixos e encaixa prioridades nos horários de
+                  maior energia.
                 </Typography>
 
                 {planPreview && (
@@ -355,7 +364,8 @@ export function DailyPlanningDialog({
                       Resumo da Capacidade do Dia:
                     </Typography>
                     <Typography variant="caption" sx={{ display: 'block' }}>
-                      • Tempo planejado: {Math.round(planPreview.capacity.plannedWorkloadMinutes / 60)}h{' '}
+                      • Tempo planejado:{' '}
+                      {Math.round(planPreview.capacity.plannedWorkloadMinutes / 60)}h{' '}
                       {planPreview.capacity.plannedWorkloadMinutes % 60}min
                     </Typography>
                     <Typography variant="caption" sx={{ display: 'block' }}>
@@ -408,4 +418,3 @@ export function DailyPlanningDialog({
     </Dialog>
   );
 }
-

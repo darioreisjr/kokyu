@@ -124,7 +124,9 @@ export function DailyTimeline({
         )}
 
         {streamItems.length === 0 ? (
-          <Stack sx={{ alignItems: 'center', justifyContent: 'center', py: 8, textAlign: 'center' }}>
+          <Stack
+            sx={{ alignItems: 'center', justifyContent: 'center', py: 8, textAlign: 'center' }}
+          >
             <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
               Nenhum evento agendado para este dia
             </Typography>
@@ -132,7 +134,8 @@ export function DailyTimeline({
               variant="caption"
               sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
             >
-              Use &quot;Planejar meu dia&quot; para organizar atividades ou adicione um compromisso manual.
+              Use &quot;Planejar meu dia&quot; para organizar atividades ou adicione um compromisso
+              manual.
             </Typography>
           </Stack>
         ) : (
@@ -163,4 +166,3 @@ export function DailyTimeline({
     </Box>
   );
 }
-

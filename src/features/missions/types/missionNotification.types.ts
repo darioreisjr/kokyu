@@ -12,7 +12,8 @@ export type MissionNotificationType =
   | 'missionUnblocked'
   | 'recurringMissionAvailable';
 
-export type MissionDeadlineReminderOffset = 'atTime' | '1dayBefore' | '3daysBefore' | '1weekBefore' | 'custom';
+export type MissionDeadlineReminderOffset =
+  'atTime' | '1dayBefore' | '3daysBefore' | '1weekBefore' | 'custom';
 
 export interface MissionReminder {
   id: string;

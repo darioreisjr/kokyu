@@ -73,12 +73,16 @@ export function ScheduleAnalyticsCard({ analytics }: ScheduleAnalyticsCardProps)
           <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, display: 'block' }}>
             Sessões de Foco
           </Typography>
-          <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, display: 'block' })}>
-            {analytics.focus.totalSessions} sessões • {formatDurationDisplay(analytics.focus.totalDurationMinutes)} de foco total • Média de {formatDurationDisplay(analytics.focus.averageSessionMinutes)} por bloco.
+          <Typography
+            variant="caption"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, display: 'block' })}
+          >
+            {analytics.focus.totalSessions} sessões •{' '}
+            {formatDurationDisplay(analytics.focus.totalDurationMinutes)} de foco total • Média de{' '}
+            {formatDurationDisplay(analytics.focus.averageSessionMinutes)} por bloco.
           </Typography>
         </Box>
       </Stack>
     </Box>
   );
 }
-

@@ -44,4 +44,3 @@ export interface FocusSessionInput {
   plannedDuration?: number;
   mode?: FocusTimerMode;
 }
-

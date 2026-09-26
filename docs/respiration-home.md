@@ -48,15 +48,15 @@ interface HomeSectionProvider<T> {
 
 Cada provider concreto mora em `features/home/providers/*.ts`:
 
-| Provider                    | Lê de                                                                 | Projeção                        |
-| ---------------------------- | ---------------------------------------------------------------------- | -------------------------------- |
-| `missionHomeProvider`        | `missionService.getMissions`/`getTodayMissions`                        | `MissionHomeProjection`          |
-| `habitHomeProvider`          | `habitService.getHabitOccurrences`/`getRoutines`                       | `HabitHomeProjection`            |
-| `trainingHomeProvider`       | `trainingScheduleService`, `activeWorkoutSessionStorage`                | `TrainingHomeProjection`         |
-| `nutritionHomeProvider`      | `mealPlanService`, `pantryService`, `shoppingService`                   | `NutritionHomeProjection`        |
-| `goalHomeProvider`           | `goalService`, `goalProgressEngine`                                     | `GoalHomeProjection`             |
-| `leisureHomeProvider`        | `leisurePlanService`, `leisureItemService`                              | `LeisureHomeProjection`          |
-| `dailyRhythmHomeProvider`    | `dailyRhythmService.getDaySchedule` (o mesmo call do Ritmo Diário)      | `DailyRhythmHomeProjection`      |
+| Provider                  | Lê de                                                              | Projeção                    |
+| ------------------------- | ------------------------------------------------------------------ | --------------------------- |
+| `missionHomeProvider`     | `missionService.getMissions`/`getTodayMissions`                    | `MissionHomeProjection`     |
+| `habitHomeProvider`       | `habitService.getHabitOccurrences`/`getRoutines`                   | `HabitHomeProjection`       |
+| `trainingHomeProvider`    | `trainingScheduleService`, `activeWorkoutSessionStorage`           | `TrainingHomeProjection`    |
+| `nutritionHomeProvider`   | `mealPlanService`, `pantryService`, `shoppingService`              | `NutritionHomeProjection`   |
+| `goalHomeProvider`        | `goalService`, `goalProgressEngine`                                | `GoalHomeProjection`        |
+| `leisureHomeProvider`     | `leisurePlanService`, `leisureItemService`                         | `LeisureHomeProjection`     |
+| `dailyRhythmHomeProvider` | `dailyRhythmService.getDaySchedule` (o mesmo call do Ritmo Diário) | `DailyRhythmHomeProjection` |
 
 ### `missionHomeProvider` lê `features/missions` de verdade
 

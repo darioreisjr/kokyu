@@ -9,7 +9,12 @@ import {
 } from './missionDependencyEngine';
 
 function dep(blockerMissionId: string, blockedMissionId: string): MissionDependency {
-  return { id: `${blockerMissionId}->${blockedMissionId}`, blockerMissionId, blockedMissionId, createdAt: '2026-09-01T00:00:00Z' };
+  return {
+    id: `${blockerMissionId}->${blockedMissionId}`,
+    blockerMissionId,
+    blockedMissionId,
+    createdAt: '2026-09-01T00:00:00Z',
+  };
 }
 
 function buildMission(id: string, status: Mission['status']): Mission {
@@ -74,13 +79,21 @@ describe('missionDependencyEngine', () => {
 
   it('countOpenBlockers only counts still-open blockers', () => {
     const deps = [dep('a', 'c'), dep('b', 'c')];
-    const missions = [buildMission('a', 'completed'), buildMission('b', 'ready'), buildMission('c', 'ready')];
+    const missions = [
+      buildMission('a', 'completed'),
+      buildMission('b', 'ready'),
+      buildMission('c', 'ready'),
+    ];
     expect(countOpenBlockers('c', deps, missions)).toBe(1);
   });
 
   it('getMissionsUnblockedBy reports missions freed once the blocker completes', () => {
     const deps = [dep('a', 'b'), dep('a', 'c')];
-    const missions = [buildMission('a', 'ready'), buildMission('b', 'ready'), buildMission('c', 'ready')];
+    const missions = [
+      buildMission('a', 'ready'),
+      buildMission('b', 'ready'),
+      buildMission('c', 'ready'),
+    ];
     expect(getMissionsUnblockedBy('a', deps, missions).sort()).toEqual(['b', 'c']);
   });
 });

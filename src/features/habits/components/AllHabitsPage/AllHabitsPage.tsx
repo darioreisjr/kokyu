@@ -15,10 +15,7 @@ import ViewListRoundedIcon from '@mui/icons-material/ViewListRounded';
 import NextLink from 'next/link';
 
 import { EmptyState, KokyuButton } from '@/design-system/components';
-import {
-  defaultHabitFilterState,
-  type HabitFilterState,
-} from '../../constants/habitFilters';
+import { defaultHabitFilterState, type HabitFilterState } from '../../constants/habitFilters';
 import { habitRoutes } from '../../constants/habitRoutes';
 import { useHabits } from '../../hooks/useHabits';
 import { deriveHabitOccurrence } from '../../services/engines/habitOccurrenceService';
@@ -149,11 +146,7 @@ export function AllHabitsPage() {
             title="Nenhum hábito encontrado"
             description="Você ainda não criou hábitos com os filtros selecionados."
             action={
-              <KokyuButton
-                component={NextLink}
-                href={habitRoutes.new}
-                variant="contained"
-              >
+              <KokyuButton component={NextLink} href={habitRoutes.new} variant="contained">
                 Criar primeiro hábito
               </KokyuButton>
             }

@@ -16,10 +16,9 @@ export interface HabitReviewAdjustment {
 export interface HabitReview {
   id: string;
   periodStart: string; // "yyyy-MM-dd"
-  periodEnd: string;   // "yyyy-MM-dd"
+  periodEnd: string; // "yyyy-MM-dd"
   type: 'weekly' | 'monthly';
   reflections: HabitReviewReflections;
   adjustmentsMade: HabitReviewAdjustment[];
   createdAt: string;
 }
-

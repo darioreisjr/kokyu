@@ -141,9 +141,10 @@ export function HabitFormPage() {
           endDate: values.endDate || undefined,
           effectiveFrom: values.startDate,
         },
-        reminders: values.reminderEnabled && values.reminderTime
-          ? [{ id: 'rem-1', time: values.reminderTime, enabled: true }]
-          : [],
+        reminders:
+          values.reminderEnabled && values.reminderTime
+            ? [{ id: 'rem-1', time: values.reminderTime, enabled: true }]
+            : [],
         timeOfDay: values.timeOfDay,
         preferredTime: values.preferredTime || undefined,
         priority: values.priority ?? 'medium',
@@ -154,9 +155,10 @@ export function HabitFormPage() {
         triggerHabitId: values.triggerHabitId || undefined,
         reward: values.reward || undefined,
         source: values.source,
-        sourceRef: values.source !== 'manual' && values.sourceMetricId
-          ? { module: values.source, metricId: values.sourceMetricId, autoLog: true }
-          : undefined,
+        sourceRef:
+          values.source !== 'manual' && values.sourceMetricId
+            ? { module: values.source, metricId: values.sourceMetricId, autoLog: true }
+            : undefined,
         goalIds: values.goalIds || [],
         routineIds: values.routineIds || [],
         startDate: values.startDate,

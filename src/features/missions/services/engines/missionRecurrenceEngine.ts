@@ -4,7 +4,10 @@ import type { Mission, MissionRecurrenceRule } from '../../types';
 import { fromDateKey, toDateKey } from '../../utils/missionDateKey';
 
 /** Pure — given a rule and the basis date, returns the next occurrence's date (or null for an unsupported rule). */
-export function computeNextOccurrenceDate(rule: MissionRecurrenceRule, basisDateKey: string): string | null {
+export function computeNextOccurrenceDate(
+  rule: MissionRecurrenceRule,
+  basisDateKey: string,
+): string | null {
   const base = fromDateKey(basisDateKey);
 
   switch (rule.frequency) {
@@ -39,7 +42,11 @@ export function computeNextOccurrenceDate(rule: MissionRecurrenceRule, basisDate
   }
 }
 
-export function hasRecurrenceEnded(rule: MissionRecurrenceRule, nextDateKey: string, nextOccurrenceIndex: number): boolean {
+export function hasRecurrenceEnded(
+  rule: MissionRecurrenceRule,
+  nextDateKey: string,
+  nextOccurrenceIndex: number,
+): boolean {
   if (rule.endDate && nextDateKey > rule.endDate) return true;
   if (rule.occurrenceCount !== undefined && nextOccurrenceIndex > rule.occurrenceCount) return true;
   return false;
@@ -63,7 +70,9 @@ export interface GenerateNextOccurrenceOptions {
  * each occurrence keeps its own row and its own history (spec "RECURRENCE INSTANCE"/"GERAR
  * PRÓXIMA"). Returns null when the rule is missing, unsupported, or the series has ended.
  */
-export function generateNextOccurrence(options: GenerateNextOccurrenceOptions): MissionRecurrenceOccurrenceInput | null {
+export function generateNextOccurrence(
+  options: GenerateNextOccurrenceOptions,
+): MissionRecurrenceOccurrenceInput | null {
   const { completedMission, completionDate, nextOccurrenceIndex } = options;
   const rule = completedMission.recurrenceRule;
   if (!rule) return null;
@@ -79,7 +88,10 @@ export function generateNextOccurrence(options: GenerateNextOccurrenceOptions): 
 
   const deadlineOffsetDays =
     completedMission.deadline && completedMission.plannedDate
-      ? differenceInCalendarDays(fromDateKey(completedMission.deadline), fromDateKey(completedMission.plannedDate))
+      ? differenceInCalendarDays(
+          fromDateKey(completedMission.deadline),
+          fromDateKey(completedMission.plannedDate),
+        )
       : null;
 
   return {

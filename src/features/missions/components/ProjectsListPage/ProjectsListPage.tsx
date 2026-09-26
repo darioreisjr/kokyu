@@ -30,7 +30,11 @@ export function ProjectsListPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Stack spacing={3}>
-        <Stack direction="row" spacing={2} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+        >
           <Stack spacing={0.5}>
             <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
               Projetos
@@ -39,12 +43,18 @@ export function ProjectsListPage() {
               Conjuntos de missões relacionadas a um resultado.
             </Typography>
           </Stack>
-          <KokyuButton variant="contained" startIcon={<AddRoundedIcon />} onClick={() => setShowCreate((v) => !v)}>
+          <KokyuButton
+            variant="contained"
+            startIcon={<AddRoundedIcon />}
+            onClick={() => setShowCreate((v) => !v)}
+          >
             Novo projeto
           </KokyuButton>
         </Stack>
 
-        {showCreate && <MissionQuickCapture onCapture={handleCreate} placeholder="Nome do projeto…" autoFocus />}
+        {showCreate && (
+          <MissionQuickCapture onCapture={handleCreate} placeholder="Nome do projeto…" autoFocus />
+        )}
 
         {isLoading ? (
           <Stack sx={{ alignItems: 'center', py: 8 }}>
@@ -56,10 +66,18 @@ export function ProjectsListPage() {
           <Grid container spacing={2}>
             {projects.map((project) => {
               const progress = calculateProjectProgress(project.id, missionDb.missions);
-              const nextAction = getProjectNextAction(project.id, missionDb.missions, missionDb.dependencies);
+              const nextAction = getProjectNextAction(
+                project.id,
+                missionDb.missions,
+                missionDb.dependencies,
+              );
               return (
                 <Grid key={project.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                  <MissionProjectCard project={project} progress={progress} nextActionTitle={nextAction?.title} />
+                  <MissionProjectCard
+                    project={project}
+                    progress={progress}
+                    nextActionTitle={nextAction?.title}
+                  />
                 </Grid>
               );
             })}

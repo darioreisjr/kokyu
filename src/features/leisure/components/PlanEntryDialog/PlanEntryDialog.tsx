@@ -61,7 +61,11 @@ export function PlanEntryDialog({
   // no reference, so every value counts as a fresh pick (see schema).
   const pastReference =
     mode === 'edit'
-      ? { date: defaultValues?.date, startTime: defaultValues?.startTime, endTime: defaultValues?.endTime }
+      ? {
+          date: defaultValues?.date,
+          startTime: defaultValues?.startTime,
+          endTime: defaultValues?.endTime,
+        }
       : undefined;
 
   const {

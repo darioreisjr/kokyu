@@ -4,12 +4,7 @@
  * related to Nutrition) without ever pulling the target module's data into Missions.
  */
 export type MissionLinkEntityType =
-  | 'goal'
-  | 'habit'
-  | 'leisure'
-  | 'training'
-  | 'nutrition'
-  | 'scheduleEntry';
+  'goal' | 'habit' | 'leisure' | 'training' | 'nutrition' | 'scheduleEntry';
 
 export type MissionLinkRelationshipType = 'contributesTo' | 'relatesTo' | 'auxiliaryFor';
 

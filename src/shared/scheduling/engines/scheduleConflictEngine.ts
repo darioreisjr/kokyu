@@ -1,8 +1,4 @@
-import type {
-  ScheduleConflict,
-  ScheduleConflictResolution,
-  ScheduleEntry,
-} from '../types';
+import type { ScheduleConflict, ScheduleConflictResolution, ScheduleEntry } from '../types';
 import {
   addMinutesToTime,
   calculateDurationMinutes,
@@ -12,7 +8,7 @@ import {
 
 export interface ConflictEngineOptions {
   dayStartsAt?: string; // "06:00"
-  dayEndsAt?: string;   // "23:00"
+  dayEndsAt?: string; // "23:00"
   travelBufferMinutes?: number; // default 15 min
 }
 
@@ -125,7 +121,11 @@ export function detectScheduleConflicts(
       firstLoc !== secondLoc &&
       (first.location?.name !== second.location?.name || !first.location?.name);
 
-    if (isDifferentPhysical && gapMinutes < travelBuffer && timeToMinutes(firstEnd) <= timeToMinutes(secondStart)) {
+    if (
+      isDifferentPhysical &&
+      gapMinutes < travelBuffer &&
+      timeToMinutes(firstEnd) <= timeToMinutes(secondStart)
+    ) {
       conflicts.push({
         id: `travel-${first.id}-${second.id}`,
         type: 'travelConflict',
@@ -147,4 +147,3 @@ export function detectScheduleConflicts(
 
   return conflicts;
 }
-

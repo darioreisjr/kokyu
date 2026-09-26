@@ -8,4 +8,3 @@ export * from './focus.types';
 export * from './inbox.types';
 export * from './analytics.types';
 export * from './adapters.types';
-

@@ -21,6 +21,9 @@ export const habitLogSchema = z.object({
 
 export const plannedPauseSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data de início inválida'),
-  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data de término inválida').optional(),
+  endDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data de término inválida')
+    .optional(),
   reason: z.string().max(200).optional(),
 });

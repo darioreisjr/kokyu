@@ -31,10 +31,7 @@ export interface ClientRequestInit extends Omit<ApiRequestInit, 'accessToken'> {
  * has no React Router context to call into, being usable from plain
  * event handlers and non-component code alike.
  */
-export async function apiFetchClient<T>(
-  path: string,
-  options: ClientRequestInit = {},
-): Promise<T> {
+export async function apiFetchClient<T>(path: string, options: ClientRequestInit = {}): Promise<T> {
   const { suppressProfileSetupRedirect, ...init } = options;
   const supabase = createClient();
   const {

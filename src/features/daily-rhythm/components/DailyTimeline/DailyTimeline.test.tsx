@@ -33,13 +33,7 @@ const mockSlots: FreeTimeSlot[] = [
 
 describe('DailyTimeline', () => {
   it('renders entries and free slots', () => {
-    render(
-      <DailyTimeline
-        date="2026-08-31"
-        entries={mockEntries}
-        freeSlots={mockSlots}
-      />,
-    );
+    render(<DailyTimeline date="2026-08-31" entries={mockEntries} freeSlots={mockSlots} />);
 
     expect(screen.getByText('Treino A')).toBeInTheDocument();
     expect(screen.getByText(/10:00 - 11:30 \(1h 30min livres\)/)).toBeInTheDocument();
@@ -47,15 +41,8 @@ describe('DailyTimeline', () => {
   });
 
   it('renders empty state when no stream items exist', () => {
-    render(
-      <DailyTimeline
-        date="2026-08-31"
-        entries={[]}
-        freeSlots={[]}
-      />,
-    );
+    render(<DailyTimeline date="2026-08-31" entries={[]} freeSlots={[]} />);
 
     expect(screen.getByText('Nenhum evento agendado para este dia')).toBeInTheDocument();
   });
 });
-

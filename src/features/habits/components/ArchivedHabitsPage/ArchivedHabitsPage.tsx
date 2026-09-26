@@ -76,7 +76,9 @@ export function ArchivedHabitsPage() {
                     <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                       <HabitAreaIcon area={habit.area} size="medium" />
                       <Stack spacing={0.5}>
-                        <Typography variant="h5" sx={{ fontWeight: 600 }}>{habit.name}</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                          {habit.name}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {getHabitAreaLabel(habit.area)}
                         </Typography>

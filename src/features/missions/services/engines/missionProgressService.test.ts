@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { Mission, MissionChecklistItem } from '../../types';
-import { calculateChecklistProgress, calculateMissionProgress, calculateSubmissionsProgress } from './missionProgressService';
+import {
+  calculateChecklistProgress,
+  calculateMissionProgress,
+  calculateSubmissionsProgress,
+} from './missionProgressService';
 
 function buildMission(overrides: Partial<Mission> = {}): Mission {
   return {
@@ -53,17 +57,32 @@ describe('missionProgressService', () => {
       buildMission({ id: 'sub-2', parentMissionId: 'parent', status: 'ready' }),
       buildMission({ id: 'sub-3', parentMissionId: 'parent', status: 'cancelled' }),
     ];
-    expect(calculateSubmissionsProgress('parent', missions)).toEqual({ completed: 1, total: 2, percent: 50 });
+    expect(calculateSubmissionsProgress('parent', missions)).toEqual({
+      completed: 1,
+      total: 2,
+      percent: 50,
+    });
   });
 
   it('binary progress mode reflects only the mission its own status', () => {
     const mission = buildMission({ status: 'completed' });
-    expect(calculateMissionProgress(mission, [mission], [])).toEqual({ completed: 1, total: 1, percent: 100 });
+    expect(calculateMissionProgress(mission, [mission], [])).toEqual({
+      completed: 1,
+      total: 1,
+      percent: 100,
+    });
   });
 
   it('calculateMissionProgress dispatches by progressMode', () => {
     const parent = buildMission({ id: 'parent', progressMode: 'checklist' });
-    const items = [buildChecklistItem({ id: 'a', completed: true }), buildChecklistItem({ id: 'b', completed: false })];
-    expect(calculateMissionProgress(parent, [parent], items)).toEqual({ completed: 1, total: 2, percent: 50 });
+    const items = [
+      buildChecklistItem({ id: 'a', completed: true }),
+      buildChecklistItem({ id: 'b', completed: false }),
+    ];
+    expect(calculateMissionProgress(parent, [parent], items)).toEqual({
+      completed: 1,
+      total: 2,
+      percent: 50,
+    });
   });
 });

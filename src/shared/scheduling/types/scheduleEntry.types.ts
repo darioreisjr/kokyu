@@ -71,7 +71,7 @@ export interface ScheduleEntry {
   preferredTime?: string; // "HH:mm" or "morning" | "afternoon" | "evening"
   timeWindow?: {
     start: string; // "HH:mm"
-    end: string;   // "HH:mm"
+    end: string; // "HH:mm"
   };
   status: ScheduleEntryStatus;
   priority?: 'low' | 'medium' | 'high' | 'focus';
@@ -115,4 +115,3 @@ export interface ScheduleActivity {
   timestamp: string;
   details?: Record<string, unknown>;
 }
-

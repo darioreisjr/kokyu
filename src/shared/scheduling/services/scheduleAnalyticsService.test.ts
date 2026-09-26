@@ -54,4 +54,3 @@ describe('scheduleAnalyticsService', () => {
     expect(analytics.focus.completedSessions).toBe(1);
   });
 });
-

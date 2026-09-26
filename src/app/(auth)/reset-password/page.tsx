@@ -1,7 +1,13 @@
 import type { Metadata } from 'next';
 
 import { KokyuAuthCard } from '@/design-system/components';
-import { authText, AuthFormPanel, AuthLayout, AuthVisualPanel, ResetPasswordForm } from '@/features/auth';
+import {
+  authText,
+  AuthFormPanel,
+  AuthLayout,
+  AuthVisualPanel,
+  ResetPasswordForm,
+} from '@/features/auth';
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {

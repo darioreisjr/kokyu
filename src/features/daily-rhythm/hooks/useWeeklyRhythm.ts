@@ -22,10 +22,7 @@ export function useWeeklyRhythm(initialDate?: Date) {
   const loadWeekly = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await weeklyPlanningService.getWeeklySchedule(
-        currentWeekStart,
-        weekStartsOn,
-      );
+      const data = await weeklyPlanningService.getWeeklySchedule(currentWeekStart, weekStartsOn);
       setWeeklyData(data);
     } finally {
       setIsLoading(false);
@@ -58,4 +55,3 @@ export function useWeeklyRhythm(initialDate?: Date) {
     refreshWeekly: loadWeekly,
   };
 }
-

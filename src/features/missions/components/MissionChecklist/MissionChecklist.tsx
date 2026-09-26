@@ -20,7 +20,12 @@ export interface MissionChecklistProps {
 }
 
 /** A checklist item is just a step, never a full Mission — see `docs/missions.md#submissão-x-checklist`. */
-export function MissionChecklist({ items, onAddItem, onToggleItem, onDeleteItem }: MissionChecklistProps) {
+export function MissionChecklist({
+  items,
+  onAddItem,
+  onToggleItem,
+  onDeleteItem,
+}: MissionChecklistProps) {
   const [newItemText, setNewItemText] = useState('');
   const progress = calculateChecklistProgress(items);
 
@@ -54,15 +59,27 @@ export function MissionChecklist({ items, onAddItem, onToggleItem, onDeleteItem 
               size="small"
               checked={item.completed}
               onChange={(event) => onToggleItem?.(item.id, event.target.checked)}
-              slotProps={{ input: { 'aria-label': `Marcar "${item.text}" como ${item.completed ? 'não concluído' : 'concluído'}` } }}
+              slotProps={{
+                input: {
+                  'aria-label': `Marcar "${item.text}" como ${item.completed ? 'não concluído' : 'concluído'}`,
+                },
+              }}
             />
             <Typography
               variant="body2"
-              sx={{ flex: 1, textDecoration: item.completed ? 'line-through' : 'none', color: item.completed ? 'text.secondary' : 'text.primary' }}
+              sx={{
+                flex: 1,
+                textDecoration: item.completed ? 'line-through' : 'none',
+                color: item.completed ? 'text.secondary' : 'text.primary',
+              }}
             >
               {item.text}
             </Typography>
-            <IconButton size="small" onClick={() => onDeleteItem?.(item.id)} aria-label={`Remover item "${item.text}"`}>
+            <IconButton
+              size="small"
+              onClick={() => onDeleteItem?.(item.id)}
+              aria-label={`Remover item "${item.text}"`}
+            >
               <DeleteOutlineRoundedIcon fontSize="small" />
             </IconButton>
           </Stack>

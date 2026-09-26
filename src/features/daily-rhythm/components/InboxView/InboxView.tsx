@@ -184,7 +184,11 @@ export function InboxView({ onScheduleItem }: InboxViewProps) {
                   {item.note && (
                     <Typography
                       variant="caption"
-                      sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mt: 0.5, display: 'block' })}
+                      sx={(theme) => ({
+                        color: themePalette(theme).kokyu.text.secondary,
+                        mt: 0.5,
+                        display: 'block',
+                      })}
                     >
                       {item.note}
                     </Typography>

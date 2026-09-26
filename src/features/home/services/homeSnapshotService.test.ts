@@ -25,7 +25,11 @@ describe('homeSnapshotService', () => {
 
   it('combines every provider into one snapshot', async () => {
     const today = toDateKey(new Date());
-    const snapshot = await homeSnapshotService.getHomeSnapshot({ date: today, now: new Date(), ...DAY_OPTIONS });
+    const snapshot = await homeSnapshotService.getHomeSnapshot({
+      date: today,
+      now: new Date(),
+      ...DAY_OPTIONS,
+    });
 
     expect(snapshot.date).toBe(today);
     expect(snapshot.missions.status).toBe('success');
@@ -42,7 +46,11 @@ describe('homeSnapshotService', () => {
     vi.spyOn(nutritionHomeProvider, 'getHomeProjection').mockRejectedValue(new Error('boom'));
 
     const today = toDateKey(new Date());
-    const snapshot = await homeSnapshotService.getHomeSnapshot({ date: today, now: new Date(), ...DAY_OPTIONS });
+    const snapshot = await homeSnapshotService.getHomeSnapshot({
+      date: today,
+      now: new Date(),
+      ...DAY_OPTIONS,
+    });
 
     expect(snapshot.nutrition.status).toBe('error');
     expect(snapshot.nutrition.data).toBeNull();
@@ -74,15 +82,23 @@ describe('homeSnapshotService', () => {
     const now = new Date();
     now.setHours(10, 30, 0, 0);
 
-    const snapshot = await homeSnapshotService.getHomeSnapshot({ date: today, now, ...DAY_OPTIONS });
+    const snapshot = await homeSnapshotService.getHomeSnapshot({
+      date: today,
+      now,
+      ...DAY_OPTIONS,
+    });
 
     expect(snapshot.currentEntry?.sourceId).toBe('home-test-now');
     expect(snapshot.nextEntries.some((entry) => entry.sourceId === 'home-test-later')).toBe(true);
   });
 
-  it("merges the mission in focus and goals in focus into dailyPriorities, capped at 5", async () => {
+  it('merges the mission in focus and goals in focus into dailyPriorities, capped at 5', async () => {
     const today = toDateKey(new Date());
-    const snapshot = await homeSnapshotService.getHomeSnapshot({ date: today, now: new Date(), ...DAY_OPTIONS });
+    const snapshot = await homeSnapshotService.getHomeSnapshot({
+      date: today,
+      now: new Date(),
+      ...DAY_OPTIONS,
+    });
 
     expect(snapshot.dailyPriorities.length).toBeLessThanOrEqual(5);
     for (const priority of snapshot.dailyPriorities) {

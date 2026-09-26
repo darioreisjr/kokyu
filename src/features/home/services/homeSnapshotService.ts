@@ -33,9 +33,19 @@ export interface GetHomeSnapshotOptions {
 const QUICK_ACTIONS: HomeQuickAction[] = [
   { id: 'new-mission', label: 'Nova Missão', icon: 'AssignmentRounded', href: '/app/missoes' },
   { id: 'log-habit', label: 'Registrar Hábito', icon: 'AutorenewRounded', href: '/app/habitos' },
-  { id: 'plan-training', label: 'Planejar Treino', icon: 'FitnessCenterRounded', href: '/app/treinamento' },
+  {
+    id: 'plan-training',
+    label: 'Planejar Treino',
+    icon: 'FitnessCenterRounded',
+    href: '/app/treinamento',
+  },
   { id: 'add-meal', label: 'Adicionar Refeição', icon: 'RestaurantRounded', href: '/app/nutricao' },
-  { id: 'save-for-later', label: 'Guardar para Depois', icon: 'MovieRounded', href: '/app/tempo-livre' },
+  {
+    id: 'save-for-later',
+    label: 'Guardar para Depois',
+    icon: 'MovieRounded',
+    href: '/app/tempo-livre',
+  },
   { id: 'new-goal', label: 'Nova Meta', icon: 'TrackChangesRounded', href: '/app/metas' },
   { id: 'new-entry', label: 'Novo Compromisso', icon: 'EventRounded', href: '/app/ritmo-diario' },
 ];
@@ -117,23 +127,28 @@ export const homeSnapshotService = {
     const dayProgress = computeDayProgress(now, options.dayStartsAt, options.dayEndsAt);
     const dailyPriorities = buildDailyPriorities(missions, goals);
 
-    const alerts: HomeAttentionItem[] = getHomeAttention({ missions, goals, nutrition, schedule }, context);
+    const alerts: HomeAttentionItem[] = getHomeAttention(
+      { missions, goals, nutrition, schedule },
+      context,
+    );
 
     const nowHHmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const currentEntry = schedule.data?.currentEntry ?? null;
     const currentFreeSlot =
       !currentEntry && schedule.data
-        ? (schedule.data.freeSlots.find((slot) => slot.startAt <= nowHHmm && slot.endAt > nowHHmm) ?? null)
+        ? (schedule.data.freeSlots.find(
+            (slot) => slot.startAt <= nowHHmm && slot.endAt > nowHHmm,
+          ) ?? null)
         : null;
 
     const hasAnyPlannedActivity = Boolean(
       schedule.data?.hasAnyEntry ||
-        (missions.data && missions.data.pendingCount + missions.data.completedCount > 0) ||
-        (habits.data && habits.data.scheduledToday > 0) ||
-        (training.data && (training.data.today || training.data.next)) ||
-        (nutrition.data && nutrition.data.plannedMealsToday > 0) ||
-        (goals.data && goals.data.inFocus.length > 0) ||
-        (leisure.data && (leisure.data.plannedToday || leisure.data.inProgress)),
+      (missions.data && missions.data.pendingCount + missions.data.completedCount > 0) ||
+      (habits.data && habits.data.scheduledToday > 0) ||
+      (training.data && (training.data.today || training.data.next)) ||
+      (nutrition.data && nutrition.data.plannedMealsToday > 0) ||
+      (goals.data && goals.data.inFocus.length > 0) ||
+      (leisure.data && (leisure.data.plannedToday || leisure.data.inProgress)),
     );
 
     return {

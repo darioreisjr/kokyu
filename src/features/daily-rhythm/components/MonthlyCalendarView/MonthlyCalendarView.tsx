@@ -65,7 +65,12 @@ export function MonthlyCalendarView() {
             <ChevronLeftRoundedIcon />
           </IconButton>
 
-          <Button size="small" variant="outlined" onClick={goToCurrentMonth} sx={{ textTransform: 'none' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={goToCurrentMonth}
+            sx={{ textTransform: 'none' }}
+          >
             Este mês
           </Button>
 
@@ -168,7 +173,10 @@ export function MonthlyCalendarView() {
                       };
                     }}
                   >
-                    <Typography variant="caption" sx={{ fontWeight: isSelected || isDayToday ? 700 : 500 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: isSelected || isDayToday ? 700 : 500 }}
+                    >
                       {format(day, 'd')}
                     </Typography>
                   </Box>
@@ -195,7 +203,12 @@ export function MonthlyCalendarView() {
             {selectedDayEntries.length === 0 ? (
               <Typography
                 variant="caption"
-                sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, py: 3, textAlign: 'center', display: 'block' })}
+                sx={(theme) => ({
+                  color: themePalette(theme).kokyu.text.secondary,
+                  py: 3,
+                  textAlign: 'center',
+                  display: 'block',
+                })}
               >
                 Nenhuma atividade agendada para esta data.
               </Typography>
@@ -212,4 +225,3 @@ export function MonthlyCalendarView() {
     </Box>
   );
 }
-

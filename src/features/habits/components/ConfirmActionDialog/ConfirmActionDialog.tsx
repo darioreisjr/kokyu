@@ -32,7 +32,13 @@ export function ConfirmActionDialog({
   onClose,
 }: ConfirmActionDialogProps) {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="confirm-action-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      aria-labelledby="confirm-action-title"
+    >
       <DialogTitle id="confirm-action-title">
         <Typography variant="h5" component="span" sx={{ fontWeight: 600 }}>
           {title}

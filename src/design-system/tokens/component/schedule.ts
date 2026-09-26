@@ -23,4 +23,3 @@ export const scheduleTokens = {
   },
   snapGridMinutes: 15,
 } as const;
-

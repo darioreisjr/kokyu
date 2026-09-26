@@ -31,9 +31,7 @@ export const mockExternalCalendarProvider: ExternalCalendarProvider = {
 
 export function convertExternalEventToScheduleEntry(event: ExternalCalendarEvent): ScheduleEntry {
   const duration =
-    event.startAt && event.endAt
-      ? calculateDurationMinutes(event.startAt, event.endAt)
-      : 60;
+    event.startAt && event.endAt ? calculateDurationMinutes(event.startAt, event.endAt) : 60;
 
   return {
     id: `ext-${event.id}`,
@@ -64,4 +62,3 @@ export function convertExternalEventToScheduleEntry(event: ExternalCalendarEvent
     updatedAt: new Date().toISOString(),
   };
 }
-

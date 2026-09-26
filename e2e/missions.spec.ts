@@ -9,7 +9,9 @@ test.describe('Missões — fluxo principal', () => {
     // 2. Criar via Quick Add (Inbox) — navega pela aba, não por goto(), para preservar o mock DB em memória entre as etapas.
     await page.getByRole('tab', { name: 'Inbox' }).click();
     await expect(page.getByRole('heading', { name: 'Inbox' })).toBeVisible();
-    const quickAdd = page.getByRole('textbox', { name: 'Nova missão' }).or(page.getByPlaceholder('Capturar algo novo…'));
+    const quickAdd = page
+      .getByRole('textbox', { name: 'Nova missão' })
+      .or(page.getByPlaceholder('Capturar algo novo…'));
     await quickAdd.fill('Comprar material de escritório (E2E)');
     await quickAdd.press('Enter');
 
@@ -17,7 +19,9 @@ test.describe('Missões — fluxo principal', () => {
     await expect(newRow).toBeVisible();
 
     // 3. Processar a missão: mover para "Fazer hoje".
-    const row = page.locator('[data-testid^="inbox-item-"]', { hasText: 'Comprar material de escritório (E2E)' });
+    const row = page.locator('[data-testid^="inbox-item-"]', {
+      hasText: 'Comprar material de escritório (E2E)',
+    });
     await row.getByRole('button', { name: 'Fazer hoje' }).click();
     await expect(newRow).not.toBeVisible();
 
@@ -29,7 +33,9 @@ test.describe('Missões — fluxo principal', () => {
     // "Concluídas" (colapsada por padrão), então a verificação é feita depois de expandir.
     await page.getByRole('checkbox', { name: /Comprar material de escritório \(E2E\)/ }).click();
     await page.getByRole('button', { name: /Concluídas/ }).click();
-    await expect(page.getByRole('checkbox', { name: /Comprar material de escritório \(E2E\)/ })).toBeChecked();
+    await expect(
+      page.getByRole('checkbox', { name: /Comprar material de escritório \(E2E\)/ }),
+    ).toBeChecked();
   });
 });
 

@@ -8,7 +8,14 @@ const withData: HomeProviderResult<HabitHomeProjection> = {
   data: {
     scheduledToday: 5,
     completedToday: 3,
-    next: { id: 'h1', name: 'Beber água', icon: 'WaterDropRounded', timeOfDay: 'afternoon', isCompleted: false, canQuickComplete: true },
+    next: {
+      id: 'h1',
+      name: 'Beber água',
+      icon: 'WaterDropRounded',
+      timeOfDay: 'afternoon',
+      isCompleted: false,
+      canQuickComplete: true,
+    },
     currentRoutine: null,
     nextRoutine: { id: 'r1', name: 'Rotina Noturna', timeOfDay: 'evening', preferredTime: '21:00' },
   },
@@ -30,7 +37,13 @@ export const Empty: Story = {
     result: {
       sourceType: 'habit',
       status: 'success',
-      data: { scheduledToday: 0, completedToday: 0, next: null, currentRoutine: null, nextRoutine: null },
+      data: {
+        scheduledToday: 0,
+        completedToday: 0,
+        next: null,
+        currentRoutine: null,
+        nextRoutine: null,
+      },
     },
   },
 };

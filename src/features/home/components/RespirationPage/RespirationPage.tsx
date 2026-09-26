@@ -173,10 +173,16 @@ export function RespirationPage() {
         return (
           <HomeAreasGrid
             key={id}
-            missions={snapshot?.missions ?? { sourceType: 'mission', status: 'success', data: null }}
+            missions={
+              snapshot?.missions ?? { sourceType: 'mission', status: 'success', data: null }
+            }
             habits={snapshot?.habits ?? { sourceType: 'habit', status: 'success', data: null }}
-            training={snapshot?.training ?? { sourceType: 'training', status: 'success', data: null }}
-            nutrition={snapshot?.nutrition ?? { sourceType: 'nutrition', status: 'success', data: null }}
+            training={
+              snapshot?.training ?? { sourceType: 'training', status: 'success', data: null }
+            }
+            nutrition={
+              snapshot?.nutrition ?? { sourceType: 'nutrition', status: 'success', data: null }
+            }
             goals={snapshot?.goals ?? { sourceType: 'goal', status: 'success', data: null }}
             leisure={snapshot?.leisure ?? { sourceType: 'leisure', status: 'success', data: null }}
             isLoading={isLoading && !snapshot}
@@ -196,7 +202,11 @@ export function RespirationPage() {
         );
       case 'quickActions':
         return (
-          <HomeQuickActions key={id} actions={snapshot?.quickActions ?? []} onSelect={handleQuickAction} />
+          <HomeQuickActions
+            key={id}
+            actions={snapshot?.quickActions ?? []}
+            onSelect={handleQuickAction}
+          />
         );
       default:
         return null;

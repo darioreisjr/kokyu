@@ -17,7 +17,11 @@ import { KokyuButton, KokyuTextField } from '@/design-system/components';
 import { missionAreaDefinitions } from '../../constants/missionAreas';
 import { missionDurationPresets } from '../../constants/missionDurationPresets';
 import { missionPriorityDefinitions } from '../../constants/missionPriorities';
-import { missionFormDefaultValues, missionSchema, type MissionFormValues } from '../../schemas/missionSchema';
+import {
+  missionFormDefaultValues,
+  missionSchema,
+  type MissionFormValues,
+} from '../../schemas/missionSchema';
 import type { MissionProject } from '../../types';
 
 export interface MissionFormProps {
@@ -34,7 +38,13 @@ export interface MissionFormProps {
  * DISCLOSURE OBRIGATÓRIO") — never a multi-step wizard like `HabitFormPage`'s, which the spec
  * explicitly doesn't ask for here.
  */
-export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submitLabel = 'Salvar missão' }: MissionFormProps) {
+export function MissionForm({
+  defaultValues,
+  projects,
+  onSubmit,
+  onCancel,
+  submitLabel = 'Salvar missão',
+}: MissionFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { control, handleSubmit, watch } = useForm<MissionFormValues>({
     resolver: zodResolver(missionSchema),
@@ -59,14 +69,22 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
         control={control}
         name="title"
         render={({ field, fieldState }) => (
-          <KokyuTextField {...field} label="Título" required error={!!fieldState.error} helperText={fieldState.error?.message} />
+          <KokyuTextField
+            {...field}
+            label="Título"
+            required
+            error={!!fieldState.error}
+            helperText={fieldState.error?.message}
+          />
         )}
       />
 
       <Controller
         control={control}
         name="description"
-        render={({ field }) => <KokyuTextField {...field} label="Descrição" multiline minRows={2} />}
+        render={({ field }) => (
+          <KokyuTextField {...field} label="Descrição" multiline minRows={2} />
+        )}
       />
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -74,7 +92,13 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
           control={control}
           name="projectId"
           render={({ field }) => (
-            <KokyuTextField {...field} select label="Projeto" sx={{ flex: 1 }} value={field.value ?? ''}>
+            <KokyuTextField
+              {...field}
+              select
+              label="Projeto"
+              sx={{ flex: 1 }}
+              value={field.value ?? ''}
+            >
               <MenuItem value="">Sem projeto</MenuItem>
               {projects.map((project) => (
                 <MenuItem key={project.id} value={project.id}>
@@ -89,7 +113,13 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
           control={control}
           name="priority"
           render={({ field }) => (
-            <KokyuTextField {...field} select label="Prioridade" sx={{ flex: 1 }} value={field.value ?? 'none'}>
+            <KokyuTextField
+              {...field}
+              select
+              label="Prioridade"
+              sx={{ flex: 1 }}
+              value={field.value ?? 'none'}
+            >
               {missionPriorityDefinitions.map((definition) => (
                 <MenuItem key={definition.id} value={definition.id}>
                   {definition.label}
@@ -105,14 +135,26 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
           control={control}
           name="plannedDate"
           render={({ field }) => (
-            <KokyuTextField {...field} type="date" label="Planejar para" sx={{ flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
+            <KokyuTextField
+              {...field}
+              type="date"
+              label="Planejar para"
+              sx={{ flex: 1 }}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
           )}
         />
         <Controller
           control={control}
           name="deadline"
           render={({ field }) => (
-            <KokyuTextField {...field} type="date" label="Prazo (deadline)" sx={{ flex: 1 }} slotProps={{ inputLabel: { shrink: true } }} />
+            <KokyuTextField
+              {...field}
+              type="date"
+              label="Prazo (deadline)"
+              sx={{ flex: 1 }}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
           )}
         />
         <Controller
@@ -125,7 +167,9 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
               label="Duração estimada"
               sx={{ flex: 1 }}
               value={field.value ?? ''}
-              onChange={(event) => field.onChange(event.target.value ? Number(event.target.value) : undefined)}
+              onChange={(event) =>
+                field.onChange(event.target.value ? Number(event.target.value) : undefined)
+              }
             >
               <MenuItem value="">Sem estimativa</MenuItem>
               {missionDurationPresets.map((preset) => (
@@ -138,7 +182,11 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
         />
       </Stack>
 
-      <Accordion disableGutters variant="outlined" sx={{ borderRadius: 2, '&::before': { display: 'none' } }}>
+      <Accordion
+        disableGutters
+        variant="outlined"
+        sx={{ borderRadius: 2, '&::before': { display: 'none' } }}
+      >
         <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
           <Typography variant="subtitle2">Avançado</Typography>
         </AccordionSummary>
@@ -148,7 +196,12 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
               control={control}
               name="availableFrom"
               render={({ field }) => (
-                <KokyuTextField {...field} type="date" label="Disponível a partir de" slotProps={{ inputLabel: { shrink: true } }} />
+                <KokyuTextField
+                  {...field}
+                  type="date"
+                  label="Disponível a partir de"
+                  slotProps={{ inputLabel: { shrink: true } }}
+                />
               )}
             />
 
@@ -171,7 +224,12 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
               control={control}
               name="energyRequirement"
               render={({ field }) => (
-                <KokyuTextField {...field} select label="Energia necessária" value={field.value ?? ''}>
+                <KokyuTextField
+                  {...field}
+                  select
+                  label="Energia necessária"
+                  value={field.value ?? ''}
+                >
                   <MenuItem value="">Não especificado</MenuItem>
                   <MenuItem value="low">Baixa</MenuItem>
                   <MenuItem value="medium">Média</MenuItem>
@@ -185,7 +243,12 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
               name="splittable"
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Switch checked={field.value ?? false} onChange={(event) => field.onChange(event.target.checked)} />}
+                  control={
+                    <Switch
+                      checked={field.value ?? false}
+                      onChange={(event) => field.onChange(event.target.checked)}
+                    />
+                  }
                   label="Pode ser dividida em partes menores"
                 />
               )}
@@ -201,7 +264,9 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
                     type="number"
                     label="Duração mínima por parte (min)"
                     value={field.value ?? ''}
-                    onChange={(event) => field.onChange(event.target.value ? Number(event.target.value) : undefined)}
+                    onChange={(event) =>
+                      field.onChange(event.target.value ? Number(event.target.value) : undefined)
+                    }
                   />
                 )}
               />
@@ -210,14 +275,21 @@ export function MissionForm({ defaultValues, projects, onSubmit, onCancel, submi
             <Controller
               control={control}
               name="waitingFor"
-              render={({ field }) => <KokyuTextField {...field} label="Aguardando (o quê/de quem)" />}
+              render={({ field }) => (
+                <KokyuTextField {...field} label="Aguardando (o quê/de quem)" />
+              )}
             />
 
             <Controller
               control={control}
               name="followUpAt"
               render={({ field }) => (
-                <KokyuTextField {...field} type="date" label="Follow-up em" slotProps={{ inputLabel: { shrink: true } }} />
+                <KokyuTextField
+                  {...field}
+                  type="date"
+                  label="Follow-up em"
+                  slotProps={{ inputLabel: { shrink: true } }}
+                />
               )}
             />
           </Stack>

@@ -60,4 +60,3 @@ describe('ScheduleEntryCard', () => {
     expect(screen.getByText('Reagendar')).toBeInTheDocument();
   });
 });
-

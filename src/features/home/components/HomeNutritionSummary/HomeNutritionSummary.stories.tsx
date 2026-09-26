@@ -30,7 +30,13 @@ export const Empty: Story = {
     result: {
       sourceType: 'nutrition',
       status: 'success',
-      data: { nextMeal: null, plannedMealsToday: 0, preparedMealsToday: 0, pantryUrgentCount: 0, shoppingPendingCount: 0 },
+      data: {
+        nextMeal: null,
+        plannedMealsToday: 0,
+        preparedMealsToday: 0,
+        pantryUrgentCount: 0,
+        shoppingPendingCount: 0,
+      },
     },
   },
 };

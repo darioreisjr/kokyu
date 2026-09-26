@@ -11,7 +11,12 @@ import { useMissionProjects } from '../../hooks/useMissionProjects';
 import { countOpenBlockers } from '../../services/engines/missionDependencyEngine';
 import { missionService } from '../../services/missionService';
 import { missionDb } from '../../services/missionMockDb';
-import type { Mission, MissionFilters as MissionFiltersValue, MissionGroupField, MissionSort } from '../../types';
+import type {
+  Mission,
+  MissionFilters as MissionFiltersValue,
+  MissionGroupField,
+  MissionSort,
+} from '../../types';
 import { MissionFiltersBar } from '../MissionFiltersBar/MissionFiltersBar';
 import { MissionList } from '../MissionList/MissionList';
 
@@ -99,7 +104,9 @@ export function MissionListPage({
             group={defaultGroup}
             getProjectName={(id) => projects.find((p) => p.id === id)?.name ?? ''}
             getSectionName={(id) => missionDb.sections.find((s) => s.id === id)?.name ?? ''}
-            getBlockedByCount={(missionId) => countOpenBlockers(missionId, missionDb.dependencies, missionDb.missions)}
+            getBlockedByCount={(missionId) =>
+              countOpenBlockers(missionId, missionDb.dependencies, missionDb.missions)
+            }
             onToggleComplete={handleToggleComplete}
             emptyMessage={emptyMessage}
           />

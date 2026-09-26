@@ -35,7 +35,11 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
   const [checklist, setChecklist] = useState<MissionChecklistItem[]>([]);
   const [submissions, setSubmissions] = useState<Mission[]>([]);
   const [activity, setActivity] = useState<MissionActivity[]>([]);
-  const [dependencyInfo, setDependencyInfo] = useState<{ blockedBy: string[]; blocks: string[]; isBlocked: boolean }>({
+  const [dependencyInfo, setDependencyInfo] = useState<{
+    blockedBy: string[];
+    blocks: string[];
+    isBlocked: boolean;
+  }>({
     blockedBy: [],
     blocks: [],
     isBlocked: false,
@@ -73,7 +77,9 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
     );
   }
 
-  const project = mission.projectId ? missionDb.projects.find((p) => p.id === mission.projectId) : undefined;
+  const project = mission.projectId
+    ? missionDb.projects.find((p) => p.id === mission.projectId)
+    : undefined;
   const progress = calculateMissionProgress(mission, [...submissions, mission], checklist);
 
   async function handleToggleComplete() {
@@ -123,33 +129,51 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
             <Checkbox
               checked={mission.status === 'completed'}
               onChange={handleToggleComplete}
-              slotProps={{ input: { 'aria-label': `Marcar "${mission.title}" como ${mission.status === 'completed' ? 'não concluída' : 'concluída'}` } }}
+              slotProps={{
+                input: {
+                  'aria-label': `Marcar "${mission.title}" como ${mission.status === 'completed' ? 'não concluída' : 'concluída'}`,
+                },
+              }}
             />
             <Typography
               variant="h4"
               component="h1"
-              sx={{ fontWeight: 700, textDecoration: mission.status === 'completed' ? 'line-through' : 'none' }}
+              sx={{
+                fontWeight: 700,
+                textDecoration: mission.status === 'completed' ? 'line-through' : 'none',
+              }}
             >
               {mission.title}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
             <MissionPriorityBadge priority={mission.priority} importance={mission.importance} />
-            {mission.areaId && <Typography variant="caption" color="text.secondary">{getMissionAreaLabel(mission.areaId)}</Typography>}
+            {mission.areaId && (
+              <Typography variant="caption" color="text.secondary">
+                {getMissionAreaLabel(mission.areaId)}
+              </Typography>
+            )}
           </Stack>
         </Stack>
 
         {/* Planejamento */}
         <Stack spacing={1.5}>
-          <Typography variant="h6" component="h2">Planejamento</Typography>
+          <Typography variant="h6" component="h2">
+            Planejamento
+          </Typography>
           <MissionDateInfo mission={mission} />
-          <MissionDuration estimatedDuration={mission.estimatedDuration} actualDurationMinutes={mission.actualDurationMinutes} />
+          <MissionDuration
+            estimatedDuration={mission.estimatedDuration}
+            actualDurationMinutes={mission.actualDurationMinutes}
+          />
         </Stack>
 
         {/* Projeto */}
         {project && (
           <Stack spacing={1}>
-            <Typography variant="h6" component="h2">Projeto</Typography>
+            <Typography variant="h6" component="h2">
+              Projeto
+            </Typography>
             <Typography
               component={NextLink}
               href={missionRoutes.projectDetail(project.id)}
@@ -163,7 +187,9 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
 
         {/* Conteúdo */}
         <Stack spacing={1.5}>
-          <Typography variant="h6" component="h2">Conteúdo</Typography>
+          <Typography variant="h6" component="h2">
+            Conteúdo
+          </Typography>
           {mission.description && <Typography variant="body1">{mission.description}</Typography>}
 
           {mission.progressMode === 'checklist' && (
@@ -181,7 +207,13 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
                 {progress.completed} de {progress.total} submissões concluídas
               </Typography>
               {submissions.map((submission) => (
-                <MissionRow key={submission.id} mission={submission} onToggleComplete={() => missionService.completeMission(submission.id).then(reloadRelated)} />
+                <MissionRow
+                  key={submission.id}
+                  mission={submission}
+                  onToggleComplete={() =>
+                    missionService.completeMission(submission.id).then(reloadRelated)
+                  }
+                />
               ))}
             </Stack>
           )}
@@ -190,7 +222,9 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
         {/* Relações */}
         {mission.goalIds.length > 0 && (
           <Stack spacing={1}>
-            <Typography variant="h6" component="h2">Relações</Typography>
+            <Typography variant="h6" component="h2">
+              Relações
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               Contribui para {mission.goalIds.length} meta{mission.goalIds.length > 1 ? 's' : ''}.
             </Typography>
@@ -199,17 +233,32 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
 
         {/* Dependências */}
         <MissionDependencies
-          blockedBy={dependencyInfo.blockedBy.map((id) => ({ id, title: allMissionsById[id]?.title ?? id, isOpen: allMissionsById[id]?.status !== 'completed' && allMissionsById[id]?.status !== 'cancelled' && allMissionsById[id]?.status !== 'archived' }))}
-          blocks={dependencyInfo.blocks.map((id) => ({ id, title: allMissionsById[id]?.title ?? id, isOpen: true }))}
+          blockedBy={dependencyInfo.blockedBy.map((id) => ({
+            id,
+            title: allMissionsById[id]?.title ?? id,
+            isOpen:
+              allMissionsById[id]?.status !== 'completed' &&
+              allMissionsById[id]?.status !== 'cancelled' &&
+              allMissionsById[id]?.status !== 'archived',
+          }))}
+          blocks={dependencyInfo.blocks.map((id) => ({
+            id,
+            title: allMissionsById[id]?.title ?? id,
+            isOpen: true,
+          }))}
           onRemove={handleRemoveDependency}
         />
 
         {mission.status === 'waiting' && (
           <Stack spacing={0.5}>
-            <Typography variant="h6" component="h2">Aguardando</Typography>
+            <Typography variant="h6" component="h2">
+              Aguardando
+            </Typography>
             <Typography variant="body2">{mission.waitingFor ?? 'Aguardando retorno.'}</Typography>
             {mission.followUpAt && (
-              <Typography variant="caption" color="text.secondary">Follow-up em {mission.followUpAt}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Follow-up em {mission.followUpAt}
+              </Typography>
             )}
           </Stack>
         )}
@@ -218,7 +267,9 @@ export function MissionDetailPage({ missionId }: MissionDetailPageProps) {
 
         {/* Histórico */}
         <Stack spacing={1.5}>
-          <Typography variant="h6" component="h2">Histórico</Typography>
+          <Typography variant="h6" component="h2">
+            Histórico
+          </Typography>
           <MissionActivityTimeline activity={activity} />
         </Stack>
 

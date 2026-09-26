@@ -67,4 +67,3 @@ export function ConflictBanner({ conflicts, onResolve }: ConflictBannerProps) {
     </Stack>
   );
 }
-

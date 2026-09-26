@@ -75,4 +75,3 @@ export const trainingScheduleAdapter: ScheduleSourceAdapter = {
     return true;
   },
 };
-

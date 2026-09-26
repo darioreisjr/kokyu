@@ -28,7 +28,12 @@ vi.mock('../../services/onboardingService', () => ({
         region: payload.region ?? null,
         city: payload.city ?? null,
       },
-      profileCompletion: { completed: true, completedAt: '2024-01-01', version: 1, missingFields: [] },
+      profileCompletion: {
+        completed: true,
+        completedAt: '2024-01-01',
+        version: 1,
+        missingFields: [],
+      },
       access: { canUseApplication: true, redirectTo: null },
     })),
   },

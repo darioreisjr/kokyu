@@ -28,12 +28,17 @@ export const dailyRhythmHomeProvider: HomeSectionProvider<DailyRhythmHomeProject
     });
 
     const nowHHmm = toHHmm(context.now);
-    const isOpen = (status: string) => status !== 'completed' && status !== 'cancelled' && status !== 'skipped';
+    const isOpen = (status: string) =>
+      status !== 'completed' && status !== 'cancelled' && status !== 'skipped';
 
     const currentEntry =
       daySchedule.entries.find(
         (entry) =>
-          entry.startAt && entry.endAt && entry.startAt <= nowHHmm && entry.endAt > nowHHmm && isOpen(entry.status),
+          entry.startAt &&
+          entry.endAt &&
+          entry.startAt <= nowHHmm &&
+          entry.endAt > nowHHmm &&
+          isOpen(entry.status),
       ) ?? null;
 
     const nextEntries = daySchedule.entries

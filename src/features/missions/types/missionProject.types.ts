@@ -7,7 +7,8 @@ export type MissionProjectStatus = 'draft' | 'active' | 'paused' | 'completed' |
  * cancelled/archived). `manual`/`weighted`/`milestone` are prepared union members for later —
  * spec explicitly says not to overengineer this now.
  */
-export type MissionProjectProgressStrategyType = 'completionRatio' | 'manual' | 'weighted' | 'milestone';
+export type MissionProjectProgressStrategyType =
+  'completionRatio' | 'manual' | 'weighted' | 'milestone';
 
 export type MissionProjectView = 'list' | 'board' | 'calendar';
 

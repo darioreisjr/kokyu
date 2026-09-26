@@ -16,7 +16,8 @@ function isTabActive(pathname: string, href: string): boolean {
 
 export function MissionTabs() {
   const pathname = usePathname();
-  const activeTab = missionTabs.find((tab) => isTabActive(pathname, tab.href))?.id ?? missionTabs[0]!.id;
+  const activeTab =
+    missionTabs.find((tab) => isTabActive(pathname, tab.href))?.id ?? missionTabs[0]!.id;
 
   return (
     <Tabs

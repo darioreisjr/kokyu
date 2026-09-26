@@ -116,7 +116,11 @@ export function HabitCard({
                 </Typography>
               )}
 
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', pt: 0.5 }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ alignItems: 'center', flexWrap: 'wrap', pt: 0.5 }}
+              >
                 {targetDescription && (
                   <Typography
                     variant="caption"
@@ -133,7 +137,9 @@ export function HabitCard({
             </Stack>
           </Stack>
 
-          {(target.type === 'quantity' || target.type === 'duration' || target.type === 'count') && (
+          {(target.type === 'quantity' ||
+            target.type === 'duration' ||
+            target.type === 'count') && (
             <Stack spacing={0.5}>
               <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography

@@ -17,10 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { KokyuButton } from '@/design-system/components';
-import {
-  habitReviewSchema,
-  type HabitReviewFormValues,
-} from '../../schemas/reviewSchema';
+import { habitReviewSchema, type HabitReviewFormValues } from '../../schemas/reviewSchema';
 import { habitService } from '../../services/habitService';
 
 export interface HabitReviewDialogProps {
@@ -71,7 +68,13 @@ export function HabitReviewDialog({ open, onClose, onSuccess }: HabitReviewDialo
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="review-dialog-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="review-dialog-title"
+    >
       <DialogTitle id="review-dialog-title">
         <Typography variant="h5" component="span" sx={{ fontWeight: 600 }}>
           Nova Revisão Periódica

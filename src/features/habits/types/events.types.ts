@@ -34,4 +34,3 @@ export interface RoutineCompletedPayload {
   skippedHabitIds: string[];
   totalDurationSeconds: number;
 }
-

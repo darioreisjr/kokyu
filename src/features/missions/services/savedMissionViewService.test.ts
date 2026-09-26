@@ -25,7 +25,9 @@ describe('savedMissionViewService', () => {
     const existing = views[0]!;
     await savedMissionViewService.updateSavedMissionView(existing.id, { name: 'Renomeada' });
 
-    const updated = (await savedMissionViewService.getSavedMissionViews()).find((v) => v.id === existing.id);
+    const updated = (await savedMissionViewService.getSavedMissionViews()).find(
+      (v) => v.id === existing.id,
+    );
     expect(updated?.name).toBe('Renomeada');
   });
 });

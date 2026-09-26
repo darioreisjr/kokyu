@@ -38,7 +38,11 @@ export const leisureHomeProvider: HomeSectionProvider<LeisureHomeProjection> = {
           }
         : null,
       inProgress: summary.inProgress
-        ? { id: summary.inProgress.id, title: summary.inProgress.title, type: summary.inProgress.type }
+        ? {
+            id: summary.inProgress.id,
+            title: summary.inProgress.title,
+            type: summary.inProgress.type,
+          }
         : null,
       backlogCount: summary.backlogCount,
     };

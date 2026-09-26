@@ -39,4 +39,3 @@ export interface ExternalCalendarProvider {
   providerName: string;
   getEvents: (startDate: string, endDate: string) => Promise<ExternalCalendarEvent[]>;
 }
-

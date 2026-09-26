@@ -6,7 +6,15 @@ import { missionService } from './missionService';
 
 export type MissionProjectInput = Omit<
   MissionProject,
-  'id' | 'createdAt' | 'updatedAt' | 'completedAt' | 'archivedAt' | 'status' | 'goalIds' | 'tags' | 'progressStrategy'
+  | 'id'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'completedAt'
+  | 'archivedAt'
+  | 'status'
+  | 'goalIds'
+  | 'tags'
+  | 'progressStrategy'
 > &
   Partial<Pick<MissionProject, 'status' | 'goalIds' | 'tags' | 'progressStrategy'>>;
 
@@ -43,20 +51,34 @@ export const missionProjectService = {
     return { ...project };
   },
 
-  async updateProject(id: string, patch: Partial<MissionProjectInput>): Promise<MissionProject | null> {
+  async updateProject(
+    id: string,
+    patch: Partial<MissionProjectInput>,
+  ): Promise<MissionProject | null> {
     const index = missionDb.projects.findIndex((p) => p.id === id);
     if (index === -1) return null;
-    const updated: MissionProject = { ...missionDb.projects[index]!, ...patch, updatedAt: nowIso() };
+    const updated: MissionProject = {
+      ...missionDb.projects[index]!,
+      ...patch,
+      updatedAt: nowIso(),
+    };
     missionDb.projects[index] = updated;
     return { ...updated };
   },
 
-  async completeProject(id: string, openMissionsAction: OpenMissionsOnCompleteAction = 'keep'): Promise<MissionProject | null> {
+  async completeProject(
+    id: string,
+    openMissionsAction: OpenMissionsOnCompleteAction = 'keep',
+  ): Promise<MissionProject | null> {
     const index = missionDb.projects.findIndex((p) => p.id === id);
     if (index === -1) return null;
 
     const openMissions = missionDb.missions.filter(
-      (m) => m.projectId === id && m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived',
+      (m) =>
+        m.projectId === id &&
+        m.status !== 'completed' &&
+        m.status !== 'cancelled' &&
+        m.status !== 'archived',
     );
 
     if (openMissionsAction === 'moveToBacklog') {
@@ -70,7 +92,12 @@ export const missionProjectService = {
     }
 
     const now = nowIso();
-    const updated: MissionProject = { ...missionDb.projects[index]!, status: 'completed', completedAt: now, updatedAt: now };
+    const updated: MissionProject = {
+      ...missionDb.projects[index]!,
+      status: 'completed',
+      completedAt: now,
+      updatedAt: now,
+    };
     missionDb.projects[index] = updated;
     return { ...updated };
   },
@@ -79,7 +106,12 @@ export const missionProjectService = {
     const index = missionDb.projects.findIndex((p) => p.id === id);
     if (index === -1) return null;
     const now = nowIso();
-    const updated: MissionProject = { ...missionDb.projects[index]!, status: 'archived', archivedAt: now, updatedAt: now };
+    const updated: MissionProject = {
+      ...missionDb.projects[index]!,
+      status: 'archived',
+      archivedAt: now,
+      updatedAt: now,
+    };
     missionDb.projects[index] = updated;
     return { ...updated };
   },
@@ -114,17 +146,26 @@ export const missionProjectService = {
     return { ...section };
   },
 
-  async updateSection(id: string, patch: Partial<Pick<MissionSection, 'name' | 'order'>>): Promise<MissionSection | null> {
+  async updateSection(
+    id: string,
+    patch: Partial<Pick<MissionSection, 'name' | 'order'>>,
+  ): Promise<MissionSection | null> {
     const index = missionDb.sections.findIndex((s) => s.id === id);
     if (index === -1) return null;
-    const updated: MissionSection = { ...missionDb.sections[index]!, ...patch, updatedAt: nowIso() };
+    const updated: MissionSection = {
+      ...missionDb.sections[index]!,
+      ...patch,
+      updatedAt: nowIso(),
+    };
     missionDb.sections[index] = updated;
     return { ...updated };
   },
 
   async deleteSection(id: string): Promise<void> {
     missionDb.sections = missionDb.sections.filter((s) => s.id !== id);
-    missionDb.missions = missionDb.missions.map((m) => (m.sectionId === id ? { ...m, sectionId: undefined } : m));
+    missionDb.missions = missionDb.missions.map((m) =>
+      m.sectionId === id ? { ...m, sectionId: undefined } : m,
+    );
   },
 
   // ----------------------------------------------------

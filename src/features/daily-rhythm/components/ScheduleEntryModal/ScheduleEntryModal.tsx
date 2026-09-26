@@ -19,7 +19,11 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
-import type { ScheduleEntry, ScheduleEntryInput, ScheduleSourceType } from '@/shared/scheduling/types';
+import type {
+  ScheduleEntry,
+  ScheduleEntryInput,
+  ScheduleSourceType,
+} from '@/shared/scheduling/types';
 
 export interface ScheduleEntryModalProps {
   open: boolean;
@@ -94,7 +98,13 @@ export function ScheduleEntryModal({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="schedule-entry-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="schedule-entry-title"
+    >
       <DialogTitle
         id="schedule-entry-title"
         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}
@@ -224,4 +234,3 @@ export function ScheduleEntryModal({
     </Dialog>
   );
 }
-

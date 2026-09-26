@@ -30,7 +30,11 @@ export function HomeLeisureSummary({ result, isLoading = false, onOpen }: HomeLe
             {item.title}
           </Typography>
           <Typography variant="caption" component="p" sx={{ mt: 0.25 }}>
-            {data?.inProgress ? 'Em andamento' : item.startTime ? `Às ${item.startTime}` : 'Planejado para hoje'}
+            {data?.inProgress
+              ? 'Em andamento'
+              : item.startTime
+                ? `Às ${item.startTime}`
+                : 'Planejado para hoje'}
           </Typography>
         </>
       ) : null}

@@ -19,7 +19,9 @@ describe('missionProjectService', () => {
     await missionProjectService.completeProject('project-portfolio', 'cancel');
 
     const missions = await missionProjectService.getProjectMissions('project-portfolio');
-    const stillOpen = missions.filter((m) => m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived');
+    const stillOpen = missions.filter(
+      (m) => m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived',
+    );
     expect(stillOpen).toHaveLength(0);
   });
 

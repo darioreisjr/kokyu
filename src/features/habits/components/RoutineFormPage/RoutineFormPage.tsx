@@ -42,7 +42,13 @@ export function RoutineFormPage() {
     defaultValues: routineFormDefaultValues,
   });
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
 
   const toggleHabit = (id: string) => {
     const next = selectedHabitIds.includes(id)
@@ -123,7 +129,10 @@ export function RoutineFormPage() {
                   <Select
                     value={watch('timeOfDay')}
                     onChange={(e) =>
-                      setValue('timeOfDay', e.target.value as 'morning' | 'afternoon' | 'evening' | 'anytime')
+                      setValue(
+                        'timeOfDay',
+                        e.target.value as 'morning' | 'afternoon' | 'evening' | 'anytime',
+                      )
                     }
                   >
                     <MenuItem value="morning">Manhã</MenuItem>
@@ -150,7 +159,9 @@ export function RoutineFormPage() {
                 </Stack>
 
                 <Stack spacing={1.5}>
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>Selecione os hábitos desta rotina:</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Selecione os hábitos desta rotina:
+                  </Typography>
                   {errors.habitIds && (
                     <Typography variant="caption" color="error">
                       {errors.habitIds.message}
@@ -177,7 +188,9 @@ export function RoutineFormPage() {
                         >
                           <Checkbox checked={isChecked} />
                           <Box sx={{ flex: 1 }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{habit.name}</Typography>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                              {habit.name}
+                            </Typography>
                             {habit.description && (
                               <Typography variant="body2" color="text.secondary">
                                 {habit.description}

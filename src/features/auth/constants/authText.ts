@@ -41,7 +41,8 @@ export const authText = {
     hasAccount: 'Já possui uma conta?',
     signIn: 'Entrar',
     successTitle: 'Verifique seu e-mail',
-    successDescription: 'Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.',
+    successDescription:
+      'Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.',
     genericError: 'Não foi possível criar sua conta. Tente novamente.',
     usernameUnavailableError: 'Este username já está em uso.',
   },

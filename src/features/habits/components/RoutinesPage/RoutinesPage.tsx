@@ -61,11 +61,7 @@ export function RoutinesPage() {
             title="Nenhuma rotina criada"
             description="Crie sequências de hábitos para a manhã, tarde ou noite e execute-as passo a passo."
             action={
-              <KokyuButton
-                component={NextLink}
-                href={habitRoutes.routineNew}
-                variant="contained"
-              >
+              <KokyuButton component={NextLink} href={habitRoutes.routineNew} variant="contained">
                 Criar primeira rotina
               </KokyuButton>
             }

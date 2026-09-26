@@ -63,12 +63,18 @@ describe('resolveDestinationForCurrentUser', () => {
 
 describe('resolvePostAuthDestinationClient', () => {
   it('resolves to /perfil/completar for an incomplete profile, ignoring the preference-based fallback', async () => {
-    mockGetCurrentUserClient.mockResolvedValueOnce({ status: 'authenticated', currentUser: incompleteUser });
+    mockGetCurrentUserClient.mockResolvedValueOnce({
+      status: 'authenticated',
+      currentUser: incompleteUser,
+    });
     await expect(resolvePostAuthDestinationClient('/app/habitos')).resolves.toBe(ONBOARDING_PATH);
   });
 
   it('resolves to the preference-based destination for a complete profile', async () => {
-    mockGetCurrentUserClient.mockResolvedValueOnce({ status: 'authenticated', currentUser: completeUser });
+    mockGetCurrentUserClient.mockResolvedValueOnce({
+      status: 'authenticated',
+      currentUser: completeUser,
+    });
     await expect(resolvePostAuthDestinationClient('/app/habitos')).resolves.toBe('/app/habitos');
   });
 

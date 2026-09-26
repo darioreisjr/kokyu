@@ -17,12 +17,12 @@ ela é lembrada até o momento em que deixa de importar.
 Estes quatro conceitos são fáceis de confundir porque todos "aparecem no seu dia", mas respondem
 perguntas diferentes:
 
-| Conceito | Pergunta que responde | Exemplo |
-| --- | --- | --- |
-| `Goal` (Metas) | Onde eu quero chegar (destino) | "Lançar meu aplicativo" |
-| `Mission` (Missões) | O que precisa ser feito (ação) | "Finalizar autenticação" |
-| `Habit` (Hábitos) | O que precisa se repetir (comportamento contínuo) | "Ler todos os dias" |
-| `ScheduleEntry` (compartilhado) | Quando isso acontece no dia | Bloco de 14h-15h para "Finalizar autenticação" |
+| Conceito                        | Pergunta que responde                             | Exemplo                                        |
+| ------------------------------- | ------------------------------------------------- | ---------------------------------------------- |
+| `Goal` (Metas)                  | Onde eu quero chegar (destino)                    | "Lançar meu aplicativo"                        |
+| `Mission` (Missões)             | O que precisa ser feito (ação)                    | "Finalizar autenticação"                       |
+| `Habit` (Hábitos)               | O que precisa se repetir (comportamento contínuo) | "Ler todos os dias"                            |
+| `ScheduleEntry` (compartilhado) | Quando isso acontece no dia                       | Bloco de 14h-15h para "Finalizar autenticação" |
 
 Uma Mission nunca duplica os outros três:
 
@@ -176,13 +176,13 @@ foco, Concluídas recentemente) são predefinições desse mesmo motor, não lin
 Cada integração vive atrás de um contrato plano, nunca importado diretamente pela UI de outro
 módulo:
 
-| Adapter | Onde mora | Contrato | Papel |
-| --- | --- | --- | --- |
-| `missionScheduleAdapter` | `features/daily-rhythm/adapters/` | `ScheduleSourceAdapter` (shared) | Traduz Mission ↔ `ScheduleEntry` |
-| `missionCandidateProvider` | `features/daily-rhythm/adapters/` | `ScheduleCandidateProvider` (shared) | Sugere Missions para preencher um slot livre |
-| `missionHomeProvider` | `features/home/providers/` | `HomeSectionProvider<MissionHomeProjection>` (shared) | Resumo de Missões para a Respiração |
-| `missionGoalAdapter` | `features/goals/services/adapters/` | `GoalProgressSource` (goals) | Progresso automático de Goals a partir de Missions concluídas |
-| `missionHabitAdapter` | `features/habits/services/adapters/` | `HabitSourceAdapter` (habits) | Eventos de Missões disponíveis como fonte automática de Hábito |
+| Adapter                    | Onde mora                            | Contrato                                              | Papel                                                          |
+| -------------------------- | ------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------- |
+| `missionScheduleAdapter`   | `features/daily-rhythm/adapters/`    | `ScheduleSourceAdapter` (shared)                      | Traduz Mission ↔ `ScheduleEntry`                               |
+| `missionCandidateProvider` | `features/daily-rhythm/adapters/`    | `ScheduleCandidateProvider` (shared)                  | Sugere Missions para preencher um slot livre                   |
+| `missionHomeProvider`      | `features/home/providers/`           | `HomeSectionProvider<MissionHomeProjection>` (shared) | Resumo de Missões para a Respiração                            |
+| `missionGoalAdapter`       | `features/goals/services/adapters/`  | `GoalProgressSource` (goals)                          | Progresso automático de Goals a partir de Missions concluídas  |
+| `missionHabitAdapter`      | `features/habits/services/adapters/` | `HabitSourceAdapter` (habits)                         | Eventos de Missões disponíveis como fonte automática de Hábito |
 
 `daily-rhythm` e `home` são as duas features com permissão documentada de importar o serviço real
 de outra feature — seu papel é sintetizar/agregar, não duplicar lógica (ver
@@ -214,7 +214,7 @@ um sistema de eventos novo.
 importador futuro tenha onde gravar identidade externa de forma idempotente (mesmo par
 provider+externalId nunca cria duplicata) — nenhum importador real está implementado.
 `MissionAssistantProvider`/`MissionAssistantProposal` (`types/adapters.types.ts`) preparam o
-contrato de uma IA futura: toda sugestão é uma *proposta*, nunca aplicada sem confirmação do
+contrato de uma IA futura: toda sugestão é uma _proposta_, nunca aplicada sem confirmação do
 usuário.
 
 ## Testes

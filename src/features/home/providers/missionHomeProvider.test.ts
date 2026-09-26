@@ -44,7 +44,10 @@ describe('missionHomeProvider', () => {
 
   it('keeps a mission completed today visible (as completed) instead of dropping it', async () => {
     // Neutralize the seed follow-up mission so it doesn't contend for "today" here.
-    await missionService.updateMission('mission-waiting-vendor', { status: 'ready', followUpAt: undefined });
+    await missionService.updateMission('mission-waiting-vendor', {
+      status: 'ready',
+      followUpAt: undefined,
+    });
     await missionService.scheduleMission('mission-backlog-1', todayKey());
     await missionService.completeMission('mission-monthly-report');
     await missionService.completeMission('mission-backlog-1');

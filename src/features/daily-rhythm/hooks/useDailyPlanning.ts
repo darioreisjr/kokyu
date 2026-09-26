@@ -67,13 +67,10 @@ export function useDailyPlanning(targetDate: string, onCompleted?: () => void) {
     [priorities.length, targetDate],
   );
 
-  const removePriority = useCallback(
-    async (priorityId: string) => {
-      await dailyPlanningService.deleteDailyPriority(priorityId);
-      setPriorities((prev) => prev.filter((p) => p.id !== priorityId));
-    },
-    [],
-  );
+  const removePriority = useCallback(async (priorityId: string) => {
+    await dailyPlanningService.deleteDailyPriority(priorityId);
+    setPriorities((prev) => prev.filter((p) => p.id !== priorityId));
+  }, []);
 
   const toggleItemSelection = useCallback((id: string) => {
     setSelectedItemIds((prev) =>
@@ -85,14 +82,10 @@ export function useDailyPlanning(targetDate: string, onCompleted?: () => void) {
     setIsLoading(true);
     try {
       const selected = candidateItems.filter((i) => selectedItemIds.includes(i.id));
-      const preview = await dailyPlanningService.generateAutoPlanProposal(
-        targetDate,
-        selected,
-        {
-          dayStartsAt: preferences.routine.dayStartsAt,
-          dayEndsAt: preferences.routine.dayEndsAt,
-        },
-      );
+      const preview = await dailyPlanningService.generateAutoPlanProposal(targetDate, selected, {
+        dayStartsAt: preferences.routine.dayStartsAt,
+        dayEndsAt: preferences.routine.dayEndsAt,
+      });
       setPlanPreview(preview);
       return preview;
     } finally {
@@ -141,4 +134,3 @@ export function useDailyPlanning(targetDate: string, onCompleted?: () => void) {
     applyPlan,
   };
 }
-

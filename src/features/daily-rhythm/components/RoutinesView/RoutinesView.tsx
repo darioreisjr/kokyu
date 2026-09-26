@@ -58,7 +58,8 @@ export function RoutinesView() {
         variant="body2"
         sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 4 })}
       >
-        Estruture modelos para dias típicos (trabalho presencial, home office, fim de semana) e aplique com um clique.
+        Estruture modelos para dias típicos (trabalho presencial, home office, fim de semana) e
+        aplique com um clique.
       </Typography>
 
       <Grid container spacing={3}>
@@ -97,7 +98,11 @@ export function RoutinesView() {
 
                 <Typography
                   variant="caption"
-                  sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 2, display: 'block' })}
+                  sx={(theme) => ({
+                    color: themePalette(theme).kokyu.text.secondary,
+                    mb: 2,
+                    display: 'block',
+                  })}
                 >
                   {tpl.description}
                 </Typography>
@@ -138,13 +143,19 @@ export function RoutinesView() {
       </Grid>
 
       {/* Apply Dialog */}
-      <Dialog open={applyDialogOpen} onClose={() => setApplyDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={applyDialogOpen}
+        onClose={() => setApplyDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle sx={{ fontWeight: 700 }}>
           Aplicar &quot;{selectedTemplate?.name}&quot;
         </DialogTitle>
         <DialogContent>
           <Typography variant="caption" sx={{ mb: 2, display: 'block' }}>
-            Escolha a data em que deseja aplicar este modelo. Compromissos já existentes nesta data serão preservados.
+            Escolha a data em que deseja aplicar este modelo. Compromissos já existentes nesta data
+            serão preservados.
           </Typography>
           <TextField
             type="date"
@@ -166,4 +177,3 @@ export function RoutinesView() {
     </Box>
   );
 }
-

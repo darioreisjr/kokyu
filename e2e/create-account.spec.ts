@@ -101,7 +101,9 @@ test.describe('Create account flow', () => {
 
     await expect(page.getByText('Verifique seu e-mail')).toBeVisible();
     await expect(
-      page.getByText('Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.'),
+      page.getByText(
+        'Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.',
+      ),
     ).toBeVisible();
   });
 

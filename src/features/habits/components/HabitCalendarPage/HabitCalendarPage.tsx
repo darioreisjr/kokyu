@@ -117,7 +117,10 @@ export function HabitCalendarPage() {
             <Card variant="outlined" sx={{ borderRadius: 3, p: 2 }}>
               <CardContent>
                 <Stack spacing={2.5}>
-                  <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Stack
+                    direction="row"
+                    sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+                  >
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>
                       {MONTH_NAMES[currentMonth]} {currentYear}
                     </Typography>
@@ -135,7 +138,10 @@ export function HabitCalendarPage() {
                   <Grid container spacing={1} columns={7}>
                     {WEEKDAY_NAMES.map((name) => (
                       <Grid key={name} size={1} sx={{ textAlign: 'center', py: 1 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
                           {name}
                         </Typography>
                       </Grid>
@@ -195,7 +201,9 @@ export function HabitCalendarPage() {
               <CardContent sx={{ p: 3 }}>
                 <Stack spacing={2.5}>
                   <Stack spacing={0.5}>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>{selectedDate}</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                      {selectedDate}
+                    </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Score do dia: {selectedDayScore.scorePercent}%
                     </Typography>

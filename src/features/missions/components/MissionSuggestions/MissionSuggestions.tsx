@@ -14,7 +14,11 @@ export interface MissionSuggestionsProps {
 }
 
 /** Never adds anything automatically (spec "NÃO ADICIONAR AUTOMATICAMENTE") — the user always confirms. */
-export function MissionSuggestions({ suggestions, missionsById, onAddToToday }: MissionSuggestionsProps) {
+export function MissionSuggestions({
+  suggestions,
+  missionsById,
+  onAddToToday,
+}: MissionSuggestionsProps) {
   if (suggestions.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
@@ -49,7 +53,11 @@ export function MissionSuggestions({ suggestions, missionsById, onAddToToday }: 
                 {suggestion.reason}
               </Typography>
             </Stack>
-            <KokyuButton size="small" variant="outlined" onClick={() => onAddToToday(suggestion.missionId)}>
+            <KokyuButton
+              size="small"
+              variant="outlined"
+              onClick={() => onAddToToday(suggestion.missionId)}
+            >
               Adicionar a hoje
             </KokyuButton>
           </Stack>

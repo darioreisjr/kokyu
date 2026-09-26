@@ -25,7 +25,10 @@ export function createMockHabits(): Habit[] {
         effectiveFrom: '2026-01-01',
         startDate: '2026-01-01',
       },
-      reminders: [{ id: 'rem-1', time: '08:00', enabled: true }, { id: 'rem-2', time: '14:00', enabled: true }],
+      reminders: [
+        { id: 'rem-1', time: '08:00', enabled: true },
+        { id: 'rem-2', time: '14:00', enabled: true },
+      ],
       timeOfDay: 'anytime',
       priority: 'high',
       icon: 'RestaurantRounded',
@@ -208,7 +211,12 @@ export function createMockRoutines(): HabitRoutine[] {
       habitIds: ['habit-water', 'habit-meditation'],
       items: [
         { routineId: 'routine-morning-1', habitId: 'habit-water', order: 0 },
-        { routineId: 'routine-morning-1', habitId: 'habit-meditation', order: 1, delayAfterPreviousMinutes: 5 },
+        {
+          routineId: 'routine-morning-1',
+          habitId: 'habit-meditation',
+          order: 1,
+          delayAfterPreviousMinutes: 5,
+        },
       ],
       active: true,
       createdAt: '2026-01-01T08:00:00.000Z',
@@ -222,9 +230,7 @@ export function createMockRoutines(): HabitRoutine[] {
       preferredTime: '21:30',
       estimatedDurationMinutes: 30,
       habitIds: ['habit-reading'],
-      items: [
-        { routineId: 'routine-evening-1', habitId: 'habit-reading', order: 0 },
-      ],
+      items: [{ routineId: 'routine-evening-1', habitId: 'habit-reading', order: 0 }],
       active: true,
       createdAt: '2026-01-01T08:00:00.000Z',
       updatedAt: '2026-01-01T08:00:00.000Z',

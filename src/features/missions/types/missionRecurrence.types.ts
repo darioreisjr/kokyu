@@ -1,11 +1,5 @@
 export type MissionRecurrenceFrequency =
-  | 'daily'
-  | 'weekdays'
-  | 'weekly'
-  | 'monthly'
-  | 'yearly'
-  | 'specificWeekdays'
-  | 'customInterval';
+  'daily' | 'weekdays' | 'weekly' | 'monthly' | 'yearly' | 'specificWeekdays' | 'customInterval';
 
 /**
  * `scheduledDate`: next occurrence is computed from the previous occurrence's planned/deadline date.

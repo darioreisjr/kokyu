@@ -24,7 +24,9 @@ describe('PlanEntryEditPage', () => {
     render(<PlanEntryEditPage planEntryId="missing-entry" />);
 
     expect(
-      await screen.findByText('Não foi possível carregar este planejamento agora. Tente novamente.'),
+      await screen.findByText(
+        'Não foi possível carregar este planejamento agora. Tente novamente.',
+      ),
     ).toBeInTheDocument();
   });
 });

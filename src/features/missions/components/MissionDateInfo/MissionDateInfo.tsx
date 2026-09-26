@@ -11,7 +11,16 @@ import { fromDateKey, todayKey } from '../../utils/missionDateKey';
 import type { Mission } from '../../types';
 
 export interface MissionDateInfoProps {
-  mission: Pick<Mission, 'availableFrom' | 'plannedDate' | 'deadline' | 'status' | 'cancelledAt' | 'completedAt' | 'archivedAt'>;
+  mission: Pick<
+    Mission,
+    | 'availableFrom'
+    | 'plannedDate'
+    | 'deadline'
+    | 'status'
+    | 'cancelledAt'
+    | 'completedAt'
+    | 'archivedAt'
+  >;
 }
 
 function formatShort(dateKey: string): string {
@@ -49,7 +58,11 @@ export function MissionDateInfo({ mission }: MissionDateInfoProps) {
           color={overdue ? 'error' : 'default'}
           variant={overdue ? 'filled' : 'outlined'}
           icon={<HourglassBottomRoundedIcon fontSize="small" />}
-          label={overdue ? `Atrasada · prazo ${formatShort(mission.deadline)}` : `Prazo: ${formatShort(mission.deadline)}`}
+          label={
+            overdue
+              ? `Atrasada · prazo ${formatShort(mission.deadline)}`
+              : `Prazo: ${formatShort(mission.deadline)}`
+          }
         />
       )}
     </Stack>

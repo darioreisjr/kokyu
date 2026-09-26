@@ -4,13 +4,7 @@
  * as a whole" (current/next entries, capacity, conflicts), not one entry.
  */
 export type HomeSourceType =
-  | 'mission'
-  | 'habit'
-  | 'training'
-  | 'nutrition'
-  | 'goal'
-  | 'leisure'
-  | 'dailyRhythm';
+  'mission' | 'habit' | 'training' | 'nutrition' | 'goal' | 'leisure' | 'dailyRhythm';
 
 /** What every Home Provider receives — never a full feature snapshot, just the day context. */
 export interface HomeProviderContext {

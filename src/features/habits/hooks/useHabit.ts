@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { calculateHabitConsistencyScore } from '../services/engines/habitConsistencyEngine';
 import { deriveHabitOccurrence } from '../services/engines/habitOccurrenceService';
-import { calculateHabitPeriodProgress, type HabitPeriodProgress } from '../services/engines/habitProgressEngine';
+import {
+  calculateHabitPeriodProgress,
+  type HabitPeriodProgress,
+} from '../services/engines/habitProgressEngine';
 import { calculateHabitStreak } from '../services/engines/habitStreakEngine';
 import { habitService } from '../services/habitService';
 import type { HabitConsistencyScore, HabitStreak } from '../types/analytics.types';

@@ -11,7 +11,11 @@ export type { UserProfile, ProfileFormData, ProfileService } from './types/profi
 // Reused by `features/settings` (Dados → "Exportar meus dados") — same
 // cross-feature pattern `features/auth` already exports its schemas
 // and services through.
-export { profileService, mapCurrentUserToProfile, mapFormDataToPayload } from './services/profileService';
+export {
+  profileService,
+  mapCurrentUserToProfile,
+  mapFormDataToPayload,
+} from './services/profileService';
 
 // Reused by `features/onboarding` — same avatar staging/crop/upload
 // flow (`useAvatarEditor` + `ProfileAvatar`/`AvatarCropDialog` above +

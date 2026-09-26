@@ -56,4 +56,3 @@ export function useMonthlyRhythm(initialDate?: Date) {
     goToCurrentMonth,
   };
 }
-

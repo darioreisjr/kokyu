@@ -46,4 +46,3 @@ export interface ExternalCalendarEvent {
   isBusy: boolean;
   meetingUrl?: string;
 }
-

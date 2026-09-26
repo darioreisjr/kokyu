@@ -43,7 +43,12 @@ export interface StepProps {
 }
 
 export function Step1Identification({ form }: StepProps) {
-  const { register, watch, setValue, formState: { errors } } = form;
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
   const currentArea = watch('area');
 
   return (
@@ -75,10 +80,7 @@ export function Step1Identification({ form }: StepProps) {
 
       <FormControl fullWidth>
         <FormLabel sx={{ mb: 1 }}>Área do Kokyu</FormLabel>
-        <Select
-          value={currentArea}
-          onChange={(e) => setValue('area', e.target.value as HabitArea)}
-        >
+        <Select value={currentArea} onChange={(e) => setValue('area', e.target.value as HabitArea)}>
           {habitAreaDefinitions.map((areaDef) => (
             <MenuItem key={areaDef.id} value={areaDef.id}>
               {areaDef.label} — {areaDef.description}
@@ -94,7 +96,12 @@ export function Step2Direction({ form }: StepProps) {
   const { watch, setValue } = form;
   const currentDirection = watch('direction');
 
-  const options: { id: HabitDirection; title: string; desc: string; icon: ComponentType<SvgIconProps> }[] = [
+  const options: {
+    id: HabitDirection;
+    title: string;
+    desc: string;
+    icon: ComponentType<SvgIconProps>;
+  }[] = [
     {
       id: 'build',
       title: 'Construir',
@@ -149,7 +156,9 @@ export function Step2Direction({ form }: StepProps) {
                 <Radio checked={isSelected} value={opt.id} />
                 <Icon sx={(theme) => ({ color: themePalette(theme).kokyu.action.primary })} />
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{opt.title}</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {opt.title}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {opt.desc}
                   </Typography>
@@ -169,10 +178,26 @@ export function Step3TrackingType({ form }: StepProps) {
 
   const options: { id: HabitTrackingType; title: string; desc: string }[] = [
     { id: 'binary', title: 'Concluir (Sim / Não)', desc: 'Basta marcar como feito ou não feito.' },
-    { id: 'quantity', title: 'Quantidade', desc: 'Meta com número e unidade (ex: 20 páginas, 2L de água).' },
-    { id: 'duration', title: 'Duração / Tempo', desc: 'Acompanhar em minutos com timer integrado (ex: 30 min).' },
-    { id: 'count', title: 'Contagem de vezes', desc: 'Quantas vezes aconteceu no dia (ex: 4 copos, 3 sessões).' },
-    { id: 'limit', title: 'Limite Máximo', desc: 'Permanecer abaixo de um teto (ex: máx. 2x por semana).' },
+    {
+      id: 'quantity',
+      title: 'Quantidade',
+      desc: 'Meta com número e unidade (ex: 20 páginas, 2L de água).',
+    },
+    {
+      id: 'duration',
+      title: 'Duração / Tempo',
+      desc: 'Acompanhar em minutos com timer integrado (ex: 30 min).',
+    },
+    {
+      id: 'count',
+      title: 'Contagem de vezes',
+      desc: 'Quantas vezes aconteceu no dia (ex: 4 copos, 3 sessões).',
+    },
+    {
+      id: 'limit',
+      title: 'Limite Máximo',
+      desc: 'Permanecer abaixo de um teto (ex: máx. 2x por semana).',
+    },
   ];
 
   return (
@@ -203,7 +228,9 @@ export function Step3TrackingType({ form }: StepProps) {
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
                 <Radio checked={isSelected} value={opt.id} />
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{opt.title}</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {opt.title}
+                  </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {opt.desc}
                   </Typography>
@@ -332,9 +359,7 @@ export function Step5Schedule({ form }: StepProps) {
   const weekdays = watch('weekdays') ?? [];
 
   const toggleWeekday = (day: number) => {
-    const next = weekdays.includes(day)
-      ? weekdays.filter((d) => d !== day)
-      : [...weekdays, day];
+    const next = weekdays.includes(day) ? weekdays.filter((d) => d !== day) : [...weekdays, day];
     setValue('weekdays', next);
   };
 
@@ -496,9 +521,21 @@ export function Step8Integration({ form }: StepProps) {
 
   const sources = [
     { id: 'manual', label: 'Manual (Acompanhado por você no Kokyu)', icon: CheckCircleRoundedIcon },
-    { id: 'training', label: 'Treinamento (Atualizado quando registrar treinos)', icon: FitnessCenterRoundedIcon },
-    { id: 'nutrition', label: 'Nutrição (Atualizado pelo planejamento e água)', icon: RestaurantRoundedIcon },
-    { id: 'leisure', label: 'Tempo Livre (Atualizado por sessões de leitura)', icon: MenuBookRoundedIcon },
+    {
+      id: 'training',
+      label: 'Treinamento (Atualizado quando registrar treinos)',
+      icon: FitnessCenterRoundedIcon,
+    },
+    {
+      id: 'nutrition',
+      label: 'Nutrição (Atualizado pelo planejamento e água)',
+      icon: RestaurantRoundedIcon,
+    },
+    {
+      id: 'leisure',
+      label: 'Tempo Livre (Atualizado por sessões de leitura)',
+      icon: MenuBookRoundedIcon,
+    },
   ];
 
   return (
@@ -530,7 +567,9 @@ export function Step8Integration({ form }: StepProps) {
               <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
                 <Radio checked={isSelected} value={s.id} />
                 <Icon sx={(theme) => ({ color: themePalette(theme).kokyu.action.primary })} />
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{s.label}</Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {s.label}
+                </Typography>
               </CardContent>
             </Card>
           );

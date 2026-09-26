@@ -19,7 +19,11 @@ import {
 } from './engines/missionDependencyEngine';
 import { getMissionSuggestions as computeMissionSuggestions } from './engines/missionSuggestionService';
 import { generateId, missionDb } from './missionMockDb';
-import { isMissionAvailable, isMissionOverdue, isMissionTerminal } from '../utils/missionDateStatus';
+import {
+  isMissionAvailable,
+  isMissionOverdue,
+  isMissionTerminal,
+} from '../utils/missionDateStatus';
 import { shouldAppearInToday } from '../utils/missionTodayInclusion';
 import { todayKey } from '../utils/missionDateKey';
 
@@ -70,11 +74,16 @@ function nowIso(): string {
 function deriveInitialStatus(input: MissionInput): MissionStatus {
   if (input.status) return input.status;
   if (input.plannedDate) return 'planned';
-  if (input.projectId || input.deadline || (input.priority && input.priority !== 'none')) return 'ready';
+  if (input.projectId || input.deadline || (input.priority && input.priority !== 'none'))
+    return 'ready';
   return 'inbox';
 }
 
-function recordActivity(missionId: string, type: MissionActivityType, detail?: string): MissionActivity {
+function recordActivity(
+  missionId: string,
+  type: MissionActivityType,
+  detail?: string,
+): MissionActivity {
   const activity: MissionActivity = {
     id: generateId('activity'),
     missionId,
@@ -134,7 +143,9 @@ export const missionService = {
     const existing = missionDb.missions[index]!;
 
     const plannedDateChanged =
-      patch.plannedDate !== undefined && patch.plannedDate !== existing.plannedDate && existing.plannedDate !== undefined;
+      patch.plannedDate !== undefined &&
+      patch.plannedDate !== existing.plannedDate &&
+      existing.plannedDate !== undefined;
     const priorityChanged = patch.priority !== undefined && patch.priority !== existing.priority;
     const deadlineChanged = patch.deadline !== undefined && patch.deadline !== existing.deadline;
     const projectChanged = patch.projectId !== undefined && patch.projectId !== existing.projectId;
@@ -148,16 +159,27 @@ export const missionService = {
     missionDb.missions[index] = updated;
 
     recordActivity(id, 'updated');
-    if (plannedDateChanged) recordActivity(id, 'rescheduled', `Replanejada para ${patch.plannedDate}`);
-    if (priorityChanged) recordActivity(id, 'priorityChanged', `${existing.priority} → ${patch.priority}`);
-    if (deadlineChanged) recordActivity(id, 'deadlineChanged', `${existing.deadline ?? '—'} → ${patch.deadline ?? '—'}`);
+    if (plannedDateChanged)
+      recordActivity(id, 'rescheduled', `Replanejada para ${patch.plannedDate}`);
+    if (priorityChanged)
+      recordActivity(id, 'priorityChanged', `${existing.priority} → ${patch.priority}`);
+    if (deadlineChanged)
+      recordActivity(
+        id,
+        'deadlineChanged',
+        `${existing.deadline ?? '—'} → ${patch.deadline ?? '—'}`,
+      );
     if (projectChanged) recordActivity(id, 'projectChanged');
 
     return { ...updated };
   },
 
   /** Ritmo Diário calls this when a mission is dropped into a time slot or moved — never touches `deadline` (spec "DEADLINE NÃO MUDA"). */
-  async scheduleMission(id: string, plannedDate: string, scheduledStartAt?: string): Promise<Mission | null> {
+  async scheduleMission(
+    id: string,
+    plannedDate: string,
+    scheduledStartAt?: string,
+  ): Promise<Mission | null> {
     const index = missionDb.missions.findIndex((m) => m.id === id);
     if (index === -1) return null;
     const existing = missionDb.missions[index]!;
@@ -167,12 +189,21 @@ export const missionService = {
       ...existing,
       plannedDate,
       scheduledStartAt,
-      status: existing.status === 'inbox' ? 'planned' : existing.status === 'ready' ? 'planned' : existing.status,
+      status:
+        existing.status === 'inbox'
+          ? 'planned'
+          : existing.status === 'ready'
+            ? 'planned'
+            : existing.status,
       replanCount: isReschedule ? existing.replanCount + 1 : existing.replanCount,
       updatedAt: nowIso(),
     };
     missionDb.missions[index] = updated;
-    recordActivity(id, isReschedule ? 'rescheduled' : 'scheduled', `${plannedDate}${scheduledStartAt ? ` ${scheduledStartAt}` : ''}`);
+    recordActivity(
+      id,
+      isReschedule ? 'rescheduled' : 'scheduled',
+      `${plannedDate}${scheduledStartAt ? ` ${scheduledStartAt}` : ''}`,
+    );
     return { ...updated };
   },
 
@@ -211,7 +242,12 @@ export const missionService = {
         nextOccurrenceIndex: priorOccurrences + 1,
       });
       if (nextInput) {
-        const nextMission: Mission = { ...nextInput, id: generateId('mission'), createdAt: now, updatedAt: now };
+        const nextMission: Mission = {
+          ...nextInput,
+          id: generateId('mission'),
+          createdAt: now,
+          updatedAt: now,
+        };
         missionDb.missions.push(nextMission);
         recordActivity(nextMission.id, 'created', `Próxima ocorrência de "${existing.title}"`);
       }
@@ -224,7 +260,12 @@ export const missionService = {
     const index = missionDb.missions.findIndex((m) => m.id === id);
     if (index === -1) return null;
     const existing = missionDb.missions[index]!;
-    const updated: Mission = { ...existing, status: 'ready', completedAt: undefined, updatedAt: nowIso() };
+    const updated: Mission = {
+      ...existing,
+      status: 'ready',
+      completedAt: undefined,
+      updatedAt: nowIso(),
+    };
     missionDb.missions[index] = updated;
     recordActivity(id, 'reopened');
     return { ...updated };
@@ -298,7 +339,10 @@ export const missionService = {
       return missionService.updateMission(id, { status: 'ready' });
     }
     if (action.type === 'doToday' || action.type === 'plan') {
-      return missionService.updateMission(id, { status: 'planned', plannedDate: action.plannedDate });
+      return missionService.updateMission(id, {
+        status: 'planned',
+        plannedDate: action.plannedDate,
+      });
     }
     if (action.type === 'moveToProject') {
       return missionService.updateMission(id, {
@@ -346,7 +390,8 @@ export const missionService = {
           today,
           isScheduledToday: m.plannedDate === today && !!m.scheduledStartAt,
           isManuallyFocused: manuallyFocusedIds.includes(m.id),
-          isFollowUpDue: m.followUpAt !== undefined && m.followUpAt <= today && m.status === 'waiting',
+          isFollowUpDue:
+            m.followUpAt !== undefined && m.followUpAt <= today && m.status === 'waiting',
         }),
       )
       .map((m) => ({ ...m }));
@@ -359,7 +404,10 @@ export const missionService = {
   },
 
   /** Deterministic candidates for "Sugestões" — never auto-applied (spec "NÃO ADICIONAR AUTOMATICAMENTE"). */
-  async getMissionSuggestions(options?: { focusGoalIds?: string[]; availableCapacityMinutes?: number }): Promise<MissionSuggestion[]> {
+  async getMissionSuggestions(options?: {
+    focusGoalIds?: string[];
+    availableCapacityMinutes?: number;
+  }): Promise<MissionSuggestion[]> {
     return computeMissionSuggestions(missionDb.missions, missionDb.dependencies, {
       today: todayKey(),
       focusGoalIds: options?.focusGoalIds ?? [],
@@ -371,10 +419,19 @@ export const missionService = {
   // DEPENDENCIES
   // ----------------------------------------------------
 
-  async addMissionDependency(blockerMissionId: string, blockedMissionId: string): Promise<MissionDependency> {
-    const validation = validateNewDependency(blockerMissionId, blockedMissionId, missionDb.dependencies);
+  async addMissionDependency(
+    blockerMissionId: string,
+    blockedMissionId: string,
+  ): Promise<MissionDependency> {
+    const validation = validateNewDependency(
+      blockerMissionId,
+      blockedMissionId,
+      missionDb.dependencies,
+    );
     if (!validation.valid) {
-      throw new Error(`Invalid dependency (${validation.error}): ${blockerMissionId} -> ${blockedMissionId}`);
+      throw new Error(
+        `Invalid dependency (${validation.error}): ${blockerMissionId} -> ${blockedMissionId}`,
+      );
     }
     const dependency: MissionDependency = {
       id: generateId('dependency'),
@@ -398,7 +455,9 @@ export const missionService = {
     }
   },
 
-  async getMissionDependencies(missionId: string): Promise<{ blockedBy: string[]; blocks: string[]; isBlocked: boolean }> {
+  async getMissionDependencies(
+    missionId: string,
+  ): Promise<{ blockedBy: string[]; blocks: string[]; isBlocked: boolean }> {
     const statusById = buildStatusById();
     return {
       blockedBy: getBlockerIds(missionId, missionDb.dependencies),

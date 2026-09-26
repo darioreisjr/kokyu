@@ -39,7 +39,8 @@ export const nutritionHomeProvider: HomeSectionProvider<NutritionHomeProjection>
       .map((meal) => ({ meal, time: meal.time ?? mealTypeById.get(meal.mealTypeId)?.defaultTime }))
       .sort((a, b) => (a.time ?? '99:99').localeCompare(b.time ?? '99:99'));
 
-    const nextMealEntry = upcoming.find((entry) => !entry.time || entry.time >= nowHHmm) ?? upcoming[0];
+    const nextMealEntry =
+      upcoming.find((entry) => !entry.time || entry.time >= nowHHmm) ?? upcoming[0];
 
     const pantryUrgentCount = pantry.filter((item) => {
       const status = getPantryFreshnessStatus(item, context.now);

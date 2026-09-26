@@ -60,8 +60,10 @@ export const habitService = {
     const scheduleHistory = existing.scheduleHistory ? [...existing.scheduleHistory] : [];
 
     // If schedule or target changed and effectiveDate is provided, create a historical version
-    const scheduleChanged = patch.schedule && JSON.stringify(patch.schedule) !== JSON.stringify(existing.schedule);
-    const targetChanged = patch.target && JSON.stringify(patch.target) !== JSON.stringify(existing.target);
+    const scheduleChanged =
+      patch.schedule && JSON.stringify(patch.schedule) !== JSON.stringify(existing.schedule);
+    const targetChanged =
+      patch.target && JSON.stringify(patch.target) !== JSON.stringify(existing.target);
 
     if (scheduleChanged || targetChanged) {
       // Calculate yesterday before effectiveDate
@@ -227,9 +229,7 @@ export const habitService = {
     return log ? { ...log } : null;
   },
 
-  async createHabitLog(
-    input: Omit<HabitLog, 'id' | 'createdAt' | 'updatedAt'>,
-  ): Promise<HabitLog> {
+  async createHabitLog(input: Omit<HabitLog, 'id' | 'createdAt' | 'updatedAt'>): Promise<HabitLog> {
     const now = new Date().toISOString();
     const log: HabitLog = {
       ...input,
@@ -271,11 +271,7 @@ export const habitService = {
     habitDb.logs = habitDb.logs.filter((l) => l.id !== id);
   },
 
-  async skipHabitOccurrence(
-    habitId: string,
-    date: string,
-    note?: string,
-  ): Promise<HabitLog> {
+  async skipHabitOccurrence(habitId: string, date: string, note?: string): Promise<HabitLog> {
     const now = new Date().toISOString();
     const log: HabitLog = {
       id: generateId('log-skip'),
@@ -289,9 +285,7 @@ export const habitService = {
       updatedAt: now,
     };
 
-    const existingIndex = habitDb.logs.findIndex(
-      (l) => l.habitId === habitId && l.date === date,
-    );
+    const existingIndex = habitDb.logs.findIndex((l) => l.habitId === habitId && l.date === date);
 
     if (existingIndex !== -1) {
       habitDb.logs[existingIndex] = log;
@@ -331,10 +325,7 @@ export const habitService = {
     return { ...routine };
   },
 
-  async updateRoutine(
-    id: string,
-    patch: Partial<HabitRoutine>,
-  ): Promise<HabitRoutine | null> {
+  async updateRoutine(id: string, patch: Partial<HabitRoutine>): Promise<HabitRoutine | null> {
     const index = habitDb.routines.findIndex((r) => r.id === id);
     if (index === -1) return null;
 
@@ -395,9 +386,7 @@ export const habitService = {
     return [...habitDb.reviews].sort((a, b) => b.periodEnd.localeCompare(a.periodEnd));
   },
 
-  async createHabitReview(
-    input: Omit<HabitReview, 'id' | 'createdAt'>,
-  ): Promise<HabitReview> {
+  async createHabitReview(input: Omit<HabitReview, 'id' | 'createdAt'>): Promise<HabitReview> {
     const now = new Date().toISOString();
     const review: HabitReview = {
       ...input,
@@ -418,13 +407,7 @@ export const habitService = {
     weekStartsOn: 0 | 1 = 1,
   ): Promise<HabitOccurrence[]> {
     const today = getTodayString();
-    return deriveHabitOccurrencesForDate(
-      habitDb.habits,
-      date,
-      habitDb.logs,
-      today,
-      weekStartsOn,
-    );
+    return deriveHabitOccurrencesForDate(habitDb.habits, date, habitDb.logs, today, weekStartsOn);
   },
 
   async getHabitOccurrenceForDate(
@@ -436,18 +419,10 @@ export const habitService = {
     if (!habit) return null;
 
     const today = getTodayString();
-    return deriveHabitOccurrence(
-      habit,
-      date,
-      habitDb.logs,
-      today,
-      weekStartsOn,
-    );
+    return deriveHabitOccurrence(habit, date, habitDb.logs, today, weekStartsOn);
   },
 
-  async getHabitAnalyticsOverview(
-    weekStartsOn: 0 | 1 = 1,
-  ): Promise<HabitsOverviewAnalytics> {
+  async getHabitAnalyticsOverview(weekStartsOn: 0 | 1 = 1): Promise<HabitsOverviewAnalytics> {
     const today = getTodayString();
     return getHabitsOverviewAnalytics(
       habitDb.habits,
@@ -458,4 +433,3 @@ export const habitService = {
     );
   },
 };
-

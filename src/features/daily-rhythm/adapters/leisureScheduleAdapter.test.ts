@@ -84,4 +84,3 @@ describe('leisureScheduleAdapter', () => {
     expect(dayTwoAfter!.status).toBe('completed');
   });
 });
-

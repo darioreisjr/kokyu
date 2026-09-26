@@ -3,10 +3,10 @@ import type { HabitProgressSource } from './habit.types';
 export type HabitLogStatus = 'completed' | 'partial' | 'missed' | 'skipped' | 'notScheduled';
 
 export interface HabitLogContext {
-  trigger?: string;      // "O que aconteceu antes?"
-  whatHelped?: string;   // "O que ajudou?"
+  trigger?: string; // "O que aconteceu antes?"
+  whatHelped?: string; // "O que ajudou?"
   whatHindered?: string; // "O que dificultou?"
-  tags?: string[];       // ['em-casa', 'trabalho', 'viagem', etc.]
+  tags?: string[]; // ['em-casa', 'trabalho', 'viagem', etc.]
   mood?: 'great' | 'good' | 'neutral' | 'difficult';
 }
 
@@ -26,4 +26,3 @@ export interface HabitLog {
   createdAt: string;
   updatedAt: string;
 }
-

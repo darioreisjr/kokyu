@@ -1,8 +1,5 @@
 import type { FreeTimeSlot, ScheduleEntry } from '../types';
-import {
-  minutesToTime,
-  timeToMinutes,
-} from '../utils/timeHelpers';
+import { minutesToTime, timeToMinutes } from '../utils/timeHelpers';
 
 export interface FreeTimeEngineOptions {
   dayStartsAt?: string;
@@ -24,7 +21,10 @@ export function findFreeTimeSlots(
 
   // 1. Filter out allDay items and entries with invalid/missing times
   const timed = entries
-    .filter((e) => !e.allDay && e.startAt && e.endAt && e.status !== 'cancelled' && e.status !== 'skipped')
+    .filter(
+      (e) =>
+        !e.allDay && e.startAt && e.endAt && e.status !== 'cancelled' && e.status !== 'skipped',
+    )
     .sort((a, b) => timeToMinutes(a.startAt!) - timeToMinutes(b.startAt!));
 
   const slots: FreeTimeSlot[] = [];
@@ -70,4 +70,3 @@ export function findFreeTimeSlots(
 
   return slots;
 }
-

@@ -27,7 +27,10 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import { themePalette } from '@/design-system/theme/useThemePalette';
-import { SCHEDULE_SOURCE_METAS, SCHEDULE_STATUS_METAS } from '@/shared/scheduling/constants/schedulingConstants';
+import {
+  SCHEDULE_SOURCE_METAS,
+  SCHEDULE_STATUS_METAS,
+} from '@/shared/scheduling/constants/schedulingConstants';
 import type { ScheduleEntry, ScheduleSourceType } from '@/shared/scheduling/types';
 import { formatDurationDisplay } from '@/shared/scheduling/utils/timeHelpers';
 import { createScheduleEntryActionProvider } from '../../adapters/actionProviders';
@@ -43,7 +46,10 @@ export interface ScheduleEntryCardProps {
   compact?: boolean;
 }
 
-const SOURCE_ICONS: Record<ScheduleSourceType, React.ComponentType<{ fontSize?: 'small' | 'inherit' }>> = {
+const SOURCE_ICONS: Record<
+  ScheduleSourceType,
+  React.ComponentType<{ fontSize?: 'small' | 'inherit' }>
+> = {
   mission: AssignmentRoundedIcon,
   habit: AutorenewRoundedIcon,
   training: FitnessCenterRoundedIcon,
@@ -265,4 +271,3 @@ export function ScheduleEntryCard({
     </Box>
   );
 }
-

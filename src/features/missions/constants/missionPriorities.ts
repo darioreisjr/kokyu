@@ -16,7 +16,10 @@ export const missionPriorityDefinitions: MissionPriorityDefinition[] = [
 ];
 
 export function getMissionPriorityDefinition(priority: MissionPriority): MissionPriorityDefinition {
-  return missionPriorityDefinitions.find((definition) => definition.id === priority) ?? missionPriorityDefinitions[0]!;
+  return (
+    missionPriorityDefinitions.find((definition) => definition.id === priority) ??
+    missionPriorityDefinitions[0]!
+  );
 }
 
 export function getMissionPriorityLabel(priority: MissionPriority): string {

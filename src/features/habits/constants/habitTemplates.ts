@@ -1,4 +1,10 @@
-import type { HabitArea, HabitDirection, HabitTarget, HabitTimeOfDay, HabitTrackingType } from '../types/habit.types';
+import type {
+  HabitArea,
+  HabitDirection,
+  HabitTarget,
+  HabitTimeOfDay,
+  HabitTrackingType,
+} from '../types/habit.types';
 import type { HabitFrequencyType } from '../types/schedule.types';
 
 export interface HabitTemplate {

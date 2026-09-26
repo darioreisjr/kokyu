@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 import { apiFetchClient, getCurrentUserClient } from '@/lib/api/client';
 import type {
@@ -122,7 +115,15 @@ export function CurrentUserProvider({ children, initialCurrentUser }: CurrentUse
       completeProfile,
       clearCurrentUser,
     }),
-    [currentUser, isLoading, error, refreshCurrentUser, updateProfile, completeProfile, clearCurrentUser],
+    [
+      currentUser,
+      isLoading,
+      error,
+      refreshCurrentUser,
+      updateProfile,
+      completeProfile,
+      clearCurrentUser,
+    ],
   );
 
   return <CurrentUserContext.Provider value={value}>{children}</CurrentUserContext.Provider>;

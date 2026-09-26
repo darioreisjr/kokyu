@@ -53,5 +53,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const WithConflicts: Story = { args: { items: [conflict] } };
-export const MixedSeverities: Story = { args: { items: [conflict, missionOverdue, goalAtRisk, pantry] } };
+export const MixedSeverities: Story = {
+  args: { items: [conflict, missionOverdue, goalAtRisk, pantry] },
+};
 export const Empty: Story = { args: { items: [] } };

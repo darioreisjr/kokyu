@@ -37,7 +37,9 @@ vi.mock('@/lib/supabase/client', () => ({
   }),
 }));
 
-vi.mock('@/lib/api/request', () => ({ apiRequest: (...args: unknown[]) => mockApiRequest(...args) }));
+vi.mock('@/lib/api/request', () => ({
+  apiRequest: (...args: unknown[]) => mockApiRequest(...args),
+}));
 
 const VALID_PAYLOAD = {
   email: 'dario@example.com',
@@ -108,7 +110,9 @@ describe('createAccountService (Supabase provider)', () => {
     await createAccountService.createAccount(VALID_PAYLOAD, 'captcha-token');
 
     expect(signUp).toHaveBeenCalledWith(
-      expect.objectContaining({ options: expect.objectContaining({ captchaToken: 'captcha-token' }) }),
+      expect.objectContaining({
+        options: expect.objectContaining({ captchaToken: 'captcha-token' }),
+      }),
     );
   });
 

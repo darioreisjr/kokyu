@@ -4,7 +4,10 @@ import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
 import WhatshotRoundedIcon from '@mui/icons-material/WhatshotRounded';
 
-import { getMissionPriorityDefinition, missionImportanceLabels } from '../../constants/missionPriorities';
+import {
+  getMissionPriorityDefinition,
+  missionImportanceLabels,
+} from '../../constants/missionPriorities';
 import type { MissionImportance, MissionPriority as MissionPriorityValue } from '../../types';
 
 export interface MissionPriorityBadgeProps {
@@ -21,9 +24,15 @@ function priorityIcon(priority: MissionPriorityValue) {
   return <FlagRoundedIcon fontSize="small" />;
 }
 
-export function MissionPriorityBadge({ priority, importance, size = 'small' }: MissionPriorityBadgeProps) {
+export function MissionPriorityBadge({
+  priority,
+  importance,
+  size = 'small',
+}: MissionPriorityBadgeProps) {
   const definition = getMissionPriorityDefinition(priority);
-  const label = importance ? `${definition.label} · ${missionImportanceLabels[importance]}` : definition.label;
+  const label = importance
+    ? `${definition.label} · ${missionImportanceLabels[importance]}`
+    : definition.label;
 
   if (priority === 'none' && !importance) return null;
 

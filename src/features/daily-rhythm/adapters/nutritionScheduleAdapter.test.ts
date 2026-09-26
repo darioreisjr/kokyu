@@ -48,4 +48,3 @@ describe('nutritionScheduleAdapter', () => {
     expect(newMeals[0]!.time).toBe('20:00');
   });
 });
-

@@ -40,8 +40,22 @@ describe('scheduleConflictEngine', () => {
 
   it('marks conflict as lockedConflict with error severity if both are locked', () => {
     const entries = [
-      createEntry({ id: '1', title: 'Consulta', startAt: '10:00', endAt: '11:00', duration: 60, locked: true }),
-      createEntry({ id: '2', title: 'Reunião Fixa', startAt: '10:30', endAt: '11:30', duration: 60, locked: true }),
+      createEntry({
+        id: '1',
+        title: 'Consulta',
+        startAt: '10:00',
+        endAt: '11:00',
+        duration: 60,
+        locked: true,
+      }),
+      createEntry({
+        id: '2',
+        title: 'Reunião Fixa',
+        startAt: '10:30',
+        endAt: '11:30',
+        duration: 60,
+        locked: true,
+      }),
     ];
     const conflicts = detectScheduleConflicts(entries);
     expect(conflicts).toHaveLength(1);
@@ -53,7 +67,10 @@ describe('scheduleConflictEngine', () => {
     const entries = [
       createEntry({ id: '1', title: 'Madrugada', startAt: '04:00', endAt: '05:00', duration: 60 }),
     ];
-    const conflicts = detectScheduleConflicts(entries, { dayStartsAt: '06:00', dayEndsAt: '23:00' });
+    const conflicts = detectScheduleConflicts(entries, {
+      dayStartsAt: '06:00',
+      dayEndsAt: '23:00',
+    });
     expect(conflicts.some((c) => c.type === 'outsideAvailability')).toBe(true);
   });
 
@@ -80,4 +97,3 @@ describe('scheduleConflictEngine', () => {
     expect(conflicts.some((c) => c.type === 'travelConflict')).toBe(true);
   });
 });
-

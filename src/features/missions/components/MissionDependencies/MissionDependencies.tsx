@@ -35,7 +35,13 @@ export function MissionDependencies({ blockedBy, blocks, onRemove }: MissionDepe
             {blockedBy.map((ref) => (
               <Chip
                 key={ref.id}
-                icon={ref.isOpen ? <BlockRoundedIcon fontSize="small" /> : <LinkRoundedIcon fontSize="small" />}
+                icon={
+                  ref.isOpen ? (
+                    <BlockRoundedIcon fontSize="small" />
+                  ) : (
+                    <LinkRoundedIcon fontSize="small" />
+                  )
+                }
                 label={ref.title}
                 color={ref.isOpen ? 'error' : 'default'}
                 variant={ref.isOpen ? 'filled' : 'outlined'}
@@ -51,7 +57,12 @@ export function MissionDependencies({ blockedBy, blocks, onRemove }: MissionDepe
           <Typography variant="subtitle2">Bloqueia</Typography>
           <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
             {blocks.map((ref) => (
-              <Chip key={ref.id} icon={<LinkRoundedIcon fontSize="small" />} label={ref.title} variant="outlined" />
+              <Chip
+                key={ref.id}
+                icon={<LinkRoundedIcon fontSize="small" />}
+                label={ref.title}
+                variant="outlined"
+              />
             ))}
           </Stack>
         </Stack>

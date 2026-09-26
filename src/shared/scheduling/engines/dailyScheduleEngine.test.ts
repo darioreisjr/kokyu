@@ -36,12 +36,11 @@ describe('dailyScheduleEngine', () => {
       priority: 'high',
     });
 
-    const preview = generateDailySchedulePlan(
-      '2026-08-31',
-      [fixedEntry],
-      [flexibleItem],
-      { dayStartsAt: '08:00', dayEndsAt: '18:00', bufferMinutes: 0 },
-    );
+    const preview = generateDailySchedulePlan('2026-08-31', [fixedEntry], [flexibleItem], {
+      dayStartsAt: '08:00',
+      dayEndsAt: '18:00',
+      bufferMinutes: 0,
+    });
 
     expect(preview.items).toHaveLength(2);
     const placedFixed = preview.items.find((i) => i.entryId === 'fixed-1');
@@ -69,12 +68,11 @@ describe('dailyScheduleEngine', () => {
     const itemA = createEntry({ id: 'a', title: 'A', duration: 60, priority: 'high' });
     const itemB = createEntry({ id: 'b', title: 'B', duration: 60, priority: 'medium' });
 
-    const preview = generateDailySchedulePlan(
-      '2026-08-31',
-      [fixedEntry],
-      [itemA, itemB],
-      { dayStartsAt: '10:00', dayEndsAt: '18:00', bufferMinutes: 15 },
-    );
+    const preview = generateDailySchedulePlan('2026-08-31', [fixedEntry], [itemA, itemB], {
+      dayStartsAt: '10:00',
+      dayEndsAt: '18:00',
+      bufferMinutes: 15,
+    });
 
     const placedA = preview.items.find((i) => i.entryId === 'a');
     const placedB = preview.items.find((i) => i.entryId === 'b');
@@ -108,4 +106,3 @@ describe('dailyScheduleEngine', () => {
     expect(unplaced[0]!.entryId).toBe('huge');
   });
 });
-

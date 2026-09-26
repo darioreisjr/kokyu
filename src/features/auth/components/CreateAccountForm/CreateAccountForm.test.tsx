@@ -259,7 +259,9 @@ describe('CreateAccountForm', () => {
 
     expect(await screen.findByText('Verifique seu e-mail')).toBeInTheDocument();
     expect(
-      screen.getByText('Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.'),
+      screen.getByText(
+        'Enviamos um link de confirmação para o seu e-mail. Confirme para poder entrar.',
+      ),
     ).toBeInTheDocument();
     expect(mockedCreateAccount).toHaveBeenCalledWith(
       expect.objectContaining({

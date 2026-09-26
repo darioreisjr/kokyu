@@ -30,7 +30,10 @@ export const Default: Story = {
 };
 
 export const Empty: Story = {
-  args: { project: buildProject({ description: undefined }), progress: { completedCount: 0, eligibleCount: 0, percent: 0 } },
+  args: {
+    project: buildProject({ description: undefined }),
+    progress: { completedCount: 0, eligibleCount: 0, percent: 0 },
+  },
 };
 
 export const Completed: Story = {
@@ -41,5 +44,8 @@ export const Completed: Story = {
 };
 
 export const Paused: Story = {
-  args: { project: buildProject({ status: 'paused' }), progress: { completedCount: 2, eligibleCount: 8, percent: 25 } },
+  args: {
+    project: buildProject({ status: 'paused' }),
+    progress: { completedCount: 2, eligibleCount: 8, percent: 25 },
+  },
 };

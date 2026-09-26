@@ -76,7 +76,9 @@ export function PlanEntryDetailDialog({ entry, onClose, onUnarchive }: PlanEntry
                 : 'Sem horário'
             }
           />
-          {entry?.duration ? <DetailRow label="Duração" value={formatDuration(entry.duration)} /> : null}
+          {entry?.duration ? (
+            <DetailRow label="Duração" value={formatDuration(entry.duration)} />
+          ) : null}
           <DetailRow label="Recorrência" value={recurrenceLabels[entry?.recurrence ?? 'none']} />
           {entry?.notes ? <DetailRow label="Notas" value={entry.notes} /> : null}
           <DetailRow

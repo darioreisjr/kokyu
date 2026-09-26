@@ -25,10 +25,18 @@ export interface AvatarMutationOptions {
  */
 function friendlyStorageUploadError(error: { message?: string } | null): string {
   const message = error?.message?.toLowerCase() ?? '';
-  if (message.includes('exceed') || message.includes('maximum allowed size') || message.includes('too large')) {
+  if (
+    message.includes('exceed') ||
+    message.includes('maximum allowed size') ||
+    message.includes('too large')
+  ) {
     return 'A imagem é muito grande. O tamanho máximo é 5 MB.';
   }
-  if (message.includes('mime') || message.includes('content-type') || message.includes('content type')) {
+  if (
+    message.includes('mime') ||
+    message.includes('content-type') ||
+    message.includes('content type')
+  ) {
     return 'Formato de imagem não suportado. Envie um arquivo JPEG, PNG ou WebP.';
   }
   return 'Não foi possível enviar a imagem. Tente novamente.';
@@ -79,7 +87,9 @@ export async function uploadAvatar(
   });
 }
 
-export async function removeAvatarUpload(options: AvatarMutationOptions = {}): Promise<CurrentUser> {
+export async function removeAvatarUpload(
+  options: AvatarMutationOptions = {},
+): Promise<CurrentUser> {
   return apiFetchClient<CurrentUser>('/profile/avatar', {
     method: 'DELETE',
     suppressProfileSetupRedirect: options.suppressProfileSetupRedirect,

@@ -38,7 +38,11 @@ describe('trainingScheduleAdapter', () => {
     const [schedEntry] = await trainingScheduleAdapter.getEntriesForDate('2026-08-31');
     expect(schedEntry).toBeDefined();
 
-    const success = await trainingScheduleAdapter.onEntryRescheduled!(schedEntry!, '2026-09-01', '20:00');
+    const success = await trainingScheduleAdapter.onEntryRescheduled!(
+      schedEntry!,
+      '2026-09-01',
+      '20:00',
+    );
     expect(success).toBe(true);
 
     const oldDateEntries = await trainingScheduleAdapter.getEntriesForDate('2026-08-31');
@@ -49,4 +53,3 @@ describe('trainingScheduleAdapter', () => {
     expect(newDateEntries[0]!.date).toBe('2026-09-01');
   });
 });
-

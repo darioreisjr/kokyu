@@ -12,7 +12,11 @@ describe('missionCandidateProvider', () => {
   it('does not suggest a non-splittable 90-minute mission for a 30-minute slot', async () => {
     const today = todayKey();
     await missionService.scheduleMission('mission-domain', today); // 30 min, no startAt yet
-    await missionService.updateMission('mission-auth', { plannedDate: today, splittable: false, estimatedDuration: 90 });
+    await missionService.updateMission('mission-auth', {
+      plannedDate: today,
+      splittable: false,
+      estimatedDuration: 90,
+    });
 
     const candidates = await missionCandidateProvider.getCandidatesForSlot(30, today);
     expect(candidates.some((c) => c.sourceId === 'mission-auth')).toBe(false);
@@ -28,7 +32,11 @@ describe('missionCandidateProvider', () => {
 
   it('suggests a splittable mission even when longer than the slot', async () => {
     const today = todayKey();
-    await missionService.updateMission('mission-auth', { plannedDate: today, splittable: true, minimumChunkDuration: 30 });
+    await missionService.updateMission('mission-auth', {
+      plannedDate: today,
+      splittable: true,
+      minimumChunkDuration: 30,
+    });
 
     const candidates = await missionCandidateProvider.getCandidatesForSlot(30, today);
     expect(candidates.some((c) => c.sourceId === 'mission-auth')).toBe(true);

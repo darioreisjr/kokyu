@@ -67,4 +67,3 @@ export function FreeTimeSlotCard({ slot, onFillSlot, compact = false }: FreeTime
     </Box>
   );
 }
-

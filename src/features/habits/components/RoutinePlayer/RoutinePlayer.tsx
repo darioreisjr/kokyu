@@ -58,18 +58,25 @@ export function RoutinePlayer({
     }
   };
 
-  const progressPercent = Math.round(((currentIndex) / totalSteps) * 100);
+  const progressPercent = Math.round((currentIndex / totalSteps) * 100);
 
   if (isDone) {
     return (
       <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
         <Stack spacing={3} sx={{ alignItems: 'center' }}>
           <CheckCircleRoundedIcon sx={{ fontSize: 72, color: 'success.main' }} />
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>Rotina Concluída!</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            Rotina Concluída!
+          </Typography>
           <Typography variant="body1" color="text.secondary">
             Excelente! Você concluiu todos os passos da rotina &ldquo;{routine.name}&rdquo;.
           </Typography>
-          <KokyuButton component={NextLink} href={habitRoutes.today} variant="contained" size="large">
+          <KokyuButton
+            component={NextLink}
+            href={habitRoutes.today}
+            variant="contained"
+            size="large"
+          >
             Voltar para Hoje
           </KokyuButton>
         </Stack>
@@ -124,7 +131,10 @@ export function RoutinePlayer({
                     </Typography>
                   )}
                   {currentHabit.cue && (
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontStyle: 'italic', color: 'text.secondary' }}
+                    >
                       Gatilho: &ldquo;{currentHabit.cue}&rdquo;
                     </Typography>
                   )}

@@ -118,7 +118,9 @@ export function HabitQuickNoteDialog({
           </Stack>
 
           <Stack spacing={1}>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>Tags de contexto:</Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              Tags de contexto:
+            </Typography>
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
               {COMMON_TAGS.map((tag) => {
                 const isSelected = selectedTags.includes(tag);

@@ -63,7 +63,9 @@ export function FocusModeView() {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 640, mx: 'auto', textAlign: 'center', py: { xs: 2, md: 4 } }}>
+    <Box
+      sx={{ width: '100%', maxWidth: 640, mx: 'auto', textAlign: 'center', py: { xs: 2, md: 4 } }}
+    >
       {!activeSession ? (
         <Box
           sx={(theme) => ({
@@ -264,7 +266,12 @@ export function FocusModeView() {
       )}
 
       {/* Distraction Dialog */}
-      <Dialog open={distractionOpen} onClose={() => setDistractionOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={distractionOpen}
+        onClose={() => setDistractionOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle sx={{ fontWeight: 700 }}>Anotar Interrupção</DialogTitle>
         <DialogContent>
           <TextField
@@ -327,4 +334,3 @@ export function FocusModeView() {
     </Box>
   );
 }
-

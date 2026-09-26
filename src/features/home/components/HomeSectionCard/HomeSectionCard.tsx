@@ -17,7 +17,11 @@ export interface HomeSectionCardProps {
  * so this stays local to `features/home` rather than being promoted
  * prematurely for a single consumer.
  */
-export function HomeSectionCard({ children, compact = false, muted = false }: HomeSectionCardProps) {
+export function HomeSectionCard({
+  children,
+  compact = false,
+  muted = false,
+}: HomeSectionCardProps) {
   return (
     <Box
       sx={(theme) => {

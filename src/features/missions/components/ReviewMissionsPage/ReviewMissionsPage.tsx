@@ -26,7 +26,13 @@ interface ReviewStepProps {
   emptyMessage: string;
 }
 
-function ReviewStep({ title, missions, defaultExpanded, onRefresh, emptyMessage }: ReviewStepProps) {
+function ReviewStep({
+  title,
+  missions,
+  defaultExpanded,
+  onRefresh,
+  emptyMessage,
+}: ReviewStepProps) {
   async function complete(id: string) {
     await missionService.completeMission(id);
     onRefresh();
@@ -41,22 +47,41 @@ function ReviewStep({ title, missions, defaultExpanded, onRefresh, emptyMessage 
   }
 
   return (
-    <Accordion defaultExpanded={defaultExpanded} variant="outlined" sx={{ borderRadius: 2, '&::before': { display: 'none' } }}>
+    <Accordion
+      defaultExpanded={defaultExpanded}
+      variant="outlined"
+      sx={{ borderRadius: 2, '&::before': { display: 'none' } }}
+    >
       <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
-        <Typography variant="subtitle1">{title} ({missions.length})</Typography>
+        <Typography variant="subtitle1">
+          {title} ({missions.length})
+        </Typography>
       </AccordionSummary>
       <AccordionDetails>
         {missions.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">{emptyMessage}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {emptyMessage}
+          </Typography>
         ) : (
           <Stack spacing={1.5}>
             {missions.map((mission) => (
               <Stack key={mission.id} spacing={0.5}>
                 <MissionRow mission={mission} />
                 <Stack direction="row" spacing={1}>
-                  <KokyuButton size="small" variant="outlined" onClick={() => complete(mission.id)}>Concluir</KokyuButton>
-                  <KokyuButton size="small" variant="outlined" onClick={() => backlog(mission.id)}>Backlog</KokyuButton>
-                  <KokyuButton size="small" variant="text" color="error" onClick={() => cancel(mission.id)}>Cancelar</KokyuButton>
+                  <KokyuButton size="small" variant="outlined" onClick={() => complete(mission.id)}>
+                    Concluir
+                  </KokyuButton>
+                  <KokyuButton size="small" variant="outlined" onClick={() => backlog(mission.id)}>
+                    Backlog
+                  </KokyuButton>
+                  <KokyuButton
+                    size="small"
+                    variant="text"
+                    color="error"
+                    onClick={() => cancel(mission.id)}
+                  >
+                    Cancelar
+                  </KokyuButton>
                 </Stack>
               </Stack>
             ))}
@@ -94,7 +119,14 @@ export function ReviewMissionsPage() {
   const blocked = missions.filter((m) => m.status === 'blocked');
   const noDate = missions.filter((m) => m.status === 'ready' && !m.plannedDate && !m.deadline);
   const upcomingDeadlines = missions
-    .filter((m) => m.deadline && m.deadline >= today && m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived')
+    .filter(
+      (m) =>
+        m.deadline &&
+        m.deadline >= today &&
+        m.status !== 'completed' &&
+        m.status !== 'cancelled' &&
+        m.status !== 'archived',
+    )
     .sort((a, b) => a.deadline!.localeCompare(b.deadline!))
     .slice(0, 10);
   const activeProjects = projects.filter((p) => p.status === 'active');
@@ -103,17 +135,45 @@ export function ReviewMissionsPage() {
     <Container maxWidth="md" sx={{ py: 3 }}>
       <Stack spacing={3}>
         <Stack spacing={0.5}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>Revisão</Typography>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
+            Revisão
+          </Typography>
           <Typography variant="body1" color="text.secondary">
             Uma passada guiada pelo que precisa de atenção.
           </Typography>
         </Stack>
 
-        <ReviewStep title="Inbox" missions={inbox} defaultExpanded onRefresh={refresh} emptyMessage="Sua caixa de entrada está organizada." />
-        <ReviewStep title="Atrasadas" missions={overdue} onRefresh={refresh} emptyMessage="Nada atrasado." />
-        <ReviewStep title="Aguardando" missions={waiting} onRefresh={refresh} emptyMessage="Nada aguardando retorno." />
-        <ReviewStep title="Bloqueadas" missions={blocked} onRefresh={refresh} emptyMessage="Nenhuma missão bloqueada." />
-        <ReviewStep title="Sem data" missions={noDate} onRefresh={refresh} emptyMessage="Nada pendente de planejamento." />
+        <ReviewStep
+          title="Inbox"
+          missions={inbox}
+          defaultExpanded
+          onRefresh={refresh}
+          emptyMessage="Sua caixa de entrada está organizada."
+        />
+        <ReviewStep
+          title="Atrasadas"
+          missions={overdue}
+          onRefresh={refresh}
+          emptyMessage="Nada atrasado."
+        />
+        <ReviewStep
+          title="Aguardando"
+          missions={waiting}
+          onRefresh={refresh}
+          emptyMessage="Nada aguardando retorno."
+        />
+        <ReviewStep
+          title="Bloqueadas"
+          missions={blocked}
+          onRefresh={refresh}
+          emptyMessage="Nenhuma missão bloqueada."
+        />
+        <ReviewStep
+          title="Sem data"
+          missions={noDate}
+          onRefresh={refresh}
+          emptyMessage="Nada pendente de planejamento."
+        />
 
         <Accordion variant="outlined" sx={{ borderRadius: 2, '&::before': { display: 'none' } }}>
           <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
@@ -135,7 +195,9 @@ export function ReviewMissionsPage() {
 
         <Accordion variant="outlined" sx={{ borderRadius: 2, '&::before': { display: 'none' } }}>
           <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
-            <Typography variant="subtitle1">Próximos prazos ({upcomingDeadlines.length})</Typography>
+            <Typography variant="subtitle1">
+              Próximos prazos ({upcomingDeadlines.length})
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Stack spacing={1}>

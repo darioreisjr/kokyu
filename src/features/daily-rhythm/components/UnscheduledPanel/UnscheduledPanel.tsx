@@ -118,4 +118,3 @@ export function UnscheduledPanel({ items, onScheduleItem }: UnscheduledPanelProp
     </Box>
   );
 }
-

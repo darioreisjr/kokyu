@@ -51,7 +51,9 @@ export const goalHomeProvider: HomeSectionProvider<GoalHomeProjection> = {
       .slice(0, 2);
 
     const focusIds = new Set(focusGoals.map((goal) => goal.id));
-    const atRiskGoals = active.filter((goal) => goal.status === 'atRisk' && !focusIds.has(goal.id)).slice(0, 2);
+    const atRiskGoals = active
+      .filter((goal) => goal.status === 'atRisk' && !focusIds.has(goal.id))
+      .slice(0, 2);
 
     const [inFocus, atRisk] = await Promise.all([
       Promise.all(focusGoals.map(toSummary)),

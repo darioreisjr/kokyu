@@ -1,12 +1,7 @@
 import type { ScheduleSourceType } from './scheduleEntry.types';
 
 export type InboxConversionTarget =
-  | 'mission'
-  | 'habit'
-  | 'training'
-  | 'leisure'
-  | 'schedule'
-  | 'note';
+  'mission' | 'habit' | 'training' | 'leisure' | 'schedule' | 'note';
 
 export interface ScheduleInboxItem {
   id: string;
@@ -25,4 +20,3 @@ export interface ScheduleInboxItemInput {
   note?: string;
   source?: ScheduleSourceType | 'manual';
 }
-

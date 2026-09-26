@@ -48,7 +48,9 @@ const QUADRANTS: Quadrant[] = [
  * because each quadrant is already `size={{ xs: 12 }}`.
  */
 export function MissionEisenhower({ missions, getProjectName }: MissionEisenhowerProps) {
-  const classifiable = missions.filter((m) => m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived');
+  const classifiable = missions.filter(
+    (m) => m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived',
+  );
 
   return (
     <Grid container spacing={2}>
@@ -67,7 +69,12 @@ export function MissionEisenhower({ missions, getProjectName }: MissionEisenhowe
                 minHeight: 160,
               })}
             >
-              <Typography id={`eisenhower-${quadrant.key}`} component="h3" variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography
+                id={`eisenhower-${quadrant.key}`}
+                component="h3"
+                variant="subtitle1"
+                sx={{ fontWeight: 600 }}
+              >
                 {quadrant.title}
               </Typography>
               {items.length === 0 ? (
@@ -80,7 +87,9 @@ export function MissionEisenhower({ missions, getProjectName }: MissionEisenhowe
                     <MissionCard
                       key={mission.id}
                       mission={mission}
-                      projectName={mission.projectId ? getProjectName(mission.projectId) : undefined}
+                      projectName={
+                        mission.projectId ? getProjectName(mission.projectId) : undefined
+                      }
                     />
                   ))}
                 </Stack>

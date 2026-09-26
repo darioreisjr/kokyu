@@ -23,7 +23,12 @@ export interface HomeFocusProps {
  * a checkbox (it's done or it isn't), a Goal gets a progress bar (see
  * spec's "NÃO MISTURAR").
  */
-export function HomeFocus({ priorities, isLoading = false, onCompleteMission, onNavigate }: HomeFocusProps) {
+export function HomeFocus({
+  priorities,
+  isLoading = false,
+  onCompleteMission,
+  onNavigate,
+}: HomeFocusProps) {
   return (
     <HomeSectionCard>
       <Typography variant="h6" component="h2" sx={{ mb: 1.5 }}>
@@ -36,7 +41,10 @@ export function HomeFocus({ priorities, isLoading = false, onCompleteMission, on
           <Skeleton variant="rounded" height={40} />
         </Stack>
       ) : priorities.length === 0 ? (
-        <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+        <Typography
+          variant="body1"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+        >
           Nada em foco definido para hoje.
         </Typography>
       ) : (
@@ -74,7 +82,10 @@ export function HomeFocus({ priorities, isLoading = false, onCompleteMission, on
               </Stack>
             ) : (
               <Stack key={`goal-${priority.id}`} spacing={0.5}>
-                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <Stack
+                  direction="row"
+                  sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}
+                >
                   <Typography
                     variant="body1"
                     onClick={() => onNavigate(priority.actionHref)}

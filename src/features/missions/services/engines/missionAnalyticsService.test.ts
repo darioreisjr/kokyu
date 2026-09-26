@@ -51,13 +51,35 @@ describe('missionAnalyticsService', () => {
       buildMission({ id: `m-${i}`, estimatedDuration: 30, actualDurationMinutes: 40 }),
     );
     const overview = getMissionAnalyticsOverview(missions, [], '2026-09-05');
-    expect(overview.estimationAccuracy).toEqual({ averageEstimatedMinutes: 30, averageActualMinutes: 40, sampleSize: MISSION_ANALYTICS_MIN_SAMPLE_SIZE });
+    expect(overview.estimationAccuracy).toEqual({
+      averageEstimatedMinutes: 30,
+      averageActualMinutes: 40,
+      sampleSize: MISSION_ANALYTICS_MIN_SAMPLE_SIZE,
+    });
   });
 
   it('counts only active projects', () => {
     const projects: MissionProject[] = [
-      { id: 'p1', name: 'A', status: 'active', goalIds: [], progressStrategy: 'completionRatio', tags: [], createdAt: '', updatedAt: '' },
-      { id: 'p2', name: 'B', status: 'paused', goalIds: [], progressStrategy: 'completionRatio', tags: [], createdAt: '', updatedAt: '' },
+      {
+        id: 'p1',
+        name: 'A',
+        status: 'active',
+        goalIds: [],
+        progressStrategy: 'completionRatio',
+        tags: [],
+        createdAt: '',
+        updatedAt: '',
+      },
+      {
+        id: 'p2',
+        name: 'B',
+        status: 'paused',
+        goalIds: [],
+        progressStrategy: 'completionRatio',
+        tags: [],
+        createdAt: '',
+        updatedAt: '',
+      },
     ];
     expect(getMissionAnalyticsOverview([], projects, '2026-09-05').activeProjectCount).toBe(1);
   });

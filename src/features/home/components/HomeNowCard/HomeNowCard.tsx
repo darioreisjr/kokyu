@@ -24,7 +24,10 @@ import type { FreeTimeSlot, ScheduleEntry, ScheduleSourceType } from '@/shared/s
 import { formatDurationDisplay, timeToMinutes } from '@/shared/scheduling/utils/timeHelpers';
 import { HomeSectionCard } from '../HomeSectionCard/HomeSectionCard';
 
-const SOURCE_ICONS: Record<ScheduleSourceType, ComponentType<{ fontSize?: 'small' | 'inherit' | 'medium' | 'large' }>> = {
+const SOURCE_ICONS: Record<
+  ScheduleSourceType,
+  ComponentType<{ fontSize?: 'small' | 'inherit' | 'medium' | 'large' }>
+> = {
   mission: AssignmentRoundedIcon,
   habit: AutorenewRoundedIcon,
   training: FitnessCenterRoundedIcon,
@@ -89,7 +92,10 @@ export function HomeNowCard({
         <Typography variant="h6" component="h2" sx={{ mb: 1.5 }}>
           Agora
         </Typography>
-        <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+        <Typography
+          variant="body1"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+        >
           {minutesFree
             ? `Nenhuma atividade planejada agora. Você tem ${formatDurationDisplay(minutesFree)} livres.`
             : 'Nenhuma atividade planejada agora.'}
@@ -111,11 +117,17 @@ export function HomeNowCard({
   const meta = SCHEDULE_SOURCE_METAS[currentEntry.sourceType] ?? SCHEDULE_SOURCE_METAS.manual;
   const Icon = SOURCE_ICONS[currentEntry.sourceType] ?? ScheduleRoundedIcon;
 
-  const actionProvider = createScheduleEntryActionProvider({ onComplete, onStartFocus, onNavigate });
+  const actionProvider = createScheduleEntryActionProvider({
+    onComplete,
+    onStartFocus,
+    onNavigate,
+  });
   const actions = actionProvider.getActionsForEntry(currentEntry);
   const primaryAction = actions[0];
   const primaryLabel =
-    currentEntry.sourceType === 'training' && trainingHasActiveSession && primaryAction?.id === 'start-training'
+    currentEntry.sourceType === 'training' &&
+    trainingHasActiveSession &&
+    primaryAction?.id === 'start-training'
       ? 'Continuar treino'
       : primaryAction?.label;
 
@@ -151,15 +163,23 @@ export function HomeNowCard({
         </Box>
 
         <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
-          <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+          <Typography
+            variant="caption"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+          >
             {meta.label}
           </Typography>
           <Typography variant="h5" component="p" sx={{ fontWeight: 700 }}>
             {currentEntry.title}
           </Typography>
-          <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+          <Typography
+            variant="body1"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+          >
             {timeRangeText}
-            {remainingMinutes !== null ? ` • ${formatDurationDisplay(remainingMinutes)} restantes` : ''}
+            {remainingMinutes !== null
+              ? ` • ${formatDurationDisplay(remainingMinutes)} restantes`
+              : ''}
           </Typography>
 
           {primaryLabel ? (

@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Ritmo Diário Module', () => {
-  test('navigates through Ritmo Diário views, opens planning, and manages entries', async ({ page }) => {
+  test('navigates through Ritmo Diário views, opens planning, and manages entries', async ({
+    page,
+  }) => {
     // 1. Visit main Ritmo Diário page
     await page.goto('/app/ritmo-diario');
     await expect(page.getByRole('heading', { name: 'Ritmo Diário' })).toBeVisible();

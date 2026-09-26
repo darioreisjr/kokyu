@@ -60,4 +60,3 @@ describe('dailyRhythmService', () => {
     expect(found?.status).toBe('completed');
   });
 });
-

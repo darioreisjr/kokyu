@@ -66,4 +66,3 @@ describe('habitScheduleAdapter', () => {
     expect(logs.some((l) => l.date === '2026-08-31' && l.status === 'completed')).toBe(true);
   });
 });
-

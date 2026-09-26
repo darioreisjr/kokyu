@@ -42,7 +42,10 @@ export function HomeCapacity({
         Ritmo do dia
       </Typography>
 
-      <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 1.5 })}>
+      <Typography
+        variant="body1"
+        sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 1.5 })}
+      >
         Agora {toHHmm(now)}
       </Typography>
 
@@ -50,7 +53,10 @@ export function HomeCapacity({
         <Skeleton variant="rounded" height={64} />
       ) : !hasAnyEntry ? (
         <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-          <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+          <Typography
+            variant="body1"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+          >
             Seu dia ainda não foi planejado.
           </Typography>
           <KokyuButton size="small" variant="outlined" onClick={onOpenPlanning}>
@@ -64,10 +70,13 @@ export function HomeCapacity({
             <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
               <Typography
                 variant="caption"
-                sx={(theme) => ({ color: themePalette(theme).kokyu.feedback.error, fontWeight: 600 })}
+                sx={(theme) => ({
+                  color: themePalette(theme).kokyu.feedback.error,
+                  fontWeight: 600,
+                })}
               >
-                Seu planejamento está {formatDurationDisplay(capacity.differenceMinutes)} acima do tempo
-                disponível.
+                Seu planejamento está {formatDurationDisplay(capacity.differenceMinutes)} acima do
+                tempo disponível.
               </Typography>
               <KokyuButton size="small" variant="outlined" onClick={onOpenPlanning}>
                 Reorganizar dia

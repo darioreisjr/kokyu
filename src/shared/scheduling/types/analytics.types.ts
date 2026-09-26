@@ -53,4 +53,3 @@ export interface ScheduleAnalytics {
   reschedule: RescheduleRate;
   estimationAccuracy?: EstimationAccuracy;
 }
-

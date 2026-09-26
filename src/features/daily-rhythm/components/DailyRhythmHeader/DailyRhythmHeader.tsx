@@ -73,11 +73,7 @@ export function DailyRhythmHeader({
           </Typography>
         </Box>
 
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{ flexWrap: 'wrap', gap: 1 }}
-        >
+        <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1 }}>
           <Button
             variant="outlined"
             size="small"
@@ -135,11 +131,7 @@ export function DailyRhythmHeader({
         })}
       >
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <IconButton
-            size="small"
-            aria-label="Dia anterior"
-            onClick={onPreviousDay}
-          >
+          <IconButton size="small" aria-label="Dia anterior" onClick={onPreviousDay}>
             <ChevronLeftRoundedIcon />
           </IconButton>
 
@@ -153,11 +145,7 @@ export function DailyRhythmHeader({
             Hoje
           </Button>
 
-          <IconButton
-            size="small"
-            aria-label="Próximo dia"
-            onClick={onNextDay}
-          >
+          <IconButton size="small" aria-label="Próximo dia" onClick={onNextDay}>
             <ChevronRightRoundedIcon />
           </IconButton>
 
@@ -199,4 +187,3 @@ export function DailyRhythmHeader({
     </Box>
   );
 }
-

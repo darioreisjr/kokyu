@@ -2,7 +2,10 @@ import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { render } from '../../../../../test/test-utils';
 import { HOME_SECTION_IDS } from '@/shared/home/types';
-import { HomePersonalizationDialog, type HomePersonalizationValue } from './HomePersonalizationDialog';
+import {
+  HomePersonalizationDialog,
+  type HomePersonalizationValue,
+} from './HomePersonalizationDialog';
 
 const baseValue: HomePersonalizationValue = {
   sectionOrder: [...HOME_SECTION_IDS],
@@ -26,7 +29,9 @@ describe('HomePersonalizationDialog', () => {
 
   it('toggling a section switch reports it in hiddenSections', () => {
     const onChange = vi.fn();
-    render(<HomePersonalizationDialog open onClose={vi.fn()} value={baseValue} onChange={onChange} />);
+    render(
+      <HomePersonalizationDialog open onClose={vi.fn()} value={baseValue} onChange={onChange} />,
+    );
 
     fireEvent.click(screen.getByRole('switch', { name: 'Mostrar seção Precisa de atenção' }));
     expect(onChange).toHaveBeenCalledWith({ hiddenSections: ['attention'] });
@@ -49,17 +54,30 @@ describe('HomePersonalizationDialog', () => {
 
   it('moving a section down swaps it with the next one, keeping "Agora"/"Próximo" pinned first', () => {
     const onChange = vi.fn();
-    render(<HomePersonalizationDialog open onClose={vi.fn()} value={baseValue} onChange={onChange} />);
+    render(
+      <HomePersonalizationDialog open onClose={vi.fn()} value={baseValue} onChange={onChange} />,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Mover Em foco para baixo' }));
     expect(onChange).toHaveBeenCalledWith({
-      sectionOrder: ['now', 'next', 'rhythm', 'focus', 'areas', 'attention', 'freeTime', 'quickActions'],
+      sectionOrder: [
+        'now',
+        'next',
+        'rhythm',
+        'focus',
+        'areas',
+        'attention',
+        'freeTime',
+        'quickActions',
+      ],
     });
   });
 
   it('toggling "Modo compacto" reports the new value', () => {
     const onChange = vi.fn();
-    render(<HomePersonalizationDialog open onClose={vi.fn()} value={baseValue} onChange={onChange} />);
+    render(
+      <HomePersonalizationDialog open onClose={vi.fn()} value={baseValue} onChange={onChange} />,
+    );
 
     fireEvent.click(screen.getByRole('switch', { name: 'Modo compacto' }));
     expect(onChange).toHaveBeenCalledWith({ compactMode: true });

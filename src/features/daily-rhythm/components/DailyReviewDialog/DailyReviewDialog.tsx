@@ -50,7 +50,9 @@ export function DailyReviewDialog({
 
   const [perception, setPerception] = useState<DayRhythmPerception>('balanced');
   const [note, setNote] = useState<string>('');
-  const [resolutions, setResolutions] = useState<Record<string, 'tomorrow' | 'inbox' | 'discard'>>({});
+  const [resolutions, setResolutions] = useState<Record<string, 'tomorrow' | 'inbox' | 'discard'>>(
+    {},
+  );
 
   useEffect(() => {
     if (open) {
@@ -94,7 +96,13 @@ export function DailyReviewDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="daily-review-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="daily-review-title"
+    >
       <DialogTitle
         id="daily-review-title"
         sx={{
@@ -142,9 +150,16 @@ export function DailyReviewDialog({
               <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
                 Resumo do Dia
               </Typography>
-              <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, display: 'block' })}>
-                {data.completedItems.length} atividades concluídas ({formatDurationDisplay(data.totalActualMinutes)}) •{' '}
-                {data.pendingItems.length} pendentes
+              <Typography
+                variant="caption"
+                sx={(theme) => ({
+                  color: themePalette(theme).kokyu.text.secondary,
+                  display: 'block',
+                })}
+              >
+                {data.completedItems.length} atividades concluídas (
+                {formatDurationDisplay(data.totalActualMinutes)}) • {data.pendingItems.length}{' '}
+                pendentes
               </Typography>
             </Box>
 
@@ -264,4 +279,3 @@ export function DailyReviewDialog({
     </Dialog>
   );
 }
-

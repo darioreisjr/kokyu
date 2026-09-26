@@ -22,4 +22,3 @@ export interface HabitOccurrence {
   isWithinLimit?: boolean;
   remainingForTarget?: number;
 }
-

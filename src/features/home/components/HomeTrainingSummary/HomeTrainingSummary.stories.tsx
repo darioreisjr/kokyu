@@ -6,7 +6,14 @@ const withToday: HomeProviderResult<TrainingHomeProjection> = {
   sourceType: 'training',
   status: 'success',
   data: {
-    today: { id: 't1', label: 'Push A', date: '2026-09-04', time: '19:00', status: 'planned', estimatedDurationMinutes: 60 },
+    today: {
+      id: 't1',
+      label: 'Push A',
+      date: '2026-09-04',
+      time: '19:00',
+      status: 'planned',
+      estimatedDurationMinutes: 60,
+    },
     next: null,
     hasActiveSession: false,
   },
@@ -39,7 +46,11 @@ export const NoTrainingToday: Story = {
 
 export const Empty: Story = {
   args: {
-    result: { sourceType: 'training', status: 'success', data: { today: null, next: null, hasActiveSession: false } },
+    result: {
+      sourceType: 'training',
+      status: 'success',
+      data: { today: null, next: null, hasActiveSession: false },
+    },
   },
 };
 

@@ -44,5 +44,11 @@ export const Empty: Story = { args: { missions: [], getProjectName: () => '' } }
 
 export const Mobile: Story = {
   args: { missions: sampleMissions, getProjectName: () => '' },
-  decorators: [(Story) => <div style={{ maxWidth: 390 }}><Story /></div>],
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 390 }}>
+        <Story />
+      </div>
+    ),
+  ],
 };

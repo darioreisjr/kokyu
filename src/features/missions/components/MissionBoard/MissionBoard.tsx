@@ -27,7 +27,9 @@ export interface MissionBoardProps {
  * the other alternative view (spec "MOBILE BOARD").
  */
 export function MissionBoard({ sections, missions, onMoveToSection }: MissionBoardProps) {
-  const [menuState, setMenuState] = useState<{ anchor: HTMLElement; missionId: string } | null>(null);
+  const [menuState, setMenuState] = useState<{ anchor: HTMLElement; missionId: string } | null>(
+    null,
+  );
 
   function openMenu(event: MouseEvent<HTMLElement>, missionId: string) {
     setMenuState({ anchor: event.currentTarget, missionId });

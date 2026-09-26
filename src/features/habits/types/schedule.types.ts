@@ -47,4 +47,3 @@ export interface HabitScheduleVersion {
   schedule: HabitSchedule;
   target: HabitTarget;
 }
-

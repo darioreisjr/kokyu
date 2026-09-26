@@ -27,7 +27,10 @@ function daysUntil(dateKey: string, today: string): number {
   return differenceInCalendarDays(fromDateKey(dateKey), fromDateKey(today));
 }
 
-function scoreMission(mission: Mission, context: MissionSuggestionContext): { score: number; reason: string } {
+function scoreMission(
+  mission: Mission,
+  context: MissionSuggestionContext,
+): { score: number; reason: string } {
   let score = PRIORITY_SCORE[mission.priority];
   const reasons: string[] = [];
 
@@ -55,7 +58,10 @@ function scoreMission(mission: Mission, context: MissionSuggestionContext): { sc
     reasons.push('Planejada para um dia anterior e ainda não concluída');
   }
 
-  if (context.focusGoalIds.length > 0 && mission.goalIds.some((id) => context.focusGoalIds.includes(id))) {
+  if (
+    context.focusGoalIds.length > 0 &&
+    mission.goalIds.some((id) => context.focusGoalIds.includes(id))
+  ) {
     score += 20;
     reasons.push('Contribui para uma meta em foco');
   }

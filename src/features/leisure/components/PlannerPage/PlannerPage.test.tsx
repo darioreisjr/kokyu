@@ -33,7 +33,7 @@ describe('PlannerPage', () => {
     expect(screen.getByText('Violão')).toBeInTheDocument();
   });
 
-  it("links \"Planejar atividade\" to the creation page, prefilled with today's date", async () => {
+  it('links "Planejar atividade" to the creation page, prefilled with today\'s date', async () => {
     render(<PlannerPage />);
     await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
 
@@ -53,7 +53,9 @@ describe('PlannerPage', () => {
     const dialog = await screen.findByRole('dialog', { name: 'O Hobbit' });
     expect(within(dialog).getByText('Dia')).toBeInTheDocument();
     const editLink = within(dialog).getByRole('link', { name: 'Editar' });
-    expect(editLink.getAttribute('href')).toBe('/app/tempo-livre/planejamento/plan-hobbit-hoje/editar');
+    expect(editLink.getAttribute('href')).toBe(
+      '/app/tempo-livre/planejamento/plan-hobbit-hoje/editar',
+    );
 
     await user.click(within(dialog).getByRole('button', { name: 'Fechar' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
@@ -63,9 +65,7 @@ describe('PlannerPage', () => {
     render(<PlannerPage />);
     await waitFor(() => expect(screen.getByText('O Hobbit')).toBeInTheDocument());
 
-    expect(
-      screen.queryByRole('button', { name: 'Remover planejamento' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Remover planejamento' })).not.toBeInTheDocument();
   });
 
   it('completes a plan entry', async () => {
@@ -125,7 +125,9 @@ describe('PlannerPage', () => {
     await waitFor(() => expect(screen.getByText('Alongar')).toBeInTheDocument());
     const tomorrowRow = screen.getByText('Alongar').closest('button')!.parentElement as HTMLElement;
     expect(within(tomorrowRow).queryByRole('button', { name: 'Concluir' })).not.toBeInTheDocument();
-    expect(within(tomorrowRow).queryByRole('button', { name: 'Concluído' })).not.toBeInTheDocument();
+    expect(
+      within(tomorrowRow).queryByRole('button', { name: 'Concluído' }),
+    ).not.toBeInTheDocument();
   });
 
   it('only shows Concluir on the card whose occurrence date is today', async () => {

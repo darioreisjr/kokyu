@@ -1,10 +1,7 @@
 import type { DailyHabitScore } from '../../types/analytics.types';
 import type { Habit } from '../../types/habit.types';
 import type { HabitLog } from '../../types/log.types';
-import {
-  deriveHabitOccurrence,
-  deriveHabitOccurrencesForDate,
-} from './habitOccurrenceService';
+import { deriveHabitOccurrence, deriveHabitOccurrencesForDate } from './habitOccurrenceService';
 import {
   getEffectiveScheduleAndTarget,
   getScheduleMonthRange,
@@ -47,10 +44,7 @@ export function calculateHabitPeriodProgress(
   let targetValue = 1;
   let currentValue = 0;
 
-  if (
-    schedule.frequencyType === 'flexibleWeekly' ||
-    schedule.frequencyType === 'flexibleMonthly'
-  ) {
+  if (schedule.frequencyType === 'flexibleWeekly' || schedule.frequencyType === 'flexibleMonthly') {
     targetValue = schedule.timesPerPeriod ?? 1;
     // Count distinct dates with successful completion or positive value
     const successfulDates = new Set<string>();
@@ -79,14 +73,10 @@ export function calculateHabitPeriodProgress(
   }
 
   const isComplete =
-    target.type === 'limit'
-      ? currentValue <= targetValue
-      : currentValue >= targetValue;
+    target.type === 'limit' ? currentValue <= targetValue : currentValue >= targetValue;
 
   const percent =
-    targetValue > 0
-      ? Math.min(100, Math.round((currentValue / targetValue) * 100))
-      : 0;
+    targetValue > 0 ? Math.min(100, Math.round((currentValue / targetValue) * 100)) : 0;
 
   return {
     currentValue,
@@ -103,13 +93,7 @@ export function calculateDailyHabitScore(
   today: string,
   weekStartsOn: 0 | 1 = 1,
 ): DailyHabitScore {
-  const occurrences = deriveHabitOccurrencesForDate(
-    habits,
-    date,
-    logs,
-    today,
-    weekStartsOn,
-  );
+  const occurrences = deriveHabitOccurrencesForDate(habits, date, logs, today, weekStartsOn);
 
   // CRITICAL RULE: only scheduled habits that are not paused and not skipped
   const scheduledOccurrences = occurrences.filter(
@@ -117,15 +101,9 @@ export function calculateDailyHabitScore(
   );
 
   const scheduledCount = scheduledOccurrences.length;
-  const completedCount = scheduledOccurrences.filter(
-    (occ) => occ.status === 'completed',
-  ).length;
-  const partialCount = scheduledOccurrences.filter(
-    (occ) => occ.status === 'partial',
-  ).length;
-  const skippedCount = scheduledOccurrences.filter(
-    (occ) => occ.status === 'skipped',
-  ).length;
+  const completedCount = scheduledOccurrences.filter((occ) => occ.status === 'completed').length;
+  const partialCount = scheduledOccurrences.filter((occ) => occ.status === 'partial').length;
+  const skippedCount = scheduledOccurrences.filter((occ) => occ.status === 'skipped').length;
 
   // Skipped habits are neutral and removed from denominator
   const effectiveDenominator = Math.max(0, scheduledCount - skippedCount);

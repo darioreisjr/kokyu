@@ -52,7 +52,12 @@ export function WeeklyView() {
             <ChevronLeftRoundedIcon />
           </IconButton>
 
-          <Button size="small" variant="outlined" onClick={goToCurrentWeek} sx={{ textTransform: 'none' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={goToCurrentWeek}
+            sx={{ textTransform: 'none' }}
+          >
             Esta semana
           </Button>
 
@@ -171,4 +176,3 @@ export function WeeklyView() {
     </Box>
   );
 }
-

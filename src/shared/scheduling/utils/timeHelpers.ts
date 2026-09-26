@@ -117,4 +117,3 @@ export function formatDurationDisplay(minutes: number): string {
 export function snapToGrid(minutes: number, step = 15): number {
   return Math.round(minutes / step) * step;
 }
-

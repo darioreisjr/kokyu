@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { confirmationLinkFromInbucket, freshSignupIdentity, loginAsCompleteUser } from './fixtures/auth';
+import {
+  confirmationLinkFromInbucket,
+  freshSignupIdentity,
+  loginAsCompleteUser,
+} from './fixtures/auth';
 
 /**
  * End-to-end coverage for profile-completion gating

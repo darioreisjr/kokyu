@@ -16,8 +16,22 @@ const trainingEntry: ScheduleEntry = {
   updatedAt: '2026-09-04T00:00:00Z',
 };
 
-const missionEntry: ScheduleEntry = { ...trainingEntry, id: 'e2', sourceType: 'mission', sourceId: 'm1', title: 'Revisar proposta do cliente' };
-const habitEntry: ScheduleEntry = { ...trainingEntry, id: 'e3', sourceType: 'habit', sourceId: 'h1', title: 'Meditação Matinal', startAt: '07:00', endAt: '07:20' };
+const missionEntry: ScheduleEntry = {
+  ...trainingEntry,
+  id: 'e2',
+  sourceType: 'mission',
+  sourceId: 'm1',
+  title: 'Revisar proposta do cliente',
+};
+const habitEntry: ScheduleEntry = {
+  ...trainingEntry,
+  id: 'e3',
+  sourceType: 'habit',
+  sourceId: 'h1',
+  title: 'Meditação Matinal',
+  startAt: '07:00',
+  endAt: '07:20',
+};
 
 const meta = {
   title: 'Home/HomeNowCard',

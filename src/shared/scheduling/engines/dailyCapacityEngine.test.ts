@@ -45,9 +45,7 @@ describe('dailyCapacityEngine', () => {
     // Total available: 330 min (5h30)
     // Planned: 435 min (7h15)
     // Diff: 105 min (1h45)
-    const entries = [
-      createEntry({ id: '1', title: 'Tarefas', duration: 435, locked: false }),
-    ];
+    const entries = [createEntry({ id: '1', title: 'Tarefas', duration: 435, locked: false })];
 
     const capacity = calculateDailyCapacity('2026-08-31', entries, {
       dayStartsAt: '08:00',
@@ -60,4 +58,3 @@ describe('dailyCapacityEngine', () => {
     expect(capacity.differenceMinutes).toBe(105);
   });
 });
-

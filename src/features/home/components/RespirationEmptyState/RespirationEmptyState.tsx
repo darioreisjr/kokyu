@@ -18,7 +18,11 @@ export function RespirationEmptyState({ onNavigate }: RespirationEmptyStateProps
       title="Comece definindo o ritmo do seu dia."
       description="Adicione sua primeira Missão, Hábito ou Treino para ver a Respiração ganhar vida."
       action={
-        <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', justifyContent: 'center', gap: 1.5 }}>
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{ flexWrap: 'wrap', justifyContent: 'center', gap: 1.5 }}
+        >
           <KokyuButton variant="contained" onClick={() => onNavigate('/app/missoes')}>
             Criar primeira Missão
           </KokyuButton>

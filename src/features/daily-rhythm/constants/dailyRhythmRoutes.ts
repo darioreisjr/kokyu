@@ -23,4 +23,3 @@ export const dailyRhythmTabs: DailyRhythmTabConfig[] = [
   { id: 'focus', label: 'Foco', href: dailyRhythmRoutes.focus },
   { id: 'review', label: 'Revisão', href: dailyRhythmRoutes.review },
 ];
-

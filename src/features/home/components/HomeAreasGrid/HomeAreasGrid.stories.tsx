@@ -29,7 +29,14 @@ const habits: HomeProviderResult<HabitHomeProjection> = {
   data: {
     scheduledToday: 5,
     completedToday: 3,
-    next: { id: 'h1', name: 'Beber água', icon: 'WaterDropRounded', timeOfDay: 'afternoon', isCompleted: false, canQuickComplete: true },
+    next: {
+      id: 'h1',
+      name: 'Beber água',
+      icon: 'WaterDropRounded',
+      timeOfDay: 'afternoon',
+      isCompleted: false,
+      canQuickComplete: true,
+    },
     currentRoutine: null,
     nextRoutine: null,
   },
@@ -38,7 +45,11 @@ const habits: HomeProviderResult<HabitHomeProjection> = {
 const training: HomeProviderResult<TrainingHomeProjection> = {
   sourceType: 'training',
   status: 'success',
-  data: { today: { id: 't1', label: 'Push A', date: '2026-09-04', time: '19:00', status: 'planned' }, next: null, hasActiveSession: false },
+  data: {
+    today: { id: 't1', label: 'Push A', date: '2026-09-04', time: '19:00', status: 'planned' },
+    next: null,
+    hasActiveSession: false,
+  },
 };
 
 const nutrition: HomeProviderResult<NutritionHomeProjection> = {
@@ -51,7 +62,11 @@ const nutrition: HomeProviderResult<NutritionHomeProjection> = {
 const goals: HomeProviderResult<GoalHomeProjection> = {
   sourceType: 'goal',
   status: 'success',
-  data: { inFocus: [{ id: 'g1', title: 'Correr 10km', status: 'onTrack', progressPercent: 62 }], atRisk: [], pendingCheckIns: 0 },
+  data: {
+    inFocus: [{ id: 'g1', title: 'Correr 10km', status: 'onTrack', progressPercent: 62 }],
+    atRisk: [],
+    pendingCheckIns: 0,
+  },
 };
 
 const leisure: HomeProviderResult<LeisureHomeProjection> = {

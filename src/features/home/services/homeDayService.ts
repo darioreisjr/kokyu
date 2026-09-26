@@ -1,5 +1,9 @@
 import { toDateKey } from '@/features/leisure/utils/dateHelpers';
-import { formatDurationDisplay, getTimeOfDay, timeToMinutes } from '@/shared/scheduling/utils/timeHelpers';
+import {
+  formatDurationDisplay,
+  getTimeOfDay,
+  timeToMinutes,
+} from '@/shared/scheduling/utils/timeHelpers';
 import type { HomeDayProgress } from '@/shared/home/types';
 
 /**
@@ -20,7 +24,11 @@ export function getLogicalToday(): string {
  * so a snapshot generated before the day starts or after it ends still
  * renders a sane bar instead of a negative/over-100% one.
  */
-export function computeDayProgress(now: Date, dayStartsAt: string, dayEndsAt: string): HomeDayProgress {
+export function computeDayProgress(
+  now: Date,
+  dayStartsAt: string,
+  dayEndsAt: string,
+): HomeDayProgress {
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const startMinutes = timeToMinutes(dayStartsAt);
   const endMinutes = timeToMinutes(dayEndsAt);

@@ -22,9 +22,9 @@ export const dailyPlanningService = {
     const yesterday = format(subDays(fromDateKey(date), 1), 'yyyy-MM-dd');
     const yesterdaySchedule = await dailyRhythmService.getDaySchedule(yesterday);
 
-    const pending = yesterdaySchedule.entries.concat(yesterdaySchedule.unscheduled).filter(
-      (e) => e.status === 'planned' || e.status === 'rescheduled',
-    );
+    const pending = yesterdaySchedule.entries
+      .concat(yesterdaySchedule.unscheduled)
+      .filter((e) => e.status === 'planned' || e.status === 'rescheduled');
 
     return pending.map((e) => ({
       id: e.id,
@@ -174,4 +174,3 @@ export const dailyPlanningService = {
     return plan;
   },
 };
-

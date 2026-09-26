@@ -50,10 +50,7 @@ export const sourceAdapters: Record<string, ScheduleSourceAdapter> = {
 };
 
 export const dailyRhythmService = {
-  async getDaySchedule(
-    date: string,
-    options: DayScheduleOptions = {},
-  ): Promise<DayScheduleResult> {
+  async getDaySchedule(date: string, options: DayScheduleOptions = {}): Promise<DayScheduleResult> {
     const dayStartsAt = options.dayStartsAt ?? '06:00';
     const dayEndsAt = options.dayEndsAt ?? '23:00';
 
@@ -245,4 +242,3 @@ export const dailyRhythmService = {
     });
   },
 };
-

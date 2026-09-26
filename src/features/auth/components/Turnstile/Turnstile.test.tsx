@@ -38,10 +38,12 @@ describe('Turnstile', () => {
     vi.resetModules();
     const { Turnstile } = await import('./Turnstile');
 
-    const renderWidget = vi.fn((_container: HTMLElement, options: { callback: (t: string) => void }) => {
-      options.callback('captcha-token-123');
-      return 'widget-1';
-    });
+    const renderWidget = vi.fn(
+      (_container: HTMLElement, options: { callback: (t: string) => void }) => {
+        options.callback('captcha-token-123');
+        return 'widget-1';
+      },
+    );
     window.turnstile = { render: renderWidget, remove: vi.fn() };
 
     const onVerify = vi.fn();

@@ -39,7 +39,9 @@ export function RespirationHeader({
 
   const greeting = GREETING_BY_MOMENT[dayMoment];
   const greetingText = firstName ? `${greeting}, ${firstName}` : greeting;
-  const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) ?? ''}`.toUpperCase() : undefined;
+  const initials = firstName
+    ? `${firstName.charAt(0)}${lastName?.charAt(0) ?? ''}`.toUpperCase()
+    : undefined;
 
   return (
     <Stack
@@ -72,10 +74,16 @@ export function RespirationHeader({
             {greetingText}
           </Typography>
         </Stack>
-        <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+        <Typography
+          variant="body1"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+        >
           {dateLabel}
         </Typography>
-        <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.disabled })}>
+        <Typography
+          variant="caption"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.disabled })}
+        >
           Veja onde está seu ritmo agora.
         </Typography>
       </Stack>

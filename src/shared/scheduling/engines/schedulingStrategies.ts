@@ -1,10 +1,6 @@
 import { DEFAULT_PRIORITY_WEIGHTS } from '../constants/schedulingConstants';
 import type { FreeTimeSlot, ScheduleEntry } from '../types';
-import {
-  isTimeAfter,
-  isTimeBefore,
-  timeToMinutes,
-} from '../utils/timeHelpers';
+import { isTimeAfter, isTimeBefore, timeToMinutes } from '../utils/timeHelpers';
 
 export interface EvaluatedSlot {
   slot: FreeTimeSlot;
@@ -37,7 +33,10 @@ export function evaluateItemForSlot(
 
   // Check required timeWindow
   if (item.timeWindow) {
-    if (isTimeBefore(slot.startAt, item.timeWindow.start) || isTimeAfter(slot.endAt, item.timeWindow.end)) {
+    if (
+      isTimeBefore(slot.startAt, item.timeWindow.start) ||
+      isTimeAfter(slot.endAt, item.timeWindow.end)
+    ) {
       return {
         fits: false,
         score: -1,
@@ -156,10 +155,10 @@ export function evaluateBestSlotForCandidate(
     if (score > bestScore) {
       bestScore = score;
       bestSlot = slot;
-      bestReason = reasons.length > 0 ? reasons.join(' • ') : 'Encaixado no primeiro horário livre compatível';
+      bestReason =
+        reasons.length > 0 ? reasons.join(' • ') : 'Encaixado no primeiro horário livre compatível';
     }
   }
 
   return bestSlot ? { slot: bestSlot, score: bestScore, reason: bestReason } : null;
 }
-

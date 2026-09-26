@@ -39,7 +39,11 @@ export function useHomeSnapshot(): UseHomeSnapshotResult {
     } finally {
       setIsLoading(false);
     }
-  }, [preferences.routine.dayStartsAt, preferences.routine.dayEndsAt, preferences.locale.weekStartsOn]);
+  }, [
+    preferences.routine.dayStartsAt,
+    preferences.routine.dayEndsAt,
+    preferences.locale.weekStartsOn,
+  ]);
 
   useEffect(() => {
     load();

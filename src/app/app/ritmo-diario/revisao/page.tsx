@@ -7,11 +7,7 @@ import Typography from '@mui/material/Typography';
 import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
 import { themePalette } from '@/design-system/theme/useThemePalette';
-import {
-  DailyReviewDialog,
-  ScheduleAnalyticsCard,
-  useDailyRhythm,
-} from '@/features/daily-rhythm';
+import { DailyReviewDialog, ScheduleAnalyticsCard, useDailyRhythm } from '@/features/daily-rhythm';
 import { scheduleAnalyticsService } from '@/shared/scheduling/services/scheduleAnalyticsService';
 
 export default function RevisaoPage() {
@@ -19,10 +15,7 @@ export default function RevisaoPage() {
   const { entries, refreshSchedule } = useDailyRhythm(todayStr);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
 
-  const analytics = useMemo(
-    () => scheduleAnalyticsService.calculateAnalytics(entries),
-    [entries],
-  );
+  const analytics = useMemo(() => scheduleAnalyticsService.calculateAnalytics(entries), [entries]);
 
   return (
     <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>

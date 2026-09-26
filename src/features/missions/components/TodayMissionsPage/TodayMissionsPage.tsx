@@ -60,7 +60,10 @@ export function TodayMissionsPage() {
     };
   }, [missions]);
 
-  const focus = useMemo(() => missions.filter((m) => focusedIds.includes(m.id) && m.status !== 'completed'), [missions, focusedIds]);
+  const focus = useMemo(
+    () => missions.filter((m) => focusedIds.includes(m.id) && m.status !== 'completed'),
+    [missions, focusedIds],
+  );
   const planned = useMemo(
     () => missions.filter((m) => m.status === 'planned' && !focusedIds.includes(m.id)),
     [missions, focusedIds],
@@ -68,7 +71,11 @@ export function TodayMissionsPage() {
   const toDoToday = useMemo(
     () =>
       missions.filter(
-        (m) => m.status !== 'completed' && m.status !== 'planned' && m.status !== 'waiting' && !focusedIds.includes(m.id),
+        (m) =>
+          m.status !== 'completed' &&
+          m.status !== 'planned' &&
+          m.status !== 'waiting' &&
+          !focusedIds.includes(m.id),
       ),
     [missions, focusedIds],
   );
@@ -154,7 +161,12 @@ export function TodayMissionsPage() {
             title="Nenhuma missão planejada para hoje."
             description="Adicione uma missão ou confira as sugestões abaixo."
             action={
-              <KokyuButton component={NextLink} href={missionRoutes.new} variant="contained" startIcon={<AddRoundedIcon />}>
+              <KokyuButton
+                component={NextLink}
+                href={missionRoutes.new}
+                variant="contained"
+                startIcon={<AddRoundedIcon />}
+              >
                 Adicionar missão
               </KokyuButton>
             }
@@ -167,14 +179,22 @@ export function TodayMissionsPage() {
             {renderSection('Aguardando retorno', waiting)}
 
             {completed.length > 0 && (
-              <Accordion disableGutters variant="outlined" sx={{ borderRadius: 2, '&::before': { display: 'none' } }}>
+              <Accordion
+                disableGutters
+                variant="outlined"
+                sx={{ borderRadius: 2, '&::before': { display: 'none' } }}
+              >
                 <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
                   <Typography variant="subtitle1">Concluídas ({completed.length})</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Stack spacing={1}>
                     {completed.map((mission) => (
-                      <MissionRow key={mission.id} mission={mission} onToggleComplete={handleToggleComplete} />
+                      <MissionRow
+                        key={mission.id}
+                        mission={mission}
+                        onToggleComplete={handleToggleComplete}
+                      />
                     ))}
                   </Stack>
                 </AccordionDetails>
@@ -187,7 +207,11 @@ export function TodayMissionsPage() {
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
             Sugestões
           </Typography>
-          <MissionSuggestions suggestions={suggestions} missionsById={allMissionsById} onAddToToday={handleAddSuggestionToToday} />
+          <MissionSuggestions
+            suggestions={suggestions}
+            missionsById={allMissionsById}
+            onAddToToday={handleAddSuggestionToToday}
+          />
         </Stack>
       </Stack>
     </Container>

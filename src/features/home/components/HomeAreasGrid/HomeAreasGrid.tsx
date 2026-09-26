@@ -45,22 +45,46 @@ export function HomeAreasGrid({
       </Typography>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HomeMissionSummary result={missions} isLoading={isLoading} onOpen={() => onOpen('/app/missoes')} />
+          <HomeMissionSummary
+            result={missions}
+            isLoading={isLoading}
+            onOpen={() => onOpen('/app/missoes')}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HomeHabitSummary result={habits} isLoading={isLoading} onOpen={() => onOpen('/app/habitos')} />
+          <HomeHabitSummary
+            result={habits}
+            isLoading={isLoading}
+            onOpen={() => onOpen('/app/habitos')}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HomeTrainingSummary result={training} isLoading={isLoading} onOpen={() => onOpen('/app/treinamento')} />
+          <HomeTrainingSummary
+            result={training}
+            isLoading={isLoading}
+            onOpen={() => onOpen('/app/treinamento')}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HomeNutritionSummary result={nutrition} isLoading={isLoading} onOpen={() => onOpen('/app/nutricao')} />
+          <HomeNutritionSummary
+            result={nutrition}
+            isLoading={isLoading}
+            onOpen={() => onOpen('/app/nutricao')}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HomeGoalSummary result={goals} isLoading={isLoading} onOpen={() => onOpen('/app/metas')} />
+          <HomeGoalSummary
+            result={goals}
+            isLoading={isLoading}
+            onOpen={() => onOpen('/app/metas')}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HomeLeisureSummary result={leisure} isLoading={isLoading} onOpen={() => onOpen('/app/tempo-livre')} />
+          <HomeLeisureSummary
+            result={leisure}
+            isLoading={isLoading}
+            onOpen={() => onOpen('/app/tempo-livre')}
+          />
         </Grid>
       </Grid>
     </>

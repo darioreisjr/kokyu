@@ -11,7 +11,8 @@ export interface HomeMissionSummaryProps {
 
 export function HomeMissionSummary({ result, isLoading = false, onOpen }: HomeMissionSummaryProps) {
   const data = result.data;
-  const isEmpty = data !== null && data.pendingCount === 0 && data.completedCount === 0 && !data.next;
+  const isEmpty =
+    data !== null && data.pendingCount === 0 && data.completedCount === 0 && !data.next;
 
   return (
     <HomeAreaCardShell

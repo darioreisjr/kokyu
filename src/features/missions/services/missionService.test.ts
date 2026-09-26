@@ -15,7 +15,10 @@ describe('missionService', () => {
   });
 
   it('creates a mission with a project/deadline already in ready, skipping inbox', async () => {
-    const mission = await missionService.createMission({ title: 'Configurar CI', projectId: 'project-portfolio' });
+    const mission = await missionService.createMission({
+      title: 'Configurar CI',
+      projectId: 'project-portfolio',
+    });
     expect(mission.status).toBe('ready');
   });
 
@@ -51,7 +54,9 @@ describe('missionService', () => {
     const seriesMissions = after.filter((m) => m.recurrenceSeriesId === seriesId);
     expect(seriesMissions).toHaveLength(2);
     expect(seriesMissions.find((m) => m.id === 'mission-monthly-report')?.status).toBe('completed');
-    expect(seriesMissions.some((m) => m.id !== 'mission-monthly-report' && m.status === 'ready')).toBe(true);
+    expect(
+      seriesMissions.some((m) => m.id !== 'mission-monthly-report' && m.status === 'ready'),
+    ).toBe(true);
   });
 
   it('rescheduling a mission (via scheduleMission) never touches its deadline', async () => {
@@ -84,7 +89,9 @@ describe('missionService', () => {
 
   it('adding a dependency rejects a cycle', async () => {
     await missionService.addMissionDependency('mission-monthly-report', 'mission-backlog-1');
-    await expect(missionService.addMissionDependency('mission-backlog-1', 'mission-monthly-report')).rejects.toThrow();
+    await expect(
+      missionService.addMissionDependency('mission-backlog-1', 'mission-monthly-report'),
+    ).rejects.toThrow();
   });
 
   it('a mission blocked by an open dependency is reported via getMissionDependencies', async () => {
@@ -115,7 +122,10 @@ describe('missionService', () => {
   });
 
   it('bulkUpdateMissions applies the same patch to every id', async () => {
-    const updated = await missionService.bulkUpdateMissions(['mission-inbox-1', 'mission-backlog-1'], { priority: 'high' });
+    const updated = await missionService.bulkUpdateMissions(
+      ['mission-inbox-1', 'mission-backlog-1'],
+      { priority: 'high' },
+    );
     expect(updated.every((m) => m.priority === 'high')).toBe(true);
   });
 

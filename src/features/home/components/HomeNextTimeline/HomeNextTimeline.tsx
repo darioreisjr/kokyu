@@ -20,7 +20,11 @@ const MAX_VISIBLE = 4;
  * `ScheduleEntryCard` (compact) from `daily-rhythm` instead of a second
  * entry-row component; "Ver dia completo" is the only way deeper.
  */
-export function HomeNextTimeline({ entries, isLoading = false, onNavigateToRhythm }: HomeNextTimelineProps) {
+export function HomeNextTimeline({
+  entries,
+  isLoading = false,
+  onNavigateToRhythm,
+}: HomeNextTimelineProps) {
   return (
     <HomeSectionCard>
       <Typography variant="h6" component="h2" sx={{ mb: 1.5 }}>
@@ -33,7 +37,10 @@ export function HomeNextTimeline({ entries, isLoading = false, onNavigateToRhyth
           <Skeleton variant="rounded" height={56} />
         </Stack>
       ) : entries.length === 0 ? (
-        <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+        <Typography
+          variant="body1"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+        >
           Nada mais planejado por enquanto.
         </Typography>
       ) : (

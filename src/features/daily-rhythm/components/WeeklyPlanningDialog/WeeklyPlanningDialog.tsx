@@ -24,7 +24,13 @@ export function WeeklyPlanningDialog({
   onPlanningComplete,
 }: WeeklyPlanningDialogProps) {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="weekly-planning-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="weekly-planning-title"
+    >
       <DialogTitle
         id="weekly-planning-title"
         sx={{
@@ -59,9 +65,14 @@ export function WeeklyPlanningDialog({
         </Typography>
         <Typography
           variant="caption"
-          sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 2, display: 'block' })}
+          sx={(theme) => ({
+            color: themePalette(theme).kokyu.text.secondary,
+            mb: 2,
+            display: 'block',
+          })}
         >
-          Seus compromissos de Treinamento, Hábitos e Nutrição já estão sincronizados automaticamente.
+          Seus compromissos de Treinamento, Hábitos e Nutrição já estão sincronizados
+          automaticamente.
         </Typography>
         <Typography variant="body2">
           A distribuição de carga está equilibrada em toda a semana!
@@ -89,4 +100,3 @@ export function WeeklyPlanningDialog({
     </Dialog>
   );
 }
-

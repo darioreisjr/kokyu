@@ -24,4 +24,3 @@ export interface DailyWorkload {
   bySource: Record<string, number>;
   byPriority: Record<string, number>;
 }
-

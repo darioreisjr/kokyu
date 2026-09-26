@@ -6,11 +6,7 @@ import { habitService } from '../services/habitService';
 import type { Habit } from '../types/habit.types';
 import type { HabitOccurrence } from '../types/occurrence.types';
 
-export function useHabitOccurrences(
-  habitId: string,
-  startDate: string,
-  endDate: string,
-) {
+export function useHabitOccurrences(habitId: string, startDate: string, endDate: string) {
   const [habit, setHabit] = useState<Habit | null>(null);
   const [occurrences, setOccurrences] = useState<HabitOccurrence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,20 +16,17 @@ export function useHabitOccurrences(
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([
-      habitService.getHabit(habitId),
-      habitService.getHabitLogs(habitId),
-    ]).then(([h, logs]) => {
-      if (!cancelled && h) {
-        setHabit(h);
-        setOccurrences(
-          deriveHabitOccurrencesForDateRange(h, startDate, endDate, logs, today),
-        );
-        setIsLoading(false);
-      } else if (!cancelled) {
-        setIsLoading(false);
-      }
-    });
+    Promise.all([habitService.getHabit(habitId), habitService.getHabitLogs(habitId)]).then(
+      ([h, logs]) => {
+        if (!cancelled && h) {
+          setHabit(h);
+          setOccurrences(deriveHabitOccurrencesForDateRange(h, startDate, endDate, logs, today));
+          setIsLoading(false);
+        } else if (!cancelled) {
+          setIsLoading(false);
+        }
+      },
+    );
 
     return () => {
       cancelled = true;

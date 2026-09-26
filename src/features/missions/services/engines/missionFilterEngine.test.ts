@@ -28,7 +28,11 @@ describe('missionFilterEngine', () => {
       buildMission({ id: 'a', contextIds: ['context-computer'] }),
       buildMission({ id: 'b', contextIds: ['context-home'] }),
     ];
-    const result = applyMissionFilters(missions, { contextId: ['context-computer'] }, { today: '2026-09-05', dependencies: [] });
+    const result = applyMissionFilters(
+      missions,
+      { contextId: ['context-computer'] },
+      { today: '2026-09-05', dependencies: [] },
+    );
     expect(result.map((m) => m.id)).toEqual(['a']);
   });
 
@@ -38,20 +42,37 @@ describe('missionFilterEngine', () => {
       buildMission({ id: 'long', estimatedDuration: 90 }),
       buildMission({ id: 'no-estimate' }),
     ];
-    const result = applyMissionFilters(missions, { durationMax: 30 }, { today: '2026-09-05', dependencies: [] });
+    const result = applyMissionFilters(
+      missions,
+      { durationMax: 30 },
+      { today: '2026-09-05', dependencies: [] },
+    );
     expect(result.map((m) => m.id)).toEqual(['short']);
   });
 
   it('search matches title and description case-insensitively', () => {
-    const missions = [buildMission({ id: 'a', title: 'Enviar Relatório' }), buildMission({ id: 'b', title: 'Comprar pão' })];
-    const result = applyMissionFilters(missions, { search: 'relatório' }, { today: '2026-09-05', dependencies: [] });
+    const missions = [
+      buildMission({ id: 'a', title: 'Enviar Relatório' }),
+      buildMission({ id: 'b', title: 'Comprar pão' }),
+    ];
+    const result = applyMissionFilters(
+      missions,
+      { search: 'relatório' },
+      { today: '2026-09-05', dependencies: [] },
+    );
     expect(result.map((m) => m.id)).toEqual(['a']);
   });
 
   it('blocked filter uses the dependency graph, not a persisted flag', () => {
     const missions = [buildMission({ id: 'a' }), buildMission({ id: 'b' })];
-    const deps = [{ id: 'd1', blockerMissionId: 'b', blockedMissionId: 'a', createdAt: '2026-09-01T00:00:00Z' }];
-    const result = applyMissionFilters(missions, { blocked: true }, { today: '2026-09-05', dependencies: deps });
+    const deps = [
+      { id: 'd1', blockerMissionId: 'b', blockedMissionId: 'a', createdAt: '2026-09-01T00:00:00Z' },
+    ];
+    const result = applyMissionFilters(
+      missions,
+      { blocked: true },
+      { today: '2026-09-05', dependencies: deps },
+    );
     expect(result.map((m) => m.id)).toEqual(['a']);
   });
 
@@ -67,7 +88,10 @@ describe('missionFilterEngine', () => {
 
   it('groups by project with a stable "no project" bucket', () => {
     const missions = [buildMission({ id: 'a', projectId: 'p1' }), buildMission({ id: 'b' })];
-    const groups = groupMissions(missions, 'project', { getProjectName: () => 'Projeto X', getSectionName: () => '' });
+    const groups = groupMissions(missions, 'project', {
+      getProjectName: () => 'Projeto X',
+      getSectionName: () => '',
+    });
     expect(groups.map((g) => g.key).sort()).toEqual(['no-project', 'p1']);
   });
 });

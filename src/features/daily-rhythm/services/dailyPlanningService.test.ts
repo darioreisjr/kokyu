@@ -23,11 +23,10 @@ describe('dailyPlanningService', () => {
       updatedAt: '2026-08-31T00:00:00Z',
     };
 
-    const proposal = await dailyPlanningService.generateAutoPlanProposal(
-      today,
-      [flexibleMission],
-      { dayStartsAt: '08:00', dayEndsAt: '18:00' },
-    );
+    const proposal = await dailyPlanningService.generateAutoPlanProposal(today, [flexibleMission], {
+      dayStartsAt: '08:00',
+      dayEndsAt: '18:00',
+    });
 
     expect(proposal.items.length).toBeGreaterThanOrEqual(1);
     expect(proposal.diffs.length).toBeGreaterThanOrEqual(1);
@@ -39,4 +38,3 @@ describe('dailyPlanningService', () => {
     expect(scheduleDb.activities.some((a) => a.action === 'plan_applied')).toBe(true);
   });
 });
-

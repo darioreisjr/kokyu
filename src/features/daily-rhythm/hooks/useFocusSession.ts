@@ -51,25 +51,34 @@ export function useFocusSession() {
     setElapsedSeconds(calculateElapsedSeconds(resumed));
   }, [activeSession]);
 
-  const extendSession = useCallback((extraMinutes: number) => {
-    if (!activeSession) return;
-    const extended = focusStorage.extendSession(activeSession, extraMinutes);
-    setActiveSession(extended);
-  }, [activeSession]);
+  const extendSession = useCallback(
+    (extraMinutes: number) => {
+      if (!activeSession) return;
+      const extended = focusStorage.extendSession(activeSession, extraMinutes);
+      setActiveSession(extended);
+    },
+    [activeSession],
+  );
 
-  const recordInterruption = useCallback((note?: string) => {
-    if (!activeSession) return;
-    const updated = focusStorage.recordInterruption(activeSession, note);
-    setActiveSession(updated);
-  }, [activeSession]);
+  const recordInterruption = useCallback(
+    (note?: string) => {
+      if (!activeSession) return;
+      const updated = focusStorage.recordInterruption(activeSession, note);
+      setActiveSession(updated);
+    },
+    [activeSession],
+  );
 
-  const completeSession = useCallback((note?: string) => {
-    if (!activeSession) return null;
-    const completed = focusStorage.completeSession(activeSession, note);
-    setActiveSession(null);
-    setElapsedSeconds(0);
-    return completed;
-  }, [activeSession]);
+  const completeSession = useCallback(
+    (note?: string) => {
+      if (!activeSession) return null;
+      const completed = focusStorage.completeSession(activeSession, note);
+      setActiveSession(null);
+      setElapsedSeconds(0);
+      return completed;
+    },
+    [activeSession],
+  );
 
   const cancelSession = useCallback(() => {
     if (!activeSession) return;
@@ -99,4 +108,3 @@ export function useFocusSession() {
     cancelSession,
   };
 }
-

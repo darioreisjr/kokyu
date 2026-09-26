@@ -47,11 +47,15 @@ export const habitHomeProvider: HomeSectionProvider<HabitHomeProjection> = {
       habitService.getRoutines(),
     ]);
 
-    const scheduled = occurrences.filter((occurrence) => occurrence.isScheduled && !occurrence.isPaused);
+    const scheduled = occurrences.filter(
+      (occurrence) => occurrence.isScheduled && !occurrence.isPaused,
+    );
     const completed = scheduled.filter((occurrence) => occurrence.status === 'completed');
     const pending = scheduled
       .filter((occurrence) => occurrence.status !== 'completed' && occurrence.status !== 'skipped')
-      .sort((a, b) => (a.habit.preferredTime ?? '99:99').localeCompare(b.habit.preferredTime ?? '99:99'));
+      .sort((a, b) =>
+        (a.habit.preferredTime ?? '99:99').localeCompare(b.habit.preferredTime ?? '99:99'),
+      );
 
     const nextPending = pending[0] ?? null;
 

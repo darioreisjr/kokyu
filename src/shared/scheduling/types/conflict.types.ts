@@ -21,4 +21,3 @@ export interface ScheduleConflict {
   message: string;
   suggestedResolutions?: ScheduleConflictResolution[];
 }
-

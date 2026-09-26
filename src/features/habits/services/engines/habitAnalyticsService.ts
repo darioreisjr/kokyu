@@ -115,17 +115,15 @@ export function getHabitsOverviewAnalytics(
     timeOfDayMap[t].completed += Math.round((score / 100) * 30);
   });
 
-  const timePatterns: TimeOfDayPattern[] = Object.entries(timeOfDayMap).map(
-    ([t, val]) => {
-      const rate = val.scheduled > 0 ? Math.round((val.completed / val.scheduled) * 100) : 100;
-      return {
-        timeOfDay: t as HabitTimeOfDay,
-        sampleSize: val.scheduled,
-        confidence: (val.scheduled >= 15 ? 'high' : 'medium') as 'low' | 'medium' | 'high',
-        description: `Consistência de ${rate}% no período da ${t === 'morning' ? 'manhã' : t === 'afternoon' ? 'tarde' : t === 'evening' ? 'noite' : 'rotina'}.`,
-      };
-    },
-  );
+  const timePatterns: TimeOfDayPattern[] = Object.entries(timeOfDayMap).map(([t, val]) => {
+    const rate = val.scheduled > 0 ? Math.round((val.completed / val.scheduled) * 100) : 100;
+    return {
+      timeOfDay: t as HabitTimeOfDay,
+      sampleSize: val.scheduled,
+      confidence: (val.scheduled >= 15 ? 'high' : 'medium') as 'low' | 'medium' | 'high',
+      description: `Consistência de ${rate}% no período da ${t === 'morning' ? 'manhã' : t === 'afternoon' ? 'tarde' : t === 'evening' ? 'noite' : 'rotina'}.`,
+    };
+  });
 
   // Area distribution
   const areaCountMap = new Map<HabitArea, number>();

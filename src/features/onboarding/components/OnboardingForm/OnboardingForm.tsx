@@ -17,7 +17,13 @@ import {
 } from '@/design-system/components';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { authText, calculateAge, type UsernameAvailability } from '@/features/auth';
-import { AvatarCropDialog, ProfileAvatar, countries, profileConfig, useHasMounted } from '@/features/profile';
+import {
+  AvatarCropDialog,
+  ProfileAvatar,
+  countries,
+  profileConfig,
+  useHasMounted,
+} from '@/features/profile';
 import type { CurrentUser } from '@/lib/api/types';
 
 import { onboardingText } from '../../constants/onboardingText';

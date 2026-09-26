@@ -69,7 +69,10 @@ describe('CurrentUserProvider', () => {
 
   it('refreshCurrentUser re-fetches /me and replaces the user', async () => {
     const refreshed = { ...baseUser, profile: { ...baseUser.profile, firstName: 'Novo' } };
-    mockGetCurrentUserClient.mockResolvedValueOnce({ status: 'authenticated', currentUser: refreshed });
+    mockGetCurrentUserClient.mockResolvedValueOnce({
+      status: 'authenticated',
+      currentUser: refreshed,
+    });
 
     const { result } = renderCurrentUser(baseUser);
     await act(async () => {
@@ -124,7 +127,12 @@ describe('CurrentUserProvider', () => {
   it('completeProfile POSTs /profile/complete, suppressing the redirect, and replaces currentUser', async () => {
     const completed = {
       ...baseUser,
-      profileCompletion: { completed: true, completedAt: '2024-02-01', version: 1, missingFields: [] },
+      profileCompletion: {
+        completed: true,
+        completedAt: '2024-02-01',
+        version: 1,
+        missingFields: [],
+      },
     };
     mockApiFetchClient.mockResolvedValueOnce(completed);
 

@@ -4,22 +4,39 @@ import { isMissionTerminal } from '../../utils/missionDateStatus';
 export type MissionStatusById = Record<string, MissionStatus | undefined>;
 
 export function getBlockerIds(missionId: string, dependencies: MissionDependency[]): string[] {
-  return dependencies.filter((d) => d.blockedMissionId === missionId).map((d) => d.blockerMissionId);
+  return dependencies
+    .filter((d) => d.blockedMissionId === missionId)
+    .map((d) => d.blockerMissionId);
 }
 
 export function getBlockedIds(missionId: string, dependencies: MissionDependency[]): string[] {
-  return dependencies.filter((d) => d.blockerMissionId === missionId).map((d) => d.blockedMissionId);
+  return dependencies
+    .filter((d) => d.blockerMissionId === missionId)
+    .map((d) => d.blockedMissionId);
 }
 
 function isOpenStatus(status: MissionStatus | undefined): boolean {
-  return status !== undefined && status !== 'completed' && status !== 'cancelled' && status !== 'archived';
+  return (
+    status !== undefined &&
+    status !== 'completed' &&
+    status !== 'cancelled' &&
+    status !== 'archived'
+  );
 }
 
-export function getOpenBlockerIds(missionId: string, dependencies: MissionDependency[], statusById: MissionStatusById): string[] {
+export function getOpenBlockerIds(
+  missionId: string,
+  dependencies: MissionDependency[],
+  statusById: MissionStatusById,
+): string[] {
   return getBlockerIds(missionId, dependencies).filter((id) => isOpenStatus(statusById[id]));
 }
 
-export function isMissionBlocked(missionId: string, dependencies: MissionDependency[], statusById: MissionStatusById): boolean {
+export function isMissionBlocked(
+  missionId: string,
+  dependencies: MissionDependency[],
+  statusById: MissionStatusById,
+): boolean {
   return getOpenBlockerIds(missionId, dependencies, statusById).length > 0;
 }
 
@@ -76,7 +93,11 @@ export function validateNewDependency(
 }
 
 /** For UI copy like "Bloqueada por 2 missões" (spec) — never hides the mission, just counts. */
-export function countOpenBlockers(missionId: string, dependencies: MissionDependency[], missions: Mission[]): number {
+export function countOpenBlockers(
+  missionId: string,
+  dependencies: MissionDependency[],
+  missions: Mission[],
+): number {
   const statusById: MissionStatusById = Object.fromEntries(missions.map((m) => [m.id, m.status]));
   return getOpenBlockerIds(missionId, dependencies, statusById).length;
 }

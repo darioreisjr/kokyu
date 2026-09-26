@@ -52,7 +52,8 @@ export interface MissionSort {
   direction: MissionSortDirection;
 }
 
-export type MissionGroupField = 'none' | 'project' | 'section' | 'status' | 'priority' | 'area' | 'date';
+export type MissionGroupField =
+  'none' | 'project' | 'section' | 'status' | 'priority' | 'area' | 'date';
 
 export type MissionLayout = 'list' | 'board' | 'calendar' | 'eisenhower';
 
@@ -69,10 +70,4 @@ export interface SavedMissionView {
 
 /** Built-in smart views ship as filter presets, not `SavedMissionView` rows — they're not user-editable or deletable. */
 export type BuiltInSmartViewId =
-  | 'today'
-  | 'overdue'
-  | 'noDate'
-  | 'waiting'
-  | 'blocked'
-  | 'inFocus'
-  | 'recentlyCompleted';
+  'today' | 'overdue' | 'noDate' | 'waiting' | 'blocked' | 'inFocus' | 'recentlyCompleted';

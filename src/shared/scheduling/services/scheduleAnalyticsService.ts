@@ -108,13 +108,14 @@ export const scheduleAnalyticsService = {
       custom: 'Outro',
     };
 
-    const timeByArea: TimeByArea[] = Array.from(areaMinutesMap.entries()).map(([area, minutes]) => ({
-      area,
-      label: areaLabels[area] ?? area,
-      minutes,
-      percentage:
-        totalSourceMinutes > 0 ? Math.round((minutes / totalSourceMinutes) * 100) : 0,
-    }));
+    const timeByArea: TimeByArea[] = Array.from(areaMinutesMap.entries()).map(
+      ([area, minutes]) => ({
+        area,
+        label: areaLabels[area] ?? area,
+        minutes,
+        percentage: totalSourceMinutes > 0 ? Math.round((minutes / totalSourceMinutes) * 100) : 0,
+      }),
+    );
 
     // 4. Focus Analytics
     let totalFocusSeconds = 0;
@@ -192,4 +193,3 @@ export const scheduleAnalyticsService = {
     };
   },
 };
-

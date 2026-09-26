@@ -9,7 +9,11 @@ export interface HomeNutritionSummaryProps {
   onOpen: () => void;
 }
 
-export function HomeNutritionSummary({ result, isLoading = false, onOpen }: HomeNutritionSummaryProps) {
+export function HomeNutritionSummary({
+  result,
+  isLoading = false,
+  onOpen,
+}: HomeNutritionSummaryProps) {
   const data = result.data;
   const isEmpty = data !== null && data.plannedMealsToday === 0;
 

@@ -1,7 +1,4 @@
-import type {
-  ScheduleEntryStatus,
-  ScheduleSourceType,
-} from '../types';
+import type { ScheduleEntryStatus, ScheduleSourceType } from '../types';
 
 export const DEFAULT_PRIORITY_WEIGHTS: Record<'low' | 'medium' | 'high' | 'focus', number> = {
   low: 10,
@@ -20,7 +17,13 @@ export const SCHEDULING_CONFIG = {
 
 export const SCHEDULE_SOURCE_METAS: Record<
   ScheduleSourceType,
-  { label: string; badgeLabel: string; defaultColorToken: string; defaultIcon: string; colorTokenKey: string }
+  {
+    label: string;
+    badgeLabel: string;
+    defaultColorToken: string;
+    defaultIcon: string;
+    colorTokenKey: string;
+  }
 > = {
   mission: {
     label: 'Missão',
@@ -128,4 +131,3 @@ export const SCHEDULE_STATUS_METAS: Record<
   missed: { label: 'Perdido', color: 'error' },
   unscheduled: { label: 'Sem horário', color: 'default' },
 };
-

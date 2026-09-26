@@ -70,4 +70,3 @@ export const habitScheduleAdapter: ScheduleSourceAdapter = {
     return true;
   },
 };
-

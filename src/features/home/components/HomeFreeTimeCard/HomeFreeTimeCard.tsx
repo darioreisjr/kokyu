@@ -28,7 +28,11 @@ const INLINE_SUGGESTION_LIMIT = 3;
  * algorithm). Fully hidden when there's no current free block — an
  * adaptive section, not an empty card (see spec's "ADAPTIVE HOME").
  */
-export function HomeFreeTimeCard({ freeSlot, onSelectCandidate, onOpenFullList }: HomeFreeTimeCardProps) {
+export function HomeFreeTimeCard({
+  freeSlot,
+  onSelectCandidate,
+  onOpenFullList,
+}: HomeFreeTimeCardProps) {
   const [suggestions, setSuggestions] = useState<HomeSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,7 +54,10 @@ export function HomeFreeTimeCard({ freeSlot, onSelectCandidate, onOpenFullList }
       <Typography variant="h6" component="h2" sx={{ mb: 1 }}>
         Tempo livre
       </Typography>
-      <Typography variant="body1" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 1.5 })}>
+      <Typography
+        variant="body1"
+        sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mb: 1.5 })}
+      >
         Você tem {formatDurationDisplay(freeSlot.duration)} livres agora.
       </Typography>
 
@@ -60,7 +67,10 @@ export function HomeFreeTimeCard({ freeSlot, onSelectCandidate, onOpenFullList }
           <Skeleton variant="rounded" width={100} height={32} />
         </Stack>
       ) : suggestions.length === 0 ? (
-        <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.disabled })}>
+        <Typography
+          variant="caption"
+          sx={(theme) => ({ color: themePalette(theme).kokyu.text.disabled })}
+        >
           Nenhuma sugestão compatível encontrada.
         </Typography>
       ) : (
@@ -77,7 +87,12 @@ export function HomeFreeTimeCard({ freeSlot, onSelectCandidate, onOpenFullList }
         </Stack>
       )}
 
-      <KokyuButton size="small" variant="text" sx={{ mt: 1.5 }} onClick={() => onOpenFullList(freeSlot)}>
+      <KokyuButton
+        size="small"
+        variant="text"
+        sx={{ mt: 1.5 }}
+        onClick={() => onOpenFullList(freeSlot)}
+      >
         Ver o que cabe aqui
       </KokyuButton>
     </HomeSectionCard>

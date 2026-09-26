@@ -79,4 +79,3 @@ export const leisureScheduleAdapter: ScheduleSourceAdapter = {
     return Boolean(archived);
   },
 };
-

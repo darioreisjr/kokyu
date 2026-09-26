@@ -67,4 +67,3 @@ describe('timeHelpers', () => {
     expect(snapToGrid(24, 15)).toBe(30);
   });
 });
-

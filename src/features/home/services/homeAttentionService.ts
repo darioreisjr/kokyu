@@ -36,7 +36,10 @@ interface RankedAttentionItem extends HomeAttentionItem {
  * provider throwing here: a failed provider's `data` is `null` and is
  * simply skipped, matching Home's partial-failure guarantee.
  */
-export function getHomeAttention(input: HomeAttentionInput, context: HomeProviderContext): HomeAttentionItem[] {
+export function getHomeAttention(
+  input: HomeAttentionInput,
+  context: HomeProviderContext,
+): HomeAttentionItem[] {
   const createdAt = context.now.toISOString();
   const items: RankedAttentionItem[] = [];
 

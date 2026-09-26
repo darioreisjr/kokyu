@@ -25,7 +25,11 @@ function friendlyStorageUploadError(error: { message?: string } | null): string 
   ) {
     return 'A imagem é muito grande. O tamanho máximo é 5 MB.';
   }
-  if (message.includes('mime') || message.includes('content-type') || message.includes('content type')) {
+  if (
+    message.includes('mime') ||
+    message.includes('content-type') ||
+    message.includes('content type')
+  ) {
     return 'Formato de imagem não suportado. Envie um arquivo JPEG, PNG ou WebP.';
   }
   return 'Não foi possível enviar a imagem. Tente novamente.';

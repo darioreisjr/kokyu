@@ -17,7 +17,9 @@ export function getMissionAnalyticsOverview(
   today: string,
 ): MissionAnalyticsOverview {
   const completed = missions.filter((m) => m.status === 'completed');
-  const pending = missions.filter((m) => m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived');
+  const pending = missions.filter(
+    (m) => m.status !== 'completed' && m.status !== 'cancelled' && m.status !== 'archived',
+  );
   const overdue = missions.filter((m) => isMissionOverdue(m, today));
   const blocked = missions.filter((m) => m.status === 'blocked');
   const waitingWithFollowUp = missions.filter((m) => m.status === 'waiting' && m.followUpAt);

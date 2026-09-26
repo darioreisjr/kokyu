@@ -167,4 +167,3 @@ export const focusStorage = {
     scheduleDb.focusHistory.push(cancelled);
   },
 };
-

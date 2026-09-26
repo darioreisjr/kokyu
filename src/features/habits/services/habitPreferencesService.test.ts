@@ -15,4 +15,3 @@ describe('habitPreferencesService', () => {
     habitPreferencesService.updatePreferences({ showStreak: true });
   });
 });
-

@@ -9,7 +9,10 @@ import type {
 } from '@/shared/home/types';
 import { getHomeAttention } from './homeAttentionService';
 
-function success<T>(sourceType: HomeProviderResult<T>['sourceType'], data: T): HomeProviderResult<T> {
+function success<T>(
+  sourceType: HomeProviderResult<T>['sourceType'],
+  data: T,
+): HomeProviderResult<T> {
   return { sourceType, status: 'success', data };
 }
 
@@ -92,7 +95,13 @@ describe('homeAttentionService', () => {
         schedule: success('dailyRhythm', {
           ...emptySchedule,
           conflicts: [
-            { id: 'c1', type: 'overlap', severity: 'error', entryIds: ['a', 'b'], message: 'Conflito' },
+            {
+              id: 'c1',
+              type: 'overlap',
+              severity: 'error',
+              entryIds: ['a', 'b'],
+              message: 'Conflito',
+            },
           ],
         }),
       },
@@ -108,7 +117,11 @@ describe('homeAttentionService', () => {
       {
         missions: success('mission', emptyMissions),
         goals: success('goal', { ...emptyGoals, pendingCheckIns: 2 }),
-        nutrition: success('nutrition', { ...emptyNutrition, pantryUrgentCount: 1, shoppingPendingCount: 3 }),
+        nutrition: success('nutrition', {
+          ...emptyNutrition,
+          pantryUrgentCount: 1,
+          shoppingPendingCount: 3,
+        }),
         schedule: success('dailyRhythm', emptySchedule),
       },
       context,

@@ -19,7 +19,9 @@ export interface MissionFiltersBarProps {
 export function MissionFiltersBar({ value, onChange }: MissionFiltersBarProps) {
   function togglePriority(priority: MissionPriority) {
     const current = value.priority ?? [];
-    const next = current.includes(priority) ? current.filter((p) => p !== priority) : [...current, priority];
+    const next = current.includes(priority)
+      ? current.filter((p) => p !== priority)
+      : [...current, priority];
     onChange({ ...value, priority: next.length > 0 ? next : undefined });
   }
 
@@ -34,7 +36,15 @@ export function MissionFiltersBar({ value, onChange }: MissionFiltersBarProps) {
         placeholder="Buscar missões…"
         value={value.search ?? ''}
         onChange={(event) => onChange({ ...value, search: event.target.value || undefined })}
-        slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRoundedIcon fontSize="small" /></InputAdornment> } }}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchRoundedIcon fontSize="small" />
+              </InputAdornment>
+            ),
+          },
+        }}
         aria-label="Buscar missões"
       />
 
@@ -59,7 +69,9 @@ export function MissionFiltersBar({ value, onChange }: MissionFiltersBarProps) {
             size="small"
             color={value.durationMax === preset.max ? 'info' : 'default'}
             variant={value.durationMax === preset.max ? 'filled' : 'outlined'}
-            onClick={() => setDurationMax(value.durationMax === preset.max ? undefined : preset.max)}
+            onClick={() =>
+              setDurationMax(value.durationMax === preset.max ? undefined : preset.max)
+            }
           />
         ))}
         <Chip

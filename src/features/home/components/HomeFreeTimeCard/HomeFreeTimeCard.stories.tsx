@@ -2,7 +2,13 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import type { FreeTimeSlot } from '@/shared/scheduling/types';
 import { HomeFreeTimeCard } from './HomeFreeTimeCard';
 
-const freeSlot: FreeTimeSlot = { id: 'slot1', date: new Date().toISOString().split('T')[0]!, startAt: '14:00', endAt: '14:45', duration: 45 };
+const freeSlot: FreeTimeSlot = {
+  id: 'slot1',
+  date: new Date().toISOString().split('T')[0]!,
+  startAt: '14:00',
+  endAt: '14:45',
+  duration: 45,
+};
 
 const meta = {
   title: 'Home/HomeFreeTimeCard',

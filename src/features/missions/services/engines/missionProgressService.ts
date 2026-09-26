@@ -15,7 +15,10 @@ export function calculateChecklistProgress(items: MissionChecklistItem[]): Missi
 }
 
 /** Ignores cancelled/archived submissions, mirroring project progress (spec "SUBMISSION PROGRESS"/"PROJECT PROGRESS"). */
-export function calculateSubmissionsProgress(missionId: string, allMissions: Mission[]): MissionProgress {
+export function calculateSubmissionsProgress(
+  missionId: string,
+  allMissions: Mission[],
+): MissionProgress {
   const submissions = allMissions.filter((m) => m.parentMissionId === missionId);
   const eligible = submissions.filter((m) => m.status !== 'cancelled' && m.status !== 'archived');
   const completed = eligible.filter((m) => m.status === 'completed');

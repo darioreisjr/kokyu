@@ -39,7 +39,9 @@ describe('MobileTopBar', () => {
         user={{ name: 'Dario Reis', initials: 'DR', avatarUrl: null }}
       />,
     );
-    expect(screen.getByRole('button', { name: 'Menu do usuário — Dario Reis' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Menu do usuário — Dario Reis' }),
+    ).toBeInTheDocument();
   });
 
   it('opens the drawer when the user avatar is clicked', async () => {

@@ -27,4 +27,3 @@ export interface HabitRoutine {
   updatedAt: string;
   archivedAt?: string;
 }
-

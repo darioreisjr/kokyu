@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { HabitSourceEvent } from '../../types/adapters.types';
 import type { Habit } from '../../types/habit.types';
-import {
-  findHabitsForSourceEvent,
-  processSourceEvent,
-} from './habitAutomaticTrackingService';
+import { findHabitsForSourceEvent, processSourceEvent } from './habitAutomaticTrackingService';
 
 const trainingHabit: Habit = {
   id: 'h-auto-train',

@@ -167,11 +167,7 @@ export function TodayHabitsPage() {
             title="Nenhum hábito agendado para hoje"
             description="Você está livre ou seus hábitos estão agendados para outros dias."
             action={
-              <KokyuButton
-                component={NextLink}
-                href={habitRoutes.new}
-                variant="contained"
-              >
+              <KokyuButton component={NextLink} href={habitRoutes.new} variant="contained">
                 Criar novo hábito
               </KokyuButton>
             }

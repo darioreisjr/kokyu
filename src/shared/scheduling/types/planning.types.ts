@@ -107,4 +107,3 @@ export interface TravelBuffer {
   toContext: ScheduleContext;
   bufferMinutes: number;
 }
-

@@ -18,8 +18,24 @@ const baseEntry: ScheduleEntry = {
 
 const entries: ScheduleEntry[] = [
   baseEntry,
-  { ...baseEntry, id: 'e2', sourceType: 'manual', sourceId: 'meeting1', title: 'Reunião de Alinhamento', startAt: '14:00', endAt: '15:00' },
-  { ...baseEntry, id: 'e3', sourceType: 'training', sourceId: 't1', title: 'Push A', startAt: '19:00', endAt: '20:00' },
+  {
+    ...baseEntry,
+    id: 'e2',
+    sourceType: 'manual',
+    sourceId: 'meeting1',
+    title: 'Reunião de Alinhamento',
+    startAt: '14:00',
+    endAt: '15:00',
+  },
+  {
+    ...baseEntry,
+    id: 'e3',
+    sourceType: 'training',
+    sourceId: 't1',
+    title: 'Push A',
+    startAt: '19:00',
+    endAt: '20:00',
+  },
 ];
 
 const meta = {

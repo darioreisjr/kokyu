@@ -7,7 +7,13 @@ const withData: HomeProviderResult<GoalHomeProjection> = {
   status: 'success',
   data: {
     inFocus: [
-      { id: 'g1', title: 'Correr 10km', status: 'onTrack', progressPercent: 62, nextMilestoneTitle: 'Correr 8km sem parar' },
+      {
+        id: 'g1',
+        title: 'Correr 10km',
+        status: 'onTrack',
+        progressPercent: 62,
+        nextMilestoneTitle: 'Correr 8km sem parar',
+      },
       { id: 'g2', title: 'Ler 12 livros', status: 'attention', progressPercent: 30 },
     ],
     atRisk: [],
@@ -27,7 +33,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = { args: { result: withData } };
 
 export const Empty: Story = {
-  args: { result: { sourceType: 'goal', status: 'success', data: { inFocus: [], atRisk: [], pendingCheckIns: 0 } } },
+  args: {
+    result: {
+      sourceType: 'goal',
+      status: 'success',
+      data: { inFocus: [], atRisk: [], pendingCheckIns: 0 },
+    },
+  },
 };
 
 export const ProviderError: Story = {

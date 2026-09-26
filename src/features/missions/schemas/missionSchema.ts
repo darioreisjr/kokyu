@@ -34,7 +34,15 @@ export const missionSchema = z.object({
   followUpAt: z.string().optional(),
 
   recurrenceFrequency: z
-    .enum(['daily', 'weekdays', 'weekly', 'monthly', 'yearly', 'specificWeekdays', 'customInterval'])
+    .enum([
+      'daily',
+      'weekdays',
+      'weekly',
+      'monthly',
+      'yearly',
+      'specificWeekdays',
+      'customInterval',
+    ])
     .optional(),
   recurrenceIntervalDays: z.number().min(1).optional(),
   recurrenceWeekdays: z.array(z.number().min(0).max(6)).optional(),

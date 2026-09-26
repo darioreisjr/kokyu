@@ -28,7 +28,7 @@ export interface DailyHabitScore {
 
 export interface WeeklyRhythmDay {
   weekday: number; // 0-6 (Sun-Sat)
-  label: string;   // "Seg", "Ter", etc.
+  label: string; // "Seg", "Ter", etc.
   completionRate: number; // 0-100%
   totalScheduled: number;
   totalCompleted: number;
@@ -76,4 +76,3 @@ export interface HabitsOverviewAnalytics {
     recentMisses: number;
   }[];
 }
-

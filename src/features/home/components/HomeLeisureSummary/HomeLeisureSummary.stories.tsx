@@ -6,7 +6,12 @@ const withPlanned: HomeProviderResult<LeisureHomeProjection> = {
   sourceType: 'leisure',
   status: 'success',
   data: {
-    plannedToday: { id: 'l1', title: 'Assistir Duna: Parte Dois', type: 'movie', startTime: '21:00' },
+    plannedToday: {
+      id: 'l1',
+      title: 'Assistir Duna: Parte Dois',
+      type: 'movie',
+      startTime: '21:00',
+    },
     inProgress: null,
     backlogCount: 5,
   },
@@ -36,7 +41,11 @@ export const InProgress: Story = { args: { result: withInProgress } };
 
 export const Empty: Story = {
   args: {
-    result: { sourceType: 'leisure', status: 'success', data: { plannedToday: null, inProgress: null, backlogCount: 0 } },
+    result: {
+      sourceType: 'leisure',
+      status: 'success',
+      data: { plannedToday: null, inProgress: null, backlogCount: 0 },
+    },
   },
 };
 

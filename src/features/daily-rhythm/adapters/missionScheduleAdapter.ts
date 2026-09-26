@@ -70,7 +70,11 @@ export const missionScheduleAdapter: ScheduleSourceAdapter = {
     return updated !== null;
   },
 
-  async onEntryRescheduled(entry: ScheduleEntry, newDate: string, newStartAt?: string): Promise<boolean> {
+  async onEntryRescheduled(
+    entry: ScheduleEntry,
+    newDate: string,
+    newStartAt?: string,
+  ): Promise<boolean> {
     const updated = await missionService.scheduleMission(entry.sourceId, newDate, newStartAt);
     return updated !== null;
   },

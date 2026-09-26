@@ -70,7 +70,13 @@ export function ReplanDialog({ open, onClose, date, onReplanApplied }: ReplanDia
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="replan-dialog-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="replan-dialog-title"
+    >
       <DialogTitle
         id="replan-dialog-title"
         sx={{
@@ -88,7 +94,8 @@ export function ReplanDialog({ open, onClose, date, onReplanApplied }: ReplanDia
             variant="caption"
             sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
           >
-            Atrasei ou imprevistos aconteceram? Redistribua as atividades a partir de agora sem bagunçar eventos fixos.
+            Atrasei ou imprevistos aconteceram? Redistribua as atividades a partir de agora sem
+            bagunçar eventos fixos.
           </Typography>
         </Box>
 
@@ -111,7 +118,11 @@ export function ReplanDialog({ open, onClose, date, onReplanApplied }: ReplanDia
             </Typography>
             <Typography
               variant="caption"
-              sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary, mt: 0.5, display: 'block' })}
+              sx={(theme) => ({
+                color: themePalette(theme).kokyu.text.secondary,
+                mt: 0.5,
+                display: 'block',
+              })}
             >
               Não há conflitos nem itens pendentes que precisem ser realocados.
             </Typography>
@@ -183,10 +194,7 @@ export function ReplanDialog({ open, onClose, date, onReplanApplied }: ReplanDia
           color="primary"
           startIcon={<ReplayRoundedIcon />}
           disabled={
-            isApplying ||
-            isLoading ||
-            !replanResult ||
-            replanResult.preview.diffs.length === 0
+            isApplying || isLoading || !replanResult || replanResult.preview.diffs.length === 0
           }
           onClick={handleApply}
           sx={{ textTransform: 'none', px: 3 }}
@@ -197,4 +205,3 @@ export function ReplanDialog({ open, onClose, date, onReplanApplied }: ReplanDia
     </Dialog>
   );
 }
-

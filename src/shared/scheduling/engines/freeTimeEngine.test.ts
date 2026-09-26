@@ -84,4 +84,3 @@ describe('freeTimeEngine', () => {
     expect(slots[1]!.endAt).toBe('13:00');
   });
 });
-

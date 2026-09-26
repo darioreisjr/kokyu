@@ -43,7 +43,11 @@ describe('missionDateStatus', () => {
 
   it('only a passed deadline on a non-terminal mission is overdue', () => {
     const overdueOpen = buildMission({ deadline: '2026-09-01' });
-    const overdueCompleted = buildMission({ deadline: '2026-09-01', status: 'completed', completedAt: '2026-09-01T10:00:00Z' });
+    const overdueCompleted = buildMission({
+      deadline: '2026-09-01',
+      status: 'completed',
+      completedAt: '2026-09-01T10:00:00Z',
+    });
 
     expect(isMissionOverdue(overdueOpen, '2026-09-05')).toBe(true);
     expect(isMissionOverdue(overdueCompleted, '2026-09-05')).toBe(false);

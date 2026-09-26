@@ -43,9 +43,7 @@ test.describe('Profile page', () => {
     await page.goto('/app/perfil');
   });
 
-  test('loads with populated identity fields — avatar, name, username, email', async ({
-    page,
-  }) => {
+  test('loads with populated identity fields — avatar, name, username, email', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'Perfil' })).toBeVisible();
 
     const firstName = await page.getByLabel('Nome', { exact: true }).inputValue();

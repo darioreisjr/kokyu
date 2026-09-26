@@ -11,7 +11,10 @@ export interface MissionDurationProps {
 }
 
 /** `estimatedDuration` never gets silently overwritten — when both exist, both show (spec "PLANNED VS ACTUAL"). */
-export function MissionDuration({ estimatedDuration, actualDurationMinutes }: MissionDurationProps) {
+export function MissionDuration({
+  estimatedDuration,
+  actualDurationMinutes,
+}: MissionDurationProps) {
   if (!estimatedDuration && !actualDurationMinutes) return null;
 
   const label =
@@ -20,7 +23,9 @@ export function MissionDuration({ estimatedDuration, actualDurationMinutes }: Mi
       : formatMissionDuration(actualDurationMinutes ?? estimatedDuration);
 
   return (
-    <Tooltip title={actualDurationMinutes !== undefined ? 'Tempo real / estimado' : 'Duração estimada'}>
+    <Tooltip
+      title={actualDurationMinutes !== undefined ? 'Tempo real / estimado' : 'Duração estimada'}
+    >
       <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
         <ScheduleRoundedIcon fontSize="inherit" sx={{ color: 'text.secondary' }} />
         <Typography variant="caption" color="text.secondary">

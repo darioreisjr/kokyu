@@ -27,4 +27,3 @@ export interface HabitSourceAdapter {
   metrics: HabitSourceMetric[];
   getAvailableEvents?: () => Promise<HabitSourceEvent[]>;
 }
-

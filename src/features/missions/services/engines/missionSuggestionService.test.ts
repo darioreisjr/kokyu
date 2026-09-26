@@ -25,20 +25,34 @@ function buildMission(overrides: Partial<Mission> = {}): Mission {
 describe('missionSuggestionService', () => {
   it('never returns a mission already planned for today (that already appears in Today directly)', () => {
     const missions = [buildMission({ id: 'a', priority: 'critical', plannedDate: '2026-09-05' })];
-    const suggestions = getMissionSuggestions(missions, [], { today: '2026-09-05', focusGoalIds: [] });
+    const suggestions = getMissionSuggestions(missions, [], {
+      today: '2026-09-05',
+      focusGoalIds: [],
+    });
     expect(suggestions).toHaveLength(0);
   });
 
   it('excludes missions not yet available', () => {
     const missions = [buildMission({ id: 'a', priority: 'high', availableFrom: '2026-09-10' })];
-    const suggestions = getMissionSuggestions(missions, [], { today: '2026-09-05', focusGoalIds: [] });
+    const suggestions = getMissionSuggestions(missions, [], {
+      today: '2026-09-05',
+      focusGoalIds: [],
+    });
     expect(suggestions).toHaveLength(0);
   });
 
   it('excludes blocked missions', () => {
-    const missions = [buildMission({ id: 'a', priority: 'high' }), buildMission({ id: 'b', priority: 'high' })];
-    const deps: MissionDependency[] = [{ id: 'd1', blockerMissionId: 'b', blockedMissionId: 'a', createdAt: '2026-09-01T00:00:00Z' }];
-    const suggestions = getMissionSuggestions(missions, deps, { today: '2026-09-05', focusGoalIds: [] });
+    const missions = [
+      buildMission({ id: 'a', priority: 'high' }),
+      buildMission({ id: 'b', priority: 'high' }),
+    ];
+    const deps: MissionDependency[] = [
+      { id: 'd1', blockerMissionId: 'b', blockedMissionId: 'a', createdAt: '2026-09-01T00:00:00Z' },
+    ];
+    const suggestions = getMissionSuggestions(missions, deps, {
+      today: '2026-09-05',
+      focusGoalIds: [],
+    });
     expect(suggestions.map((s) => s.missionId)).not.toContain('a');
   });
 
@@ -47,7 +61,10 @@ describe('missionSuggestionService', () => {
       buildMission({ id: 'urgent', priority: 'low', deadline: '2026-09-01' }),
       buildMission({ id: 'chill', priority: 'low' }),
     ];
-    const suggestions = getMissionSuggestions(missions, [], { today: '2026-09-05', focusGoalIds: [] });
+    const suggestions = getMissionSuggestions(missions, [], {
+      today: '2026-09-05',
+      focusGoalIds: [],
+    });
     expect(suggestions[0]!.missionId).toBe('urgent');
   });
 
@@ -56,7 +73,10 @@ describe('missionSuggestionService', () => {
       buildMission({ id: 'goal-linked', priority: 'low', goalIds: ['goal-1'] }),
       buildMission({ id: 'unrelated', priority: 'low' }),
     ];
-    const suggestions = getMissionSuggestions(missions, [], { today: '2026-09-05', focusGoalIds: ['goal-1'] });
+    const suggestions = getMissionSuggestions(missions, [], {
+      today: '2026-09-05',
+      focusGoalIds: ['goal-1'],
+    });
     expect(suggestions[0]!.missionId).toBe('goal-linked');
   });
 

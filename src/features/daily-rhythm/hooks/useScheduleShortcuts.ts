@@ -53,4 +53,3 @@ export function useScheduleShortcuts(handlers: ScheduleShortcutsHandlers) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handlers]);
 }
-

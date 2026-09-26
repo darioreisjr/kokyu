@@ -3,7 +3,7 @@ import { timeToMinutes } from '../utils/timeHelpers';
 
 export interface DailyCapacityOptions {
   dayStartsAt?: string; // "06:00"
-  dayEndsAt?: string;   // "23:00"
+  dayEndsAt?: string; // "23:00"
 }
 
 export function calculateDailyCapacity(
@@ -66,4 +66,3 @@ export function calculateDailyCapacity(
     differenceMinutes,
   };
 }
-

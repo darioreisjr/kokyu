@@ -24,7 +24,10 @@ export interface MissionAssistantProposal {
 export interface MissionAssistantProvider {
   proposeBreakdown?: (mission: Mission) => Promise<MissionAssistantProposal>;
   proposeDuration?: (mission: Mission) => Promise<MissionAssistantProposal>;
-  proposeDependencies?: (mission: Mission, candidates: Mission[]) => Promise<MissionAssistantProposal>;
+  proposeDependencies?: (
+    mission: Mission,
+    candidates: Mission[],
+  ) => Promise<MissionAssistantProposal>;
   proposeProject?: (mission: Mission) => Promise<MissionAssistantProposal>;
   summarizeDescription?: (mission: Mission) => Promise<MissionAssistantProposal>;
   detectDuplicates?: (mission: Mission, candidates: Mission[]) => Promise<MissionAssistantProposal>;

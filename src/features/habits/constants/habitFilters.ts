@@ -1,21 +1,16 @@
-import type { HabitArea, HabitDirection, HabitStatus, HabitTimeOfDay, HabitTrackingType } from '../types/habit.types';
+import type {
+  HabitArea,
+  HabitDirection,
+  HabitStatus,
+  HabitTimeOfDay,
+  HabitTrackingType,
+} from '../types/habit.types';
 import type { HabitFrequencyType } from '../types/schedule.types';
 
 export type HabitQuickFilter =
-  | 'all'
-  | 'today'
-  | 'morning'
-  | 'automatic'
-  | 'needsAttention'
-  | 'paused'
-  | 'reduce';
+  'all' | 'today' | 'morning' | 'automatic' | 'needsAttention' | 'paused' | 'reduce';
 
-export type HabitSortOption =
-  | 'manual'
-  | 'name'
-  | 'consistency'
-  | 'streak'
-  | 'recent';
+export type HabitSortOption = 'manual' | 'name' | 'consistency' | 'streak' | 'recent';
 
 export interface HabitFilterState {
   search: string;

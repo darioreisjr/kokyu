@@ -3,8 +3,17 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import type { MissionDependency, MissionFilters, MissionGroupField, MissionSort } from '../../types';
-import { applyMissionFilters, groupMissions, sortMissions } from '../../services/engines/missionFilterEngine';
+import type {
+  MissionDependency,
+  MissionFilters,
+  MissionGroupField,
+  MissionSort,
+} from '../../types';
+import {
+  applyMissionFilters,
+  groupMissions,
+  sortMissions,
+} from '../../services/engines/missionFilterEngine';
 import { todayKey } from '../../utils/missionDateKey';
 import type { Mission } from '../../types';
 import { MissionRow } from '../MissionRow/MissionRow';

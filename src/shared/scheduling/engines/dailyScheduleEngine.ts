@@ -1,9 +1,4 @@
-import type {
-  DailyPlanItem,
-  PlanItemDiff,
-  PlanPreview,
-  ScheduleEntry,
-} from '../types';
+import type { DailyPlanItem, PlanItemDiff, PlanPreview, ScheduleEntry } from '../types';
 import { addMinutesToTime } from '../utils/timeHelpers';
 import { calculateDailyCapacity } from './dailyCapacityEngine';
 import { findFreeTimeSlots } from './freeTimeEngine';
@@ -141,4 +136,3 @@ export function generateDailySchedulePlan(
     conflicts,
   };
 }
-

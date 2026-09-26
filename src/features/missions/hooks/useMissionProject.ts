@@ -8,7 +8,11 @@ export function useMissionProject(id: string) {
   const [project, setProject] = useState<MissionProject | null>(null);
   const [sections, setSections] = useState<MissionSection[]>([]);
   const [missions, setMissions] = useState<Mission[]>([]);
-  const [progress, setProgress] = useState<MissionProjectProgress>({ completedCount: 0, eligibleCount: 0, percent: 0 });
+  const [progress, setProgress] = useState<MissionProjectProgress>({
+    completedCount: 0,
+    eligibleCount: 0,
+    percent: 0,
+  });
   const [nextAction, setNextAction] = useState<Mission | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);

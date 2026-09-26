@@ -47,7 +47,10 @@ export function MissionActivityTimeline({ activity }: MissionActivityTimelinePro
           component="li"
           direction="row"
           spacing={1.5}
-          sx={(theme) => ({ borderLeft: `2px solid ${themePalette(theme).kokyu.border.default}`, pl: 1.5 })}
+          sx={(theme) => ({
+            borderLeft: `2px solid ${themePalette(theme).kokyu.border.default}`,
+            pl: 1.5,
+          })}
         >
           <Stack spacing={0.25}>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>

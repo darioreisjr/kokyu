@@ -34,9 +34,7 @@ export function deriveHabitOccurrence(
     periodEnd = range.end;
   }
 
-  const dayLogs = logs.filter(
-    (log) => log.habitId === habit.id && log.date === date,
-  );
+  const dayLogs = logs.filter((log) => log.habitId === habit.id && log.date === date);
 
   const hasSkipped = dayLogs.some((l) => l.status === 'skipped');
 
@@ -178,7 +176,7 @@ export function deriveHabitOccurrence(
         status = 'partial';
       }
 
-      const allowOver = target.type === 'quantity' ? target.allowOverachievement ?? true : false;
+      const allowOver = target.type === 'quantity' ? (target.allowOverachievement ?? true) : false;
       const rawPercent = targetVal > 0 ? Math.round((totalLogged / targetVal) * 100) : 0;
       const progressPercent = allowOver ? rawPercent : Math.min(100, rawPercent);
 

@@ -8,7 +8,7 @@ import { minutesToTime } from '@/shared/scheduling/utils/timeHelpers';
 
 export interface NowIndicatorProps {
   dayStartMinutes?: number; // default e.g. 360 (06:00)
-  hourHeight?: number;      // default 64px
+  hourHeight?: number; // default 64px
 }
 
 export function NowIndicator({
@@ -91,4 +91,3 @@ export function NowIndicator({
     </Box>
   );
 }
-

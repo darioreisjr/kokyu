@@ -222,4 +222,3 @@ export function resetScheduleDb(): void {
   scheduleDb.focusHistory = [];
   scheduleDb.activities = [];
 }
-

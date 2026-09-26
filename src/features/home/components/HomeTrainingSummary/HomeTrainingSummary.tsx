@@ -17,7 +17,11 @@ const STATUS_LABEL: Record<string, string> = {
   rest: 'Descanso',
 };
 
-export function HomeTrainingSummary({ result, isLoading = false, onOpen }: HomeTrainingSummaryProps) {
+export function HomeTrainingSummary({
+  result,
+  isLoading = false,
+  onOpen,
+}: HomeTrainingSummaryProps) {
   const data = result.data;
   const isEmpty = data !== null && !data.today && !data.next;
   const entry = data?.today ?? data?.next ?? null;

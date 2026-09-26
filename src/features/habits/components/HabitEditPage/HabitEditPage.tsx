@@ -40,9 +40,7 @@ export interface HabitEditPageProps {
 export function HabitEditPage({ habitId }: HabitEditPageProps) {
   const router = useRouter();
   const { habit, isLoading } = useHabit(habitId);
-  const [effectiveDate, setEffectiveDate] = useState(
-    new Date().toISOString().split('T')[0]!,
-  );
+  const [effectiveDate, setEffectiveDate] = useState(new Date().toISOString().split('T')[0]!);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<HabitFormValues>({
@@ -50,7 +48,14 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
     defaultValues: habitFormDefaultValues,
   });
 
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = form;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
 
   useEffect(() => {
     if (habit) {
@@ -66,7 +71,8 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
         maxLimit: 'maxLimit' in habit.target ? habit.target.maxLimit : 2,
         unit: 'unit' in habit.target && habit.target.unit ? habit.target.unit : 'times',
         customUnitLabel: 'customUnitLabel' in habit.target ? habit.target.customUnitLabel : '',
-        allowOverachievement: 'allowOverachievement' in habit.target ? habit.target.allowOverachievement : true,
+        allowOverachievement:
+          'allowOverachievement' in habit.target ? habit.target.allowOverachievement : true,
         limitPeriod: 'period' in habit.target ? habit.target.period : 'week',
         frequencyType: habit.schedule.frequencyType,
         weekdays: habit.schedule.weekdays ?? [1, 2, 3, 4, 5],
@@ -264,11 +270,7 @@ export function HabitEditPage({ habitId }: HabitEditPageProps) {
                   {...register('motivation')}
                 />
 
-                <TextField
-                  fullWidth
-                  label="Gatilho (Depois de...)"
-                  {...register('cue')}
-                />
+                <TextField fullWidth label="Gatilho (Depois de...)" {...register('cue')} />
 
                 <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end', pt: 2 }}>
                   <Button component={NextLink} href={habitRoutes.detail(habitId)} color="inherit">

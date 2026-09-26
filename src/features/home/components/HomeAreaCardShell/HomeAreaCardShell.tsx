@@ -38,7 +38,10 @@ export function HomeAreaCardShell({
     <HomeSectionCard compact muted={status !== 'success' || isEmpty}>
       <Stack spacing={1}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Icon fontSize="small" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })} />
+          <Icon
+            fontSize="small"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+          />
           <Typography variant="labelLarge" component="h3">
             {title}
           </Typography>
@@ -50,18 +53,29 @@ export function HomeAreaCardShell({
             <Skeleton variant="text" width="40%" />
           </Stack>
         ) : status === 'error' ? (
-          <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.disabled })}>
+          <Typography
+            variant="caption"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.disabled })}
+          >
             Não foi possível carregar agora.
           </Typography>
         ) : isEmpty ? (
-          <Typography variant="caption" sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}>
+          <Typography
+            variant="caption"
+            sx={(theme) => ({ color: themePalette(theme).kokyu.text.secondary })}
+          >
             {emptyMessage}
           </Typography>
         ) : (
           children
         )}
 
-        <KokyuButton size="small" variant="text" sx={{ alignSelf: 'flex-start', mt: 0.5 }} onClick={onOpen}>
+        <KokyuButton
+          size="small"
+          variant="text"
+          sx={{ alignSelf: 'flex-start', mt: 0.5 }}
+          onClick={onOpen}
+        >
           {actionLabel}
         </KokyuButton>
       </Stack>

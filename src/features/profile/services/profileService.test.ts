@@ -14,9 +14,8 @@ vi.mock('./avatarUploadService', () => ({
   removeAvatarUpload: mockRemoveAvatarUpload,
 }));
 
-const { mapCurrentUserToProfile, mapFormDataToPayload, profileService } = await import(
-  './profileService'
-);
+const { mapCurrentUserToProfile, mapFormDataToPayload, profileService } =
+  await import('./profileService');
 
 const baseCurrentUser: CurrentUser = {
   id: 'mock-user',

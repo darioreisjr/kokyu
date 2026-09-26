@@ -121,9 +121,12 @@ export function HabitProgressPage() {
         <Card variant="outlined" sx={{ borderRadius: 3, p: 2 }}>
           <CardContent>
             <Stack spacing={2.5}>
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>Ritmo Semanal</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                Ritmo Semanal
+              </Typography>
               <Typography variant="body2" color="text.secondary">
-                Percentual médio de cumprimento dos hábitos em cada dia da semana nas últimas 4 semanas:
+                Percentual médio de cumprimento dos hábitos em cada dia da semana nas últimas 4
+                semanas:
               </Typography>
 
               <Grid container spacing={2}>
@@ -158,7 +161,9 @@ export function HabitProgressPage() {
         <Card variant="outlined" sx={{ borderRadius: 3, p: 2 }}>
           <CardContent>
             <Stack spacing={2.5}>
-              <Typography variant="h5" sx={{ fontWeight: 600 }}>Distribuição por Áreas da Vida</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                Distribuição por Áreas da Vida
+              </Typography>
 
               <Grid container spacing={2}>
                 {analytics.areaDistribution.map((item) => (

@@ -18,7 +18,13 @@ const baseEntry: ScheduleEntry = {
   updatedAt: '2026-09-04T00:00:00Z',
 };
 
-const freeSlot: FreeTimeSlot = { id: 'slot-1', date: '2026-09-04', startAt: '14:00', endAt: '14:45', duration: 45 };
+const freeSlot: FreeTimeSlot = {
+  id: 'slot-1',
+  date: '2026-09-04',
+  startAt: '14:00',
+  endAt: '14:45',
+  duration: 45,
+};
 
 function noop() {}
 async function noopAsync() {}

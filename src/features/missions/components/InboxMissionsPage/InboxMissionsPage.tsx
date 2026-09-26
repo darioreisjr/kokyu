@@ -32,16 +32,37 @@ function InboxItemActions({ mission, onProcessed }: { mission: Mission; onProces
 
   return (
     <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
-      <KokyuButton size="small" variant="outlined" disabled={busy} onClick={() => run({ type: 'doToday', plannedDate: today })}>
+      <KokyuButton
+        size="small"
+        variant="outlined"
+        disabled={busy}
+        onClick={() => run({ type: 'doToday', plannedDate: today })}
+      >
         Fazer hoje
       </KokyuButton>
-      <KokyuButton size="small" variant="outlined" disabled={busy} onClick={() => run({ type: 'backlog' })}>
+      <KokyuButton
+        size="small"
+        variant="outlined"
+        disabled={busy}
+        onClick={() => run({ type: 'backlog' })}
+      >
         Backlog
       </KokyuButton>
-      <KokyuButton size="small" variant="outlined" disabled={busy} onClick={() => run({ type: 'setPriority', priority: 'high' })}>
+      <KokyuButton
+        size="small"
+        variant="outlined"
+        disabled={busy}
+        onClick={() => run({ type: 'setPriority', priority: 'high' })}
+      >
         Prioridade alta
       </KokyuButton>
-      <KokyuButton size="small" color="error" variant="text" disabled={busy} onClick={() => run({ type: 'delete' })}>
+      <KokyuButton
+        size="small"
+        color="error"
+        variant="text"
+        disabled={busy}
+        onClick={() => run({ type: 'delete' })}
+      >
         Excluir
       </KokyuButton>
     </Stack>
@@ -81,7 +102,10 @@ export function InboxMissionsPage() {
           <Stack spacing={2}>
             {missions.map((mission) => (
               <Stack key={mission.id} spacing={1} data-testid={`inbox-item-${mission.id}`}>
-                <MissionRow mission={mission} projectName={projects.find((p) => p.id === mission.projectId)?.name} />
+                <MissionRow
+                  mission={mission}
+                  projectName={projects.find((p) => p.id === mission.projectId)?.name}
+                />
                 <InboxItemActions mission={mission} onProcessed={refresh} />
               </Stack>
             ))}

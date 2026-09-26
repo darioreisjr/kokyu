@@ -21,7 +21,12 @@ export interface MissionCardProps {
 }
 
 /** Used only where a view justifies a card (Board/Eisenhower) — spec "NÃO TRANSFORMAR TODA MISSION EM CARD". */
-export function MissionCard({ mission, projectName, goalLabel, dependenciesCount }: MissionCardProps) {
+export function MissionCard({
+  mission,
+  projectName,
+  goalLabel,
+  dependenciesCount,
+}: MissionCardProps) {
   return (
     <Card
       variant="outlined"
@@ -33,7 +38,11 @@ export function MissionCard({ mission, projectName, goalLabel, dependenciesCount
             component={NextLink}
             href={missionRoutes.detail(mission.id)}
             variant="subtitle2"
-            sx={(theme) => ({ color: themePalette(theme).kokyu.text.primary, textDecoration: 'none', fontWeight: 600 })}
+            sx={(theme) => ({
+              color: themePalette(theme).kokyu.text.primary,
+              textDecoration: 'none',
+              fontWeight: 600,
+            })}
           >
             {mission.title}
           </Typography>
@@ -48,7 +57,10 @@ export function MissionCard({ mission, projectName, goalLabel, dependenciesCount
 
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
             <MissionPriorityBadge priority={mission.priority} importance={mission.importance} />
-            <MissionDuration estimatedDuration={mission.estimatedDuration} actualDurationMinutes={mission.actualDurationMinutes} />
+            <MissionDuration
+              estimatedDuration={mission.estimatedDuration}
+              actualDurationMinutes={mission.actualDurationMinutes}
+            />
             {!!dependenciesCount && (
               <Typography variant="caption" color="error">
                 Bloqueada por {dependenciesCount}

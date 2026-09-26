@@ -1,8 +1,4 @@
-import type {
-  InboxConversionTarget,
-  ScheduleInboxItem,
-  ScheduleInboxItemInput,
-} from '../types';
+import type { InboxConversionTarget, ScheduleInboxItem, ScheduleInboxItemInput } from '../types';
 import { generateScheduleId, scheduleDb } from './scheduleMockDb';
 
 export const scheduleInboxService = {
@@ -64,4 +60,3 @@ export const scheduleInboxService = {
     return updated;
   },
 };
-

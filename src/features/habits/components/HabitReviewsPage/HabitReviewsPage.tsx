@@ -81,10 +81,7 @@ export function HabitReviewsPage() {
             title="Nenhuma revisão realizada"
             description="Faça sua primeira revisão periódica para avaliar o que funcionou e o que pode ser calibrado."
             action={
-              <KokyuButton
-                variant="contained"
-                onClick={() => setIsDialogOpen(true)}
-              >
+              <KokyuButton variant="contained" onClick={() => setIsDialogOpen(true)}>
                 Iniciar primeira revisão
               </KokyuButton>
             }
@@ -118,7 +115,11 @@ export function HabitReviewsPage() {
                     <Stack spacing={1.5} sx={{ pt: 1 }}>
                       {rev.reflections.whatWorked && (
                         <Box>
-                          <Typography variant="subtitle2" color="success.main" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            color="success.main"
+                            sx={{ fontWeight: 600 }}
+                          >
                             O que funcionou:
                           </Typography>
                           <Typography variant="body2">{rev.reflections.whatWorked}</Typography>
@@ -127,7 +128,11 @@ export function HabitReviewsPage() {
 
                       {rev.reflections.whatWasHard && (
                         <Box>
-                          <Typography variant="subtitle2" color="warning.main" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            color="warning.main"
+                            sx={{ fontWeight: 600 }}
+                          >
                             O que foi difícil:
                           </Typography>
                           <Typography variant="body2">{rev.reflections.whatWasHard}</Typography>
@@ -136,7 +141,11 @@ export function HabitReviewsPage() {
 
                       {rev.reflections.changesPlanned && (
                         <Box>
-                          <Typography variant="subtitle2" color="primary.main" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            color="primary.main"
+                            sx={{ fontWeight: 600 }}
+                          >
                             Mudanças planejadas:
                           </Typography>
                           <Typography variant="body2">{rev.reflections.changesPlanned}</Typography>

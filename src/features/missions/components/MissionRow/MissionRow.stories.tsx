@@ -33,7 +33,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = { args: { mission: buildMission() } };
 
 export const Scheduled: Story = {
-  args: { mission: buildMission({ plannedDate: '2026-09-10', scheduledStartAt: '09:00', estimatedDuration: 60 }) },
+  args: {
+    mission: buildMission({
+      plannedDate: '2026-09-10',
+      scheduledStartAt: '09:00',
+      estimatedDuration: 60,
+    }),
+  },
 };
 
 export const Deadline: Story = {
@@ -57,7 +63,9 @@ export const Blocked: Story = {
 };
 
 export const Recurring: Story = {
-  args: { mission: buildMission({ recurrenceRule: { frequency: 'monthly', basis: 'scheduledDate' } }) },
+  args: {
+    mission: buildMission({ recurrenceRule: { frequency: 'monthly', basis: 'scheduledDate' } }),
+  },
 };
 
 export const Completed: Story = {

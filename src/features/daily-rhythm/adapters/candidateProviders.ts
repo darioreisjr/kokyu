@@ -61,7 +61,9 @@ export const habitCandidateProvider: ScheduleCandidateProvider = {
   async getCandidatesForSlot(availableMinutes: number): Promise<ScheduleCandidate[]> {
     const habits = await habitService.getHabits();
     return habits
-      .filter((h) => (h.estimatedDurationMinutes ?? 15) <= availableMinutes && h.status === 'active')
+      .filter(
+        (h) => (h.estimatedDurationMinutes ?? 15) <= availableMinutes && h.status === 'active',
+      )
       .map((h) => ({
         id: `candidate-habit-${h.id}`,
         sourceType: 'habit',
@@ -80,7 +82,10 @@ export const habitCandidateProvider: ScheduleCandidateProvider = {
 export const missionCandidateProvider: ScheduleCandidateProvider = {
   sourceType: 'mission',
   label: 'Missões',
-  async getCandidatesForSlot(availableMinutes: number, date?: string): Promise<ScheduleCandidate[]> {
+  async getCandidatesForSlot(
+    availableMinutes: number,
+    date?: string,
+  ): Promise<ScheduleCandidate[]> {
     const targetDate = date ?? new Date().toISOString().split('T')[0]!;
     const unscheduled = await missionScheduleAdapter.getUnscheduledEntries!(targetDate);
     return unscheduled
@@ -118,4 +123,3 @@ export async function getCandidatesForAvailableTime(
   );
   return lists.flat();
 }
-

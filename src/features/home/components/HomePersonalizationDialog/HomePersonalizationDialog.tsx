@@ -43,7 +43,12 @@ export interface HomePersonalizationDialogProps {
  * `SettingsToggle` for the same reason). "Agora"/"Próximo" stay pinned
  * and can't be hidden — see spec's "NÃO PERMITIR REMOVER AGORA".
  */
-export function HomePersonalizationDialog({ open, onClose, value, onChange }: HomePersonalizationDialogProps) {
+export function HomePersonalizationDialog({
+  open,
+  onClose,
+  value,
+  onChange,
+}: HomePersonalizationDialogProps) {
   const reorderableSections = value.sectionOrder.filter(
     (id) => !HOME_ESSENTIAL_SECTIONS.includes(id),
   );
@@ -68,7 +73,13 @@ export function HomePersonalizationDialog({ open, onClose, value, onChange }: Ho
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="home-personalization-title">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      aria-labelledby="home-personalization-title"
+    >
       <DialogTitle
         id="home-personalization-title"
         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}

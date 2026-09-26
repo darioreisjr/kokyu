@@ -62,7 +62,9 @@ test.describe('Respiração (Home)', () => {
 test.describe('Respiração — mobile', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('renders Agora/Próximo/Em foco/Áreas/Adicionar without horizontal overflow', async ({ page }) => {
+  test('renders Agora/Próximo/Em foco/Áreas/Adicionar without horizontal overflow', async ({
+    page,
+  }) => {
     await page.goto('/app');
 
     await expect(page.getByRole('heading', { name: 'Agora' })).toBeVisible();

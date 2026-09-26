@@ -20,7 +20,12 @@ export interface MissionRowProps {
 }
 
 /** Compact — the primary presentation for volume (spec "LIST VIEW"/"NÃO TRANSFORMAR TODA MISSION EM CARD"). */
-export function MissionRow({ mission, projectName, blockedByCount = 0, onToggleComplete }: MissionRowProps) {
+export function MissionRow({
+  mission,
+  projectName,
+  blockedByCount = 0,
+  onToggleComplete,
+}: MissionRowProps) {
   const isCompleted = mission.status === 'completed';
   const isBlocked = mission.status === 'blocked' || blockedByCount > 0;
 
@@ -40,7 +45,11 @@ export function MissionRow({ mission, projectName, blockedByCount = 0, onToggleC
       <Checkbox
         checked={isCompleted}
         onChange={() => onToggleComplete?.(mission)}
-        slotProps={{ input: { 'aria-label': `Marcar "${mission.title}" como ${isCompleted ? 'não concluída' : 'concluída'}` } }}
+        slotProps={{
+          input: {
+            'aria-label': `Marcar "${mission.title}" como ${isCompleted ? 'não concluída' : 'concluída'}`,
+          },
+        }}
       />
 
       <Stack spacing={0.25} sx={{ flex: 1, minWidth: 0 }}>
@@ -51,7 +60,9 @@ export function MissionRow({ mission, projectName, blockedByCount = 0, onToggleC
             variant="body1"
             sx={(theme) => ({
               textDecoration: isCompleted ? 'line-through' : 'none',
-              color: isCompleted ? themePalette(theme).kokyu.text.secondary : themePalette(theme).kokyu.text.primary,
+              color: isCompleted
+                ? themePalette(theme).kokyu.text.secondary
+                : themePalette(theme).kokyu.text.primary,
               fontWeight: 500,
             })}
           >
@@ -66,14 +77,20 @@ export function MissionRow({ mission, projectName, blockedByCount = 0, onToggleC
 
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
           <MissionDateInfo mission={mission} />
-          <MissionDuration estimatedDuration={mission.estimatedDuration} actualDurationMinutes={mission.actualDurationMinutes} />
+          <MissionDuration
+            estimatedDuration={mission.estimatedDuration}
+            actualDurationMinutes={mission.actualDurationMinutes}
+          />
         </Stack>
       </Stack>
 
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexShrink: 0 }}>
         {isBlocked && (
           <Typography variant="caption" color="error" role="status">
-            Bloqueada{blockedByCount > 0 ? ` por ${blockedByCount} missõe${blockedByCount > 1 ? 's' : ''}` : ''}
+            Bloqueada
+            {blockedByCount > 0
+              ? ` por ${blockedByCount} missõe${blockedByCount > 1 ? 's' : ''}`
+              : ''}
           </Typography>
         )}
         {mission.status === 'waiting' && (

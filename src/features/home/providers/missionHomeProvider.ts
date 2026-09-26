@@ -21,7 +21,11 @@ const PRIORITY_RANK: Record<Mission['priority'], number> = {
 };
 
 function isMissionOpen(mission: Mission): boolean {
-  return mission.status !== 'completed' && mission.status !== 'cancelled' && mission.status !== 'archived';
+  return (
+    mission.status !== 'completed' &&
+    mission.status !== 'cancelled' &&
+    mission.status !== 'archived'
+  );
 }
 
 function resolveStatus(mission: Mission, today: string): MissionHomeStatus {
@@ -73,8 +77,11 @@ export const missionHomeProvider: HomeSectionProvider<MissionHomeProjection> = {
         .filter(isMissionOpen)
         .filter((m) => m.id !== focusMission?.id)
         .filter((m) => m.deadline ?? m.plannedDate)
-        .sort((a, b) => (a.deadline ?? a.plannedDate ?? '9999-99-99').localeCompare(b.deadline ?? b.plannedDate ?? '9999-99-99'))[0] ??
-      null;
+        .sort((a, b) =>
+          (a.deadline ?? a.plannedDate ?? '9999-99-99').localeCompare(
+            b.deadline ?? b.plannedDate ?? '9999-99-99',
+          ),
+        )[0] ?? null;
 
     const pendingCount = todayMissions.filter((m) => resolveStatus(m, today) === 'pending').length;
     const completedCount = todayMissions.filter((m) => m.status === 'completed').length;

@@ -25,7 +25,11 @@ const STATUS_LABELS: Record<MissionProject['status'], string> = {
   archived: 'Arquivado',
 };
 
-export function MissionProjectCard({ project, progress, nextActionTitle }: MissionProjectCardProps) {
+export function MissionProjectCard({
+  project,
+  progress,
+  nextActionTitle,
+}: MissionProjectCardProps) {
   return (
     <Card
       variant="outlined"
@@ -41,7 +45,11 @@ export function MissionProjectCard({ project, progress, nextActionTitle }: Missi
     >
       <CardContent>
         <Stack spacing={1.5}>
-          <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+          >
             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
               {project.name}
             </Typography>

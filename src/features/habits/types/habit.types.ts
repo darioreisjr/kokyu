@@ -2,14 +2,7 @@ import type { HabitSchedule, HabitScheduleVersion } from './schedule.types';
 
 /** The area of life a habit belongs to — compatible with Kokyu modules and goals. */
 export type HabitArea =
-  | 'routine'
-  | 'work'
-  | 'training'
-  | 'nutrition'
-  | 'habits'
-  | 'leisure'
-  | 'personal'
-  | 'other';
+  'routine' | 'work' | 'training' | 'nutrition' | 'habits' | 'leisure' | 'personal' | 'other';
 
 /**
  * Direction defines the intent of the habit:
@@ -29,12 +22,7 @@ export type HabitDirection = 'build' | 'reduce' | 'observe';
  * - 'automatic': Fed automatically by another Kokyu module
  */
 export type HabitTrackingType =
-  | 'binary'
-  | 'count'
-  | 'quantity'
-  | 'duration'
-  | 'limit'
-  | 'automatic';
+  'binary' | 'count' | 'quantity' | 'duration' | 'limit' | 'automatic';
 
 export type HabitStatus = 'active' | 'paused' | 'completed' | 'archived';
 
@@ -56,17 +44,11 @@ export type HabitTimeOfDay = 'morning' | 'afternoon' | 'evening' | 'anytime' | '
 
 export interface HabitTimeWindow {
   startTime: string; // "07:00"
-  endTime: string;   // "09:00"
+  endTime: string; // "09:00"
 }
 
 export type HabitProgressSource =
-  | 'manual'
-  | 'training'
-  | 'nutrition'
-  | 'leisure'
-  | 'missions'
-  | 'schedule'
-  | 'external';
+  'manual' | 'training' | 'nutrition' | 'leisure' | 'missions' | 'schedule' | 'external';
 
 export interface HabitSourceRef {
   module: HabitProgressSource;
@@ -85,7 +67,7 @@ export interface HabitReminder {
 
 export interface HabitPlannedPause {
   startDate: string; // "yyyy-MM-dd"
-  endDate?: string;  // "yyyy-MM-dd"
+  endDate?: string; // "yyyy-MM-dd"
   reason?: string;
 }
 
@@ -155,7 +137,7 @@ export interface Habit {
   estimatedDurationMinutes?: number;
   minimumDurationMinutes?: number;
   startDate: string; // "yyyy-MM-dd"
-  endDate?: string;  // "yyyy-MM-dd"
+  endDate?: string; // "yyyy-MM-dd"
   priority?: HabitPriority;
   colorToken?: string;
   icon: string; // e.g. "AutoStoriesRounded", "FitnessCenterRounded"
@@ -175,4 +157,3 @@ export interface Habit {
   archivedAt?: string;
   pausedAt?: string;
 }
-

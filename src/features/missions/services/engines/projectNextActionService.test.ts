@@ -35,7 +35,9 @@ describe('projectNextActionService', () => {
 
   it('never returns a blocked mission', () => {
     const missions = [buildMission({ id: 'a', deadline: '2026-09-01' }), buildMission({ id: 'b' })];
-    const deps: MissionDependency[] = [{ id: 'd1', blockerMissionId: 'b', blockedMissionId: 'a', createdAt: '2026-09-01T00:00:00Z' }];
+    const deps: MissionDependency[] = [
+      { id: 'd1', blockerMissionId: 'b', blockedMissionId: 'a', createdAt: '2026-09-01T00:00:00Z' },
+    ];
     expect(getProjectNextAction('project-1', missions, deps)?.id).toBe('b');
   });
 

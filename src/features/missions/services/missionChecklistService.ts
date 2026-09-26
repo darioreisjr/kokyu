@@ -34,7 +34,11 @@ export const missionChecklistService = {
   ): Promise<MissionChecklistItem | null> {
     const index = missionDb.checklistItems.findIndex((item) => item.id === id);
     if (index === -1) return null;
-    const updated: MissionChecklistItem = { ...missionDb.checklistItems[index]!, ...patch, updatedAt: nowIso() };
+    const updated: MissionChecklistItem = {
+      ...missionDb.checklistItems[index]!,
+      ...patch,
+      updatedAt: nowIso(),
+    };
     missionDb.checklistItems[index] = updated;
     return { ...updated };
   },

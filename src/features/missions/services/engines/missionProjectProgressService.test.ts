@@ -33,10 +33,18 @@ describe('missionProjectProgressService', () => {
       buildMission({ id: 'e', projectId: 'other-project', status: 'completed' }),
     ];
 
-    expect(calculateProjectProgress('project-1', missions)).toEqual({ completedCount: 1, eligibleCount: 2, percent: 50 });
+    expect(calculateProjectProgress('project-1', missions)).toEqual({
+      completedCount: 1,
+      eligibleCount: 2,
+      percent: 50,
+    });
   });
 
   it('returns 0% for a project with no eligible missions', () => {
-    expect(calculateProjectProgress('empty-project', [])).toEqual({ completedCount: 0, eligibleCount: 0, percent: 0 });
+    expect(calculateProjectProgress('empty-project', [])).toEqual({
+      completedCount: 0,
+      eligibleCount: 0,
+      percent: 0,
+    });
   });
 });

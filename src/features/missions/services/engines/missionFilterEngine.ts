@@ -1,4 +1,10 @@
-import type { Mission, MissionDependency, MissionFilters, MissionGroupField, MissionSort } from '../../types';
+import type {
+  Mission,
+  MissionDependency,
+  MissionFilters,
+  MissionGroupField,
+  MissionSort,
+} from '../../types';
 import { isMissionAvailable, isMissionTerminal } from '../../utils/missionDateStatus';
 import { isMissionBlocked, type MissionStatusById } from './missionDependencyEngine';
 
@@ -16,13 +22,21 @@ export function applyMissionFilters(
 
   return missions.filter((mission) => {
     if (filters.status && !filters.status.includes(mission.status)) return false;
-    if (filters.projectId && !(mission.projectId && filters.projectId.includes(mission.projectId))) return false;
-    if (filters.sectionId && !(mission.sectionId && filters.sectionId.includes(mission.sectionId))) return false;
-    if (filters.areaId && !(mission.areaId && filters.areaId.includes(mission.areaId))) return false;
+    if (filters.projectId && !(mission.projectId && filters.projectId.includes(mission.projectId)))
+      return false;
+    if (filters.sectionId && !(mission.sectionId && filters.sectionId.includes(mission.sectionId)))
+      return false;
+    if (filters.areaId && !(mission.areaId && filters.areaId.includes(mission.areaId)))
+      return false;
     if (filters.priority && !filters.priority.includes(mission.priority)) return false;
-    if (filters.importance && !(mission.importance && filters.importance.includes(mission.importance))) return false;
+    if (
+      filters.importance &&
+      !(mission.importance && filters.importance.includes(mission.importance))
+    )
+      return false;
     if (filters.tagId && !filters.tagId.some((id) => mission.tagIds.includes(id))) return false;
-    if (filters.contextId && !filters.contextId.some((id) => mission.contextIds.includes(id))) return false;
+    if (filters.contextId && !filters.contextId.some((id) => mission.contextIds.includes(id)))
+      return false;
     if (
       filters.energyRequirement &&
       !(mission.energyRequirement && filters.energyRequirement.includes(mission.energyRequirement))
@@ -30,19 +44,32 @@ export function applyMissionFilters(
       return false;
     }
     if (filters.goalId && !filters.goalId.some((id) => mission.goalIds.includes(id))) return false;
-    if (filters.durationMax !== undefined && (mission.estimatedDuration ?? Infinity) > filters.durationMax) return false;
-    if (filters.durationMin !== undefined && (mission.estimatedDuration ?? 0) < filters.durationMin) return false;
-    if (filters.waiting !== undefined && (mission.status === 'waiting') !== filters.waiting) return false;
-    if (filters.recurring !== undefined && !!mission.recurrenceRule !== filters.recurring) return false;
-    if (filters.available !== undefined && isMissionAvailable(mission, context.today) !== filters.available) return false;
+    if (
+      filters.durationMax !== undefined &&
+      (mission.estimatedDuration ?? Infinity) > filters.durationMax
+    )
+      return false;
+    if (filters.durationMin !== undefined && (mission.estimatedDuration ?? 0) < filters.durationMin)
+      return false;
+    if (filters.waiting !== undefined && (mission.status === 'waiting') !== filters.waiting)
+      return false;
+    if (filters.recurring !== undefined && !!mission.recurrenceRule !== filters.recurring)
+      return false;
+    if (
+      filters.available !== undefined &&
+      isMissionAvailable(mission, context.today) !== filters.available
+    )
+      return false;
     if (filters.blocked !== undefined) {
       const blocked = isMissionBlocked(mission.id, context.dependencies, statusById);
       if (blocked !== filters.blocked) return false;
     }
     if (filters.plannedDateRange) {
       if (!mission.plannedDate) return false;
-      if (filters.plannedDateRange.from && mission.plannedDate < filters.plannedDateRange.from) return false;
-      if (filters.plannedDateRange.to && mission.plannedDate > filters.plannedDateRange.to) return false;
+      if (filters.plannedDateRange.from && mission.plannedDate < filters.plannedDateRange.from)
+        return false;
+      if (filters.plannedDateRange.to && mission.plannedDate > filters.plannedDateRange.to)
+        return false;
     }
     if (filters.deadlineRange) {
       if (!mission.deadline) return false;
@@ -57,7 +84,13 @@ export function applyMissionFilters(
   });
 }
 
-const PRIORITY_RANK: Record<Mission['priority'], number> = { critical: 4, high: 3, medium: 2, low: 1, none: 0 };
+const PRIORITY_RANK: Record<Mission['priority'], number> = {
+  critical: 4,
+  high: 3,
+  medium: 2,
+  low: 1,
+  none: 0,
+};
 
 function compareBy(field: MissionSort['field'], a: Mission, b: Mission): number {
   switch (field) {
@@ -122,9 +155,13 @@ export function groupMissions(
       case 'priority':
         return { key: mission.priority, label: mission.priority };
       case 'area':
-        return mission.areaId ? { key: mission.areaId, label: mission.areaId } : { key: 'no-area', label: 'Sem área' };
+        return mission.areaId
+          ? { key: mission.areaId, label: mission.areaId }
+          : { key: 'no-area', label: 'Sem área' };
       case 'date':
-        return mission.plannedDate ? { key: mission.plannedDate, label: mission.plannedDate } : { key: 'no-date', label: 'Sem data' };
+        return mission.plannedDate
+          ? { key: mission.plannedDate, label: mission.plannedDate }
+          : { key: 'no-date', label: 'Sem data' };
       default:
         return { key: 'all', label: 'Todas' };
     }

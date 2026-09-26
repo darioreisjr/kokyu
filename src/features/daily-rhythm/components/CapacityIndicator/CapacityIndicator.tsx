@@ -14,7 +14,10 @@ export interface CapacityIndicatorProps {
   compact?: boolean;
 }
 
-const STATUS_LABELS: Record<CapacityStatus, { label: string; color: 'success' | 'info' | 'warning' | 'error' }> = {
+const STATUS_LABELS: Record<
+  CapacityStatus,
+  { label: string; color: 'success' | 'info' | 'warning' | 'error' }
+> = {
   light: { label: 'Leve', color: 'info' },
   balanced: { label: 'Equilibrado', color: 'success' },
   full: { label: 'Cheio', color: 'warning' },
@@ -96,4 +99,3 @@ export function CapacityIndicator({ capacity, compact = false }: CapacityIndicat
     </Box>
   );
 }
-

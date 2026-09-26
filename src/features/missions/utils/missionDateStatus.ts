@@ -1,7 +1,11 @@
 import type { Mission, MissionDerivedFlags } from '../types';
 
 export function isMissionTerminal(mission: Mission): boolean {
-  return mission.status === 'completed' || mission.status === 'cancelled' || mission.status === 'archived';
+  return (
+    mission.status === 'completed' ||
+    mission.status === 'cancelled' ||
+    mission.status === 'archived'
+  );
 }
 
 /** A mission is unavailable before `availableFrom` — spec "AVAILABLE FROM". No `availableFrom` means always available. */
@@ -41,7 +45,10 @@ export interface MissionDerivedFlagsContext {
   isScheduledToday: boolean;
 }
 
-export function computeMissionDerivedFlags(mission: Mission, context: MissionDerivedFlagsContext): MissionDerivedFlags {
+export function computeMissionDerivedFlags(
+  mission: Mission,
+  context: MissionDerivedFlagsContext,
+): MissionDerivedFlags {
   return {
     overdue: isMissionOverdue(mission, context.today),
     dueToday: isMissionDueToday(mission, context.today),

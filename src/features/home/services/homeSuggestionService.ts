@@ -8,7 +8,10 @@ import type { HomeSuggestion } from '@/shared/home/types';
  * already makes for "preencher tempo livre") instead of a second
  * candidate/matching algorithm. This only ranks what that call returns.
  */
-export async function getHomeSuggestions(availableMinutes: number, date?: string): Promise<HomeSuggestion[]> {
+export async function getHomeSuggestions(
+  availableMinutes: number,
+  date?: string,
+): Promise<HomeSuggestion[]> {
   const candidates = await getCandidatesForAvailableTime(availableMinutes, date);
 
   return candidates
@@ -29,6 +32,8 @@ export async function getHomeSuggestions(availableMinutes: number, date?: string
 
       return { candidate, reason, fitType, weight };
     })
-    .sort((a, b) => b.weight - a.weight || a.candidate.durationMinutes - b.candidate.durationMinutes)
+    .sort(
+      (a, b) => b.weight - a.weight || a.candidate.durationMinutes - b.candidate.durationMinutes,
+    )
     .map(({ weight: _weight, ...suggestion }) => suggestion);
 }

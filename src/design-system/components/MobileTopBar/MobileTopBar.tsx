@@ -74,7 +74,12 @@ export function MobileTopBar({ title, onMenuClick, user }: MobileTopBarProps) {
                 },
               }}
             >
-              <KokyuAvatar src={user.avatarUrl} alt={user.name} initials={user.initials} size="xs" />
+              <KokyuAvatar
+                src={user.avatarUrl}
+                alt={user.name}
+                initials={user.initials}
+                size="xs"
+              />
             </IconButton>
           </Box>
         ) : null}

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { Mission } from '../../types';
-import { computeNextOccurrenceDate, generateNextOccurrence, hasRecurrenceEnded } from './missionRecurrenceEngine';
+import {
+  computeNextOccurrenceDate,
+  generateNextOccurrence,
+  hasRecurrenceEnded,
+} from './missionRecurrenceEngine';
 
 function buildRecurringMission(overrides: Partial<Mission> = {}): Mission {
   return {
@@ -28,42 +32,70 @@ function buildRecurringMission(overrides: Partial<Mission> = {}): Mission {
 
 describe('missionRecurrenceEngine', () => {
   it('computes the next date for every supported frequency', () => {
-    expect(computeNextOccurrenceDate({ frequency: 'daily', basis: 'scheduledDate' }, '2026-09-01')).toBe('2026-09-02');
-    expect(computeNextOccurrenceDate({ frequency: 'weekly', basis: 'scheduledDate' }, '2026-09-01')).toBe('2026-09-08');
-    expect(computeNextOccurrenceDate({ frequency: 'monthly', basis: 'scheduledDate' }, '2026-09-01')).toBe('2026-10-01');
-    expect(computeNextOccurrenceDate({ frequency: 'yearly', basis: 'scheduledDate' }, '2026-09-01')).toBe('2027-09-01');
-    expect(computeNextOccurrenceDate({ frequency: 'customInterval', intervalDays: 10, basis: 'scheduledDate' }, '2026-09-01')).toBe(
-      '2026-09-11',
-    );
+    expect(
+      computeNextOccurrenceDate({ frequency: 'daily', basis: 'scheduledDate' }, '2026-09-01'),
+    ).toBe('2026-09-02');
+    expect(
+      computeNextOccurrenceDate({ frequency: 'weekly', basis: 'scheduledDate' }, '2026-09-01'),
+    ).toBe('2026-09-08');
+    expect(
+      computeNextOccurrenceDate({ frequency: 'monthly', basis: 'scheduledDate' }, '2026-09-01'),
+    ).toBe('2026-10-01');
+    expect(
+      computeNextOccurrenceDate({ frequency: 'yearly', basis: 'scheduledDate' }, '2026-09-01'),
+    ).toBe('2027-09-01');
+    expect(
+      computeNextOccurrenceDate(
+        { frequency: 'customInterval', intervalDays: 10, basis: 'scheduledDate' },
+        '2026-09-01',
+      ),
+    ).toBe('2026-09-11');
   });
 
   it('weekdays frequency always skips Saturday/Sunday', () => {
     // 2026-09-04 is a Friday
-    expect(computeNextOccurrenceDate({ frequency: 'weekdays', basis: 'scheduledDate' }, '2026-09-04')).toBe('2026-09-07');
+    expect(
+      computeNextOccurrenceDate({ frequency: 'weekdays', basis: 'scheduledDate' }, '2026-09-04'),
+    ).toBe('2026-09-07');
   });
 
   it('specificWeekdays picks the next matching weekday', () => {
     // 2026-09-01 is a Tuesday (2); next Monday (1) is 2026-09-07
     expect(
-      computeNextOccurrenceDate({ frequency: 'specificWeekdays', weekdays: [1], basis: 'scheduledDate' }, '2026-09-01'),
+      computeNextOccurrenceDate(
+        { frequency: 'specificWeekdays', weekdays: [1], basis: 'scheduledDate' },
+        '2026-09-01',
+      ),
     ).toBe('2026-09-07');
   });
 
   it('respects an explicit endDate', () => {
-    const rule = { frequency: 'daily' as const, basis: 'scheduledDate' as const, endDate: '2026-09-01' };
+    const rule = {
+      frequency: 'daily' as const,
+      basis: 'scheduledDate' as const,
+      endDate: '2026-09-01',
+    };
     expect(hasRecurrenceEnded(rule, '2026-09-02', 2)).toBe(true);
     expect(hasRecurrenceEnded(rule, '2026-08-31', 2)).toBe(false);
   });
 
   it('respects an occurrenceCount limit', () => {
-    const rule = { frequency: 'daily' as const, basis: 'scheduledDate' as const, occurrenceCount: 3 };
+    const rule = {
+      frequency: 'daily' as const,
+      basis: 'scheduledDate' as const,
+      occurrenceCount: 3,
+    };
     expect(hasRecurrenceEnded(rule, '2026-09-02', 3)).toBe(false);
     expect(hasRecurrenceEnded(rule, '2026-09-02', 4)).toBe(true);
   });
 
   it('generates the next occurrence as a brand-new input, preserving the series id and the deadline offset', () => {
     const completed = buildRecurringMission();
-    const next = generateNextOccurrence({ completedMission: completed, completionDate: '2026-08-01', nextOccurrenceIndex: 1 });
+    const next = generateNextOccurrence({
+      completedMission: completed,
+      completionDate: '2026-08-01',
+      nextOccurrenceIndex: 1,
+    });
 
     expect(next).not.toBeNull();
     expect(next!.plannedDate).toBe('2026-09-01');
@@ -76,7 +108,11 @@ describe('missionRecurrenceEngine', () => {
 
   it('never mutates or overwrites the completed occurrence — it is a distinct input for a new row', () => {
     const completed = buildRecurringMission();
-    const next = generateNextOccurrence({ completedMission: completed, completionDate: '2026-08-01', nextOccurrenceIndex: 1 });
+    const next = generateNextOccurrence({
+      completedMission: completed,
+      completionDate: '2026-08-01',
+      nextOccurrenceIndex: 1,
+    });
 
     expect(completed.status).toBe('completed');
     expect(completed.completedAt).toBe('2026-08-01T12:00:00Z');
@@ -89,7 +125,11 @@ describe('missionRecurrenceEngine', () => {
       recurrenceRule: { frequency: 'monthly', basis: 'completionDate' },
       plannedDate: '2026-08-01',
     });
-    const next = generateNextOccurrence({ completedMission: completed, completionDate: '2026-08-20', nextOccurrenceIndex: 1 });
+    const next = generateNextOccurrence({
+      completedMission: completed,
+      completionDate: '2026-08-20',
+      nextOccurrenceIndex: 1,
+    });
 
     expect(next!.plannedDate).toBe('2026-09-20');
   });
@@ -98,12 +138,22 @@ describe('missionRecurrenceEngine', () => {
     const completed = buildRecurringMission({
       recurrenceRule: { frequency: 'monthly', basis: 'scheduledDate', occurrenceCount: 1 },
     });
-    const next = generateNextOccurrence({ completedMission: completed, completionDate: '2026-08-01', nextOccurrenceIndex: 2 });
+    const next = generateNextOccurrence({
+      completedMission: completed,
+      completionDate: '2026-08-01',
+      nextOccurrenceIndex: 2,
+    });
     expect(next).toBeNull();
   });
 
   it('returns null when the mission has no recurrenceRule', () => {
     const completed = buildRecurringMission({ recurrenceRule: undefined });
-    expect(generateNextOccurrence({ completedMission: completed, completionDate: '2026-08-01', nextOccurrenceIndex: 1 })).toBeNull();
+    expect(
+      generateNextOccurrence({
+        completedMission: completed,
+        completionDate: '2026-08-01',
+        nextOccurrenceIndex: 1,
+      }),
+    ).toBeNull();
   });
 });

@@ -13,10 +13,20 @@ export interface MissionProjectHeaderProps {
   onArchive?: () => void;
 }
 
-export function MissionProjectHeader({ project, progress, nextActionTitle, onComplete, onArchive }: MissionProjectHeaderProps) {
+export function MissionProjectHeader({
+  project,
+  progress,
+  nextActionTitle,
+  onComplete,
+  onArchive,
+}: MissionProjectHeaderProps) {
   return (
     <Stack spacing={2}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}
+      >
         <Stack spacing={0.5}>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
             {project.name}
@@ -51,7 +61,11 @@ export function MissionProjectHeader({ project, progress, nextActionTitle, onCom
             {progress.percent}%
           </Typography>
         </Stack>
-        <LinearProgress variant="determinate" value={progress.percent} sx={{ height: 8, borderRadius: 1 }} />
+        <LinearProgress
+          variant="determinate"
+          value={progress.percent}
+          sx={{ height: 8, borderRadius: 1 }}
+        />
       </Stack>
 
       {nextActionTitle && (

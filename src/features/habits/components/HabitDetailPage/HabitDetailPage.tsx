@@ -50,18 +50,16 @@ export interface HabitDetailPageProps {
 
 export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
   const router = useRouter();
-  const {
-    habit,
-    logs,
-    streak,
-    consistency,
-    periodProgress,
-    todayOccurrence,
-    isLoading,
-    refresh,
-  } = useHabit(habitId);
+  const { habit, logs, streak, consistency, periodProgress, todayOccurrence, isLoading, refresh } =
+    useHabit(habitId);
 
-  const { confirm, pendingAction, handleConfirm, handleCancel, isOpen: isConfirmOpen } = useConfirmAction();
+  const {
+    confirm,
+    pendingAction,
+    handleConfirm,
+    handleCancel,
+    isOpen: isConfirmOpen,
+  } = useConfirmAction();
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isTimerOpen, setIsTimerOpen] = useState(false);
@@ -88,7 +86,8 @@ export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
       date: today,
       timestamp: new Date().toISOString(),
       status: 'completed',
-      value: ('targetValue' in habit.target && habit.target.targetValue) ? habit.target.targetValue : 1,
+      value:
+        'targetValue' in habit.target && habit.target.targetValue ? habit.target.targetValue : 1,
       source: 'manual',
     });
     await refresh();
@@ -199,7 +198,11 @@ export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
                 <HabitAreaIcon area={habit.area} size="large" />
 
                 <Stack spacing={1} sx={{ flex: 1 }}>
-                  <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                  >
                     <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
                       {habit.name}
                     </Typography>
@@ -216,7 +219,10 @@ export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
                   )}
 
                   {habit.cue && (
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontStyle: 'italic', color: 'text.secondary' }}
+                    >
                       Gatilho: &ldquo;{habit.cue}&rdquo;
                     </Typography>
                   )}
@@ -291,7 +297,8 @@ export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
                     </Typography>
                   </Stack>
                   <Typography variant="caption" color="text.secondary">
-                    Melhor: {streak?.bestStreak ?? 0} {streak?.periodUnit === 'weeks' ? 'semanas' : 'dias'}
+                    Melhor: {streak?.bestStreak ?? 0}{' '}
+                    {streak?.periodUnit === 'weeks' ? 'semanas' : 'dias'}
                   </Typography>
                 </Stack>
               </CardContent>
@@ -378,7 +385,10 @@ export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
                       })}
                     >
                       <Stack spacing={0.5}>
-                        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Stack
+                          direction="row"
+                          sx={{ justifyContent: 'space-between', alignItems: 'center' }}
+                        >
                           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                             {log.date}
                           </Typography>
@@ -394,9 +404,7 @@ export function HabitDetailPage({ habitId }: HabitDetailPageProps) {
                             color={log.status === 'completed' ? 'primary' : 'default'}
                           />
                         </Stack>
-                        {log.note && (
-                          <Typography variant="body2">{log.note}</Typography>
-                        )}
+                        {log.note && <Typography variant="body2">{log.note}</Typography>}
                         {log.context?.trigger && (
                           <Typography variant="caption" color="text.secondary">
                             Gatilho: {log.context.trigger}

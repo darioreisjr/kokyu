@@ -44,7 +44,8 @@ function addDaysToDateKey(key: string, days: number): string {
 }
 
 function daysBetweenDateKeys(from: string, to: string): number {
-  const ms = new Date(`${to}T00:00:00.000Z`).getTime() - new Date(`${from}T00:00:00.000Z`).getTime();
+  const ms =
+    new Date(`${to}T00:00:00.000Z`).getTime() - new Date(`${from}T00:00:00.000Z`).getTime();
   return Math.round(ms / 86_400_000);
 }
 
@@ -100,7 +101,10 @@ function expandPlanEntries(
   return occurrences;
 }
 
-export async function mockLeisureApiFetchClient(path: string, init: RequestInit = {}): Promise<unknown> {
+export async function mockLeisureApiFetchClient(
+  path: string,
+  init: RequestInit = {},
+): Promise<unknown> {
   const { segments, query } = parse(path);
   const method = (init.method ?? 'GET').toUpperCase();
   // segments[0] === 'leisure'
@@ -137,7 +141,9 @@ function handleSummary(query: URLSearchParams): unknown {
       ? {
           id: plannedEntry.id,
           title: plannedEntry.title,
-          type: plannedEntry.leisureItemId ? (itemById.get(plannedEntry.leisureItemId)?.type ?? 'custom') : 'custom',
+          type: plannedEntry.leisureItemId
+            ? (itemById.get(plannedEntry.leisureItemId)?.type ?? 'custom')
+            : 'custom',
           startTime: plannedEntry.startTime ?? null,
         }
       : null,
@@ -183,7 +189,11 @@ function handleItems(
   if (sub === 'favorite' && method === 'POST') {
     if (index === -1) notFound();
     const existing = leisureDb.items[index]!;
-    const updated = { ...existing, favorite: !existing.favorite, updatedAt: new Date().toISOString() };
+    const updated = {
+      ...existing,
+      favorite: !existing.favorite,
+      updatedAt: new Date().toISOString(),
+    };
     leisureDb.items[index] = updated;
     return updated;
   }
@@ -242,7 +252,11 @@ function handleItems(
     if (method === 'PATCH') {
       if (index === -1) notFound();
       const existing = leisureDb.items[index]!;
-      const updated = { ...existing, ...(body as Record<string, unknown>), updatedAt: new Date().toISOString() };
+      const updated = {
+        ...existing,
+        ...(body as Record<string, unknown>),
+        updatedAt: new Date().toISOString(),
+      };
       leisureDb.items[index] = updated as (typeof leisureDb.items)[number];
       return updated;
     }
@@ -252,7 +266,9 @@ function handleItems(
     }
   }
 
-  throw new Error(`mockLeisureApiFetchClient: unhandled items route ${method} ${segments.join('/')}`);
+  throw new Error(
+    `mockLeisureApiFetchClient: unhandled items route ${method} ${segments.join('/')}`,
+  );
 }
 
 // --- plan ----------------------------------------------------------------
@@ -355,7 +371,9 @@ function handlePlan(
     // (above) is the only removal path, mirroring the real backend.
   }
 
-  throw new Error(`mockLeisureApiFetchClient: unhandled plan route ${method} ${segments.join('/')}`);
+  throw new Error(
+    `mockLeisureApiFetchClient: unhandled plan route ${method} ${segments.join('/')}`,
+  );
 }
 
 // --- history ---------------------------------------------------------------
@@ -376,7 +394,9 @@ function handleHistory(segments: string[], method: string, body: unknown): unkno
     }
   }
 
-  throw new Error(`mockLeisureApiFetchClient: unhandled history route ${method} ${segments.join('/')}`);
+  throw new Error(
+    `mockLeisureApiFetchClient: unhandled history route ${method} ${segments.join('/')}`,
+  );
 }
 
 // --- notes -----------------------------------------------------------------
@@ -415,7 +435,11 @@ function handleNotes(segments: string[], method: string, body: unknown): unknown
 
   if (sub === 'archive' && method === 'POST') {
     if (index === -1) notFound();
-    const updated = { ...leisureDb.notes[index]!, archived: true, updatedAt: new Date().toISOString() };
+    const updated = {
+      ...leisureDb.notes[index]!,
+      archived: true,
+      updatedAt: new Date().toISOString(),
+    };
     leisureDb.notes[index] = updated;
     return updated;
   }
@@ -441,7 +465,11 @@ function handleNotes(segments: string[], method: string, body: unknown): unknown
     }
     if (method === 'PATCH') {
       if (index === -1) notFound();
-      const updated = { ...leisureDb.notes[index]!, ...(body as Record<string, unknown>), updatedAt: new Date().toISOString() };
+      const updated = {
+        ...leisureDb.notes[index]!,
+        ...(body as Record<string, unknown>),
+        updatedAt: new Date().toISOString(),
+      };
       leisureDb.notes[index] = updated as (typeof leisureDb.notes)[number];
       return updated;
     }
@@ -451,7 +479,9 @@ function handleNotes(segments: string[], method: string, body: unknown): unknown
     }
   }
 
-  throw new Error(`mockLeisureApiFetchClient: unhandled notes route ${method} ${segments.join('/')}`);
+  throw new Error(
+    `mockLeisureApiFetchClient: unhandled notes route ${method} ${segments.join('/')}`,
+  );
 }
 
 // --- collections -------------------------------------------------------------

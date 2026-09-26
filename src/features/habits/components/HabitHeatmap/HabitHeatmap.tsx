@@ -19,7 +19,12 @@ export interface HabitHeatmapProps {
 export function HabitHeatmap({ logs, habit, weeksToShow = 20 }: HabitHeatmapProps) {
   void habit;
   const days = useMemo(() => {
-    const list: { date: string; dayOfWeek: number; status: 'completed' | 'partial' | 'skipped' | 'none'; value: number }[] = [];
+    const list: {
+      date: string;
+      dayOfWeek: number;
+      status: 'completed' | 'partial' | 'skipped' | 'none';
+      value: number;
+    }[] = [];
     const today = new Date();
 
     const totalDays = weeksToShow * 7;
@@ -51,7 +56,7 @@ export function HabitHeatmap({ logs, habit, weeksToShow = 20 }: HabitHeatmapProp
   }, [logs, weeksToShow]);
 
   const columns = useMemo(() => {
-    const cols: typeof days[] = [];
+    const cols: (typeof days)[] = [];
     for (let i = 0; i < days.length; i += 7) {
       cols.push(days.slice(i, i + 7));
     }

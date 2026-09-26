@@ -2,14 +2,7 @@ import type { MissionRecurrenceRule } from './missionRecurrence.types';
 
 /** Mirrors the area vocabulary already used by `HabitArea`/`GoalArea` — not a shared import, same convention those two features already follow. */
 export type MissionArea =
-  | 'work'
-  | 'routine'
-  | 'training'
-  | 'nutrition'
-  | 'habits'
-  | 'leisure'
-  | 'personal'
-  | 'other';
+  'work' | 'routine' | 'training' | 'nutrition' | 'habits' | 'leisure' | 'personal' | 'other';
 
 /**
  * Persisted lifecycle status. `overdue` is intentionally NOT a member — it is always derived from
@@ -43,23 +36,11 @@ export type MissionEnergyRequirement = 'low' | 'medium' | 'high';
  */
 export type MissionProgressMode = 'binary' | 'submissions' | 'checklist';
 
-export type MissionSource =
-  | 'manual'
-  | 'goal'
-  | 'leisure'
-  | 'recurrence'
-  | 'template'
-  | 'external';
+export type MissionSource = 'manual' | 'goal' | 'leisure' | 'recurrence' | 'template' | 'external';
 
 /** Prepared for future importers (Todoist/CSV/JSON/Microsoft To Do/GitHub/email/Slack) — not implemented now. */
 export type MissionImportProvider =
-  | 'todoist'
-  | 'csv'
-  | 'json'
-  | 'microsoftToDo'
-  | 'github'
-  | 'email'
-  | 'slack';
+  'todoist' | 'csv' | 'json' | 'microsoftToDo' | 'github' | 'email' | 'slack';
 
 /** Keeps re-imports idempotent once a real importer exists — `provider` + `externalId` is the natural key. */
 export interface MissionExternalRef {

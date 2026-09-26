@@ -6,7 +6,12 @@ const withData: HomeProviderResult<MissionHomeProjection> = {
   sourceType: 'mission',
   status: 'success',
   data: {
-    focusToday: { id: 'm1', title: 'Implementar Scheduler', status: 'pending', estimatedDurationMinutes: 90 },
+    focusToday: {
+      id: 'm1',
+      title: 'Implementar Scheduler',
+      status: 'pending',
+      estimatedDurationMinutes: 90,
+    },
     next: { id: 'm2', title: 'Escrever documentação', status: 'pending' },
     pendingCount: 3,
     completedCount: 2,
@@ -31,7 +36,14 @@ export const Empty: Story = {
     result: {
       sourceType: 'mission',
       status: 'success',
-      data: { focusToday: null, next: null, pendingCount: 0, completedCount: 0, overdue: [], waitingFollowUp: [] },
+      data: {
+        focusToday: null,
+        next: null,
+        pendingCount: 0,
+        completedCount: 0,
+        overdue: [],
+        waitingFollowUp: [],
+      },
     },
   },
 };

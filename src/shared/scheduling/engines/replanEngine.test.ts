@@ -67,4 +67,3 @@ describe('replanEngine', () => {
     expect(dinner?.startAt).toBe('19:00');
   });
 });
-
