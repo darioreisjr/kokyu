@@ -15,6 +15,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
+import { leisureCardGridColumns } from '../../constants/leisureGrid';
 import { useLeisureItems } from '../../hooks/useLeisureItems';
 import type { LeisureItemFormValues } from '../../schemas/leisureItemSchema';
 import type { PlanEntryFormValues } from '../../schemas/planEntrySchema';
@@ -157,7 +158,7 @@ export function PlacesPage() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            gridTemplateColumns: leisureCardGridColumns,
             gap: 2,
           }}
         >
@@ -188,24 +189,19 @@ export function PlacesPage() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-              lg: 'repeat(4, 1fr)',
-            },
+            gridTemplateColumns: leisureCardGridColumns,
             gap: 2,
           }}
         >
           {filteredPlaces.map((item) => (
             <Stack key={item.id} spacing={1}>
               <LeisureItemCard item={item} />
-              <Stack direction="row" spacing={1}>
+              <Stack spacing={1}>
                 <KokyuButton
                   variant="outlined"
                   size="small"
                   onClick={() => setPlanTarget(item)}
-                  sx={{ flex: 1 }}
+                  fullWidth
                 >
                   Planejar
                 </KokyuButton>
@@ -214,7 +210,7 @@ export function PlacesPage() {
                     variant="outlined"
                     size="small"
                     onClick={() => setVisitTarget(item)}
-                    sx={{ flex: 1 }}
+                    fullWidth
                   >
                     Marcar visitado
                   </KokyuButton>
