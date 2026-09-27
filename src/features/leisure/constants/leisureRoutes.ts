@@ -12,6 +12,7 @@ export const leisureRoutes = {
   noteEdit: (id: string) => `/app/tempo-livre/notas/${id}/editar`,
   history: '/app/tempo-livre/historico',
   item: (id: string) => `/app/tempo-livre/item/${id}`,
+  itemEdit: (id: string) => `/app/tempo-livre/item/${id}/editar`,
   planNew: '/app/tempo-livre/planejamento/nova',
   planEdit: (id: string) => `/app/tempo-livre/planejamento/${id}/editar`,
 } as const;

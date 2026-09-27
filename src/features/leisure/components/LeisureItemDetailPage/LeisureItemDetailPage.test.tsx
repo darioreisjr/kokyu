@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
 import { leisureItemService } from '../../services/leisureItemService';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
+import { leisureRoutes } from '../../constants/leisureRoutes';
 import { resetLeisureDb } from '../../services/leisureMockDb';
 import { LeisureItemDetailPage } from './LeisureItemDetailPage';
 
@@ -111,27 +112,17 @@ describe('LeisureItemDetailPage', () => {
     );
   });
 
-  it('edits the item, prefilling the form from its current data', async () => {
-    const user = userEvent.setup();
+  it('links Editar to the edit page instead of opening a dialog', async () => {
     render(<LeisureItemDetailPage itemId="book-hobbit" />);
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'O Hobbit' })).toBeInTheDocument(),
     );
 
-    await user.click(screen.getByRole('button', { name: 'Editar' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Editar item' });
-    expect(within(dialog).getByLabelText('Autor')).toHaveValue('J.R.R. Tolkien');
-
-    await user.clear(within(dialog).getByLabelText('Título'));
-    await user.type(within(dialog).getByLabelText('Título'), 'O Hobbit — edição revisada');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
-
-    await waitFor(() => expect(screen.getByText('Item atualizado.')).toBeInTheDocument());
-    await waitFor(() =>
-      expect(
-        screen.getByRole('heading', { name: 'O Hobbit — edição revisada' }),
-      ).toBeInTheDocument(),
+    expect(screen.getByRole('link', { name: 'Editar' })).toHaveAttribute(
+      'href',
+      leisureRoutes.itemEdit('book-hobbit'),
     );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('plans the item', async () => {
@@ -194,32 +185,12 @@ describe('LeisureItemDetailPage', () => {
     );
   });
 
-  it('archives the item after confirming', async () => {
-    const user = userEvent.setup();
+  it('no longer offers Arquivar or Excluir (they moved to the edit page)', async () => {
     render(<LeisureItemDetailPage itemId="movie-curta-noite" />);
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Arquivar' })).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByRole('link', { name: 'Editar' })).toBeInTheDocument());
 
-    await user.click(screen.getByRole('button', { name: 'Arquivar' }));
-    const confirmDialog = await screen.findByRole('dialog', { name: 'Arquivar item?' });
-    await user.click(within(confirmDialog).getByRole('button', { name: 'Arquivar' }));
-
-    await waitFor(() => expect(screen.getByText('Item arquivado.')).toBeInTheDocument());
-  });
-
-  it('deletes the item after confirming, then navigates to the library', async () => {
-    const user = userEvent.setup();
-    render(<LeisureItemDetailPage itemId="movie-curta-noite" />);
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Excluir' })).toBeInTheDocument(),
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Excluir' }));
-    const confirmDialog = await screen.findByRole('dialog', { name: 'Excluir item?' });
-    await user.click(within(confirmDialog).getByRole('button', { name: 'Excluir' }));
-
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/app/tempo-livre/biblioteca'));
+    expect(screen.queryByRole('button', { name: 'Arquivar' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Excluir' })).not.toBeInTheDocument();
   });
 
   it('shows a pt-BR error when toggling favorite fails', async () => {
