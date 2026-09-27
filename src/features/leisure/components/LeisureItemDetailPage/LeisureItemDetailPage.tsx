@@ -1,7 +1,5 @@
 'use client';
 
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
@@ -16,7 +14,7 @@ import Link from '@mui/material/Link';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/navigation';
+import NextLink from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 import { KokyuButton, KokyuTextField } from '@/design-system/components';
@@ -28,7 +26,6 @@ import { isHttpUrl } from '@/shared/links/httpLink';
 import { getLeisureItemTypeLabel } from '../../constants/leisureItemTypes';
 import { leisureRoutes } from '../../constants/leisureRoutes';
 import { getStatusLabel } from '../../constants/leisureStatuses';
-import { useConfirmAction } from '../../hooks/useConfirmAction';
 import { collectionService } from '../../services/collectionService';
 import { leisureItemService } from '../../services/leisureItemService';
 import { historyService } from '../../services/historyService';
@@ -41,16 +38,9 @@ import { toDateKey } from '../../utils/dateHelpers';
 import { formatDuration } from '../../utils/durationFormat';
 import { getItemDetailRows } from '../../utils/itemDetails';
 import { getEffectiveDuration } from '../../utils/suggestionEngine';
-import {
-  mapFormValuesToLeisureItemPatch,
-  mapLeisureItemToFormValues,
-} from '../../utils/leisureItemFormMapper';
 import { getLeisureItemProgress } from '../../utils/progress';
-import { ConfirmActionDialog } from '../ConfirmActionDialog/ConfirmActionDialog';
-import { LeisureItemDialog } from '../LeisureItemDialog/LeisureItemDialog';
 import { LogEntryDialog, type LogEntryDraft } from '../LogEntryDialog/LogEntryDialog';
 import { NoteDialog, type NoteDraft } from '../NoteDialog/NoteDialog';
-import type { LeisureItemFormValues } from '../../schemas/leisureItemSchema';
 import type { PlanEntryFormValues } from '../../schemas/planEntrySchema';
 import { PlanEntryDialog } from '../PlanEntryDialog/PlanEntryDialog';
 import { AddToCollectionDialog } from './AddToCollectionDialog';
@@ -69,9 +59,7 @@ function progressFieldLabel(item: LeisureItem): string | null {
 
 /** `/app/tempo-livre/item/[id]` — the first dynamic route in Tempo Livre. Only ever shows the fields relevant to the item's own `type`. */
 export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
-  const router = useRouter();
   const { showSuccess, showError } = useSnackbar();
-  const confirmAction = useConfirmAction();
 
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'not-found'>('loading');
   const [item, setItem] = useState<LeisureItem | null>(null);
@@ -80,7 +68,6 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
   const [planOpen, setPlanOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   /** A local typing buffer, separate from `item`'s own server-confirmed value — committed only on blur, so each keystroke doesn't race an async round trip through `updateProgress`+reload. Re-synced whenever `item` reloads (initial load, or after a commit). */
@@ -136,24 +123,6 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
     }
   }
 
-  async function handleEdit(values: LeisureItemFormValues) {
-    if (!item) return;
-    setIsSubmitting(true);
-    try {
-      await leisureItemService.updateLeisureItem(
-        item.id,
-        mapFormValuesToLeisureItemPatch(values, item),
-      );
-      showSuccess('Item atualizado.');
-      setEditOpen(false);
-      reload();
-    } catch (error) {
-      showError(friendlyErrorMessage(error, 'Não foi possível salvar as alterações agora.'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
   async function handleToggleCollection(collectionId: string, checked: boolean) {
     if (!item) return;
     try {
@@ -180,38 +149,6 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
     } catch (error) {
       showError(friendlyErrorMessage(error, 'Não foi possível iniciar agora.'));
     }
-  }
-
-  async function handleArchive() {
-    if (!item) return;
-    try {
-      confirmAction.request({
-        title: 'Arquivar item?',
-        description: `"${item.title}" será arquivado.`,
-        confirmLabel: 'Arquivar',
-        onConfirm: async () => {
-          await leisureItemService.archiveLeisureItem(item.id);
-          showSuccess('Item arquivado.');
-          reload();
-        },
-      });
-    } catch (error) {
-      showError(friendlyErrorMessage(error, 'Não foi possível arquivar agora.'));
-    }
-  }
-
-  function handleDelete() {
-    if (!item) return;
-    confirmAction.request({
-      title: 'Excluir item?',
-      description: `"${item.title}" será removido permanentemente.`,
-      confirmLabel: 'Excluir',
-      onConfirm: async () => {
-        await leisureItemService.deleteLeisureItem(item.id);
-        showSuccess('Item excluído.');
-        router.push(leisureRoutes.library);
-      },
-    });
   }
 
   async function handlePlan(values: PlanEntryFormValues) {
@@ -387,26 +324,10 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
             variant="text"
             fullWidth
             startIcon={<EditRoundedIcon />}
-            onClick={() => setEditOpen(true)}
+            component={NextLink}
+            href={leisureRoutes.itemEdit(item.id)}
           >
             Editar
-          </KokyuButton>
-          <KokyuButton
-            variant="text"
-            fullWidth
-            startIcon={<ArchiveOutlinedIcon />}
-            onClick={handleArchive}
-          >
-            Arquivar
-          </KokyuButton>
-          <KokyuButton
-            variant="text"
-            fullWidth
-            color="error"
-            startIcon={<DeleteOutlineRoundedIcon />}
-            onClick={handleDelete}
-          >
-            Excluir
           </KokyuButton>
         </Stack>
       </Stack>
@@ -553,13 +474,6 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
         onSave={handleCreateNote}
         isSubmitting={isSubmitting}
       />
-      <LeisureItemDialog
-        open={editOpen}
-        defaultValues={mapLeisureItemToFormValues(item)}
-        onClose={() => setEditOpen(false)}
-        onSave={handleEdit}
-        isSubmitting={isSubmitting}
-      />
       <LogEntryDialog
         open={logOpen}
         itemTitle={item.title}
@@ -573,11 +487,6 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
         collections={collections}
         onClose={() => setCollectionsOpen(false)}
         onToggle={handleToggleCollection}
-      />
-      <ConfirmActionDialog
-        request={confirmAction.pending}
-        onConfirm={confirmAction.confirm}
-        onCancel={confirmAction.cancel}
       />
     </Stack>
   );
