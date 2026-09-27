@@ -28,6 +28,15 @@ describe('LeisureItemDetailPage', () => {
     expect(screen.getByText(/Filme · Para assistir · 2h49/)).toBeInTheDocument();
   });
 
+  it('shows the estimated duration in the summary, not the minimum useful session', async () => {
+    // book-hobbit is flexible with a 15 min minimum useful session and no
+    // estimated duration: the summary used to show "15 min" as if it were its length.
+    render(<LeisureItemDetailPage itemId="book-hobbit" />);
+    const summary = await screen.findByText(/^Livro · /);
+
+    expect(summary.textContent).not.toMatch(/min|h\d/);
+  });
+
   it('shows the cover and actions in one column and the filled-in details in the other', async () => {
     render(<LeisureItemDetailPage itemId="book-hiperfoco" />);
 

@@ -37,7 +37,6 @@ import type { Note } from '../../types/note.types';
 import { toDateKey } from '../../utils/dateHelpers';
 import { formatDuration } from '../../utils/durationFormat';
 import { getItemDetailRows } from '../../utils/itemDetails';
-import { getEffectiveDuration } from '../../utils/suggestionEngine';
 import { getLeisureItemProgress } from '../../utils/progress';
 import { LogEntryDialog, type LogEntryDraft } from '../LogEntryDialog/LogEntryDialog';
 import { NoteDialog, type NoteDraft } from '../NoteDialog/NoteDialog';
@@ -242,7 +241,10 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
     );
   }
 
-  const duration = getEffectiveDuration(item);
+  // The duration the user entered. Not getEffectiveDuration: for a
+  // flexible item that's the minimum useful session (often a type default
+  // like 30 min), which read as the item's length here.
+  const duration = item.estimatedDuration ?? undefined;
   const progress = getLeisureItemProgress(item);
   const progressLabel = progressFieldLabel(item);
   const detailRows = getItemDetailRows(item);
