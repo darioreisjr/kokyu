@@ -14,7 +14,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
-import { leisureCardGridColumns } from '../../constants/leisureGrid';
+import { leisureCardGridAutoRows, leisureCardGridColumns } from '../../constants/leisureGrid';
 import { leisureRoutes } from '../../constants/leisureRoutes';
 
 import { useLeisureItems } from '../../hooks/useLeisureItems';
@@ -135,11 +135,12 @@ export function HobbiesPage() {
           sx={{
             display: 'grid',
             gridTemplateColumns: leisureCardGridColumns,
+            gridAutoRows: leisureCardGridAutoRows,
             gap: 2,
           }}
         >
           {hobbies.map((item) => (
-            <Stack key={item.id} spacing={1}>
+            <Stack key={item.id} spacing={1} sx={{ height: '100%', minWidth: 0 }}>
               <LeisureItemCard item={item} />
               <Stack spacing={1}>
                 <KokyuButton

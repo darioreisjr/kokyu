@@ -19,7 +19,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
-import { leisureCardGridColumns } from '../../constants/leisureGrid';
+import { leisureCardGridAutoRows, leisureCardGridColumns } from '../../constants/leisureGrid';
 import { leisureItemTypeDefinitions } from '../../constants/leisureItemTypes';
 import { useCollections } from '../../hooks/useCollections';
 import { useLeisureItems } from '../../hooks/useLeisureItems';
@@ -291,6 +291,7 @@ export function LibraryPage() {
             sx={{
               display: 'grid',
               gridTemplateColumns: viewMode === 'grid' ? leisureCardGridColumns : '1fr',
+              gridAutoRows: viewMode === 'grid' ? leisureCardGridAutoRows : undefined,
               gap: 2,
             }}
           >

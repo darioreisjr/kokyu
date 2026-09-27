@@ -15,7 +15,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
-import { leisureCardGridColumns } from '../../constants/leisureGrid';
+import { leisureCardGridAutoRows, leisureCardGridColumns } from '../../constants/leisureGrid';
 import { useLeisureItems } from '../../hooks/useLeisureItems';
 import type { LeisureItemFormValues } from '../../schemas/leisureItemSchema';
 import type { PlanEntryFormValues } from '../../schemas/planEntrySchema';
@@ -190,11 +190,12 @@ export function PlacesPage() {
           sx={{
             display: 'grid',
             gridTemplateColumns: leisureCardGridColumns,
+            gridAutoRows: leisureCardGridAutoRows,
             gap: 2,
           }}
         >
           {filteredPlaces.map((item) => (
-            <Stack key={item.id} spacing={1}>
+            <Stack key={item.id} spacing={1} sx={{ height: '100%', minWidth: 0 }}>
               <LeisureItemCard item={item} />
               <Stack spacing={1}>
                 <KokyuButton
