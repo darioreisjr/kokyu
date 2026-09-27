@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { render, screen } from '../../../../../test/test-utils';
+import { render, screen, waitFor } from '../../../../../test/test-utils';
 import { LeisureItemDialog } from './LeisureItemDialog';
 
 describe('LeisureItemDialog', () => {
@@ -111,5 +111,23 @@ describe('LeisureItemDialog', () => {
     render(<LeisureItemDialog open onClose={onClose} onSave={vi.fn()} />);
     await user.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('saves when given the API’s nulls as default values (regression: Organizar did nothing)', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    const fromApi = {
+      title: 'Duna: Parte Dois',
+      description: null,
+      sourceUrl: null,
+    } as unknown as {
+      title: string;
+    };
+    render(<LeisureItemDialog open defaultValues={fromApi} onClose={vi.fn()} onSave={onSave} />);
+
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ title: 'Duna: Parte Dois' }));
   });
 });
