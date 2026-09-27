@@ -1,6 +1,8 @@
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
+import { leisurePlanService } from '../../services/leisurePlanService';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { resetLeisureDb } from '../../services/leisureMockDb';
 import { TodayPage } from './TodayPage';
@@ -100,5 +102,22 @@ describe('TodayPage', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     await waitFor(() => expect(screen.getByText('Item salvo.')).toBeInTheDocument());
+  });
+
+  it('shows a pt-BR error when completing a planned entry fails', async () => {
+    const user = userEvent.setup();
+    const completeSpy = vi
+      .spyOn(leisurePlanService, 'completePlanEntry')
+      .mockRejectedValueOnce(apiValidationError());
+    render(<TodayPage />);
+    await waitFor(() => expect(screen.getByText('Planejado para hoje')).toBeInTheDocument());
+
+    const planSection = screen.getByText('Planejado para hoje').closest('div') as HTMLElement;
+    const row = within(planSection).getByText('O Hobbit').closest('div')!
+      .parentElement as HTMLElement;
+    await user.click(within(row).getByRole('button', { name: 'Concluir' }));
+
+    expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
+    completeSpy.mockRestore();
   });
 });

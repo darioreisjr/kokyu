@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { EmptyState, KokyuButton, KokyuTextField } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { leisureItemTypeDefinitions } from '../../constants/leisureItemTypes';
 import { useCollections } from '../../hooks/useCollections';
@@ -52,7 +53,7 @@ const filterOptions: { id: FilterValue; label: string }[] = [
 export function LibraryPage() {
   const { status, items, reload } = useLeisureItems();
   const { status: collectionsStatus, collections, reload: reloadCollections } = useCollections();
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
 
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterValue>('todos');
@@ -111,16 +112,22 @@ export function LibraryPage() {
       showSuccess('Item salvo.');
       setAddDialogOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar o item agora.'));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function handleCreateCollection(name: string) {
-    await collectionService.createCollection({ name });
-    showSuccess('Lista criada.');
-    setCreateCollectionOpen(false);
-    reloadCollections();
+    try {
+      await collectionService.createCollection({ name });
+      showSuccess('Lista criada.');
+      setCreateCollectionOpen(false);
+      reloadCollections();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível criar a coleção agora.'));
+    }
   }
 
   return (

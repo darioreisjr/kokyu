@@ -1,6 +1,7 @@
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { leisureRoutes } from '../../constants/leisureRoutes';
 import { resetLeisureDb } from '../../services/leisureMockDb';
@@ -151,5 +152,22 @@ describe('NotesPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Ativas' }));
     expect(screen.getByText('Recomendação do João')).toBeInTheDocument();
+  });
+
+  it('shows a pt-BR error when pinning a note fails', async () => {
+    const user = userEvent.setup();
+    const pinSpy = vi.spyOn(noteService, 'togglePin').mockRejectedValueOnce(apiValidationError());
+    render(<NotesPage />);
+    await waitFor(() =>
+      expect(screen.getByText('Coisas para levar para a praia')).toBeInTheDocument(),
+    );
+
+    const card = screen
+      .getByText('Coisas para levar para a praia')
+      .closest('.MuiPaper-root') as HTMLElement;
+    await user.click(within(card).getByRole('button', { name: 'Desafixar nota' }));
+
+    expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
+    pinSpy.mockRestore();
   });
 });

@@ -59,13 +59,21 @@ export function NotesPage() {
   }
 
   async function handleTogglePin(note: Note) {
-    await noteService.togglePin(note.id);
-    reload();
+    try {
+      await noteService.togglePin(note.id);
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível fixar a nota agora.'));
+    }
   }
 
   async function handleToggleChecklistItem(noteId: string, checklistItemId: string) {
-    await noteService.toggleChecklistItem(noteId, checklistItemId);
-    reload();
+    try {
+      await noteService.toggleChecklistItem(noteId, checklistItemId);
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível atualizar a checklist agora.'));
+    }
   }
 
   function handleUnarchive(note: Note) {

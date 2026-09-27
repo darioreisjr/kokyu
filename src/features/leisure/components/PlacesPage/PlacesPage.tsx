@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { EmptyState, KokyuButton } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { useLeisureItems } from '../../hooks/useLeisureItems';
 import type { LeisureItemFormValues } from '../../schemas/leisureItemSchema';
@@ -40,7 +41,7 @@ const filterOptions: { id: FilterValue; label: string }[] = [
 /** `/app/tempo-livre/lugares` — restaurantes, cafés, parques, eventos, viagens curtas: everywhere the user wants to go, sharing the same `LeisureItem`/plan/log architecture as the rest of the feature. */
 export function PlacesPage() {
   const { status, items, reload } = useLeisureItems();
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
 
   const [filter, setFilter] = useState<FilterValue>('todos');
   const [addOpen, setAddOpen] = useState(false);
@@ -59,6 +60,8 @@ export function PlacesPage() {
       showSuccess('Item salvo.');
       setAddOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar o item agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -66,9 +69,13 @@ export function PlacesPage() {
 
   async function handlePlan(values: PlanEntryFormValues) {
     if (!planTarget) return;
-    await leisurePlanService.createPlanEntry({ ...values, leisureItemId: planTarget.id });
-    showSuccess('Atividade planejada.');
-    setPlanTarget(null);
+    try {
+      await leisurePlanService.createPlanEntry({ ...values, leisureItemId: planTarget.id });
+      showSuccess('Atividade planejada.');
+      setPlanTarget(null);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível planejar agora.'));
+    }
   }
 
   async function handleVisit(draft: LogEntryDraft) {
@@ -90,6 +97,8 @@ export function PlacesPage() {
       showSuccess('Visita registrada.');
       setVisitTarget(null);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível registrar a visita agora.'));
     } finally {
       setIsSubmitting(false);
     }

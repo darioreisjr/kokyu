@@ -12,6 +12,7 @@ import { EmptyState, KokyuButton } from '@/design-system/components';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { leisureRoutes } from '../../constants/leisureRoutes';
 import { useLeisureToday } from '../../hooks/useLeisureToday';
@@ -40,7 +41,7 @@ export function TodayPage() {
   const { status, planEntries, inProgressItems, laterItems, allItems, reload } = useLeisureToday(
     new Date(),
   );
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
 
   const [addAction, setAddAction] = useState<AddMenuAction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,6 +64,8 @@ export function TodayPage() {
       showSuccess('Adicionado para depois.');
       setAddAction(null);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -81,6 +84,8 @@ export function TodayPage() {
       });
       showSuccess('Nota salva.');
       setAddAction(null);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar a nota agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -93,25 +98,35 @@ export function TodayPage() {
       showSuccess('Item salvo.');
       setAddAction(null);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar o item agora.'));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function handleStartItem(item: LeisureItem) {
-    await leisureItemService.updateLeisureItem(item.id, { status: 'inProgress' } as Parameters<
-      typeof leisureItemService.updateLeisureItem
-    >[1]);
-    showSuccess('Atividade iniciada.');
-    reload();
+    try {
+      await leisureItemService.updateLeisureItem(item.id, { status: 'inProgress' } as Parameters<
+        typeof leisureItemService.updateLeisureItem
+      >[1]);
+      showSuccess('Atividade iniciada.');
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível iniciar agora.'));
+    }
   }
 
   async function handleCompletePlanEntry(entry: LeisurePlanEntry) {
-    // `occurrenceDate` — a daily/weekly entry's "hoje" row must only
-    // complete today's occurrence, never the whole series.
-    await leisurePlanService.completePlanEntry(entry.id, entry.occurrenceDate);
-    showSuccess('Planejamento concluído.');
-    reload();
+    try {
+      // `occurrenceDate` — a daily/weekly entry's "hoje" row must only
+      // complete today's occurrence, never the whole series.
+      await leisurePlanService.completePlanEntry(entry.id, entry.occurrenceDate);
+      showSuccess('Planejamento concluído.');
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível concluir agora.'));
+    }
   }
 
   return (

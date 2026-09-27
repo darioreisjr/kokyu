@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { EmptyState, KokyuButton } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { useLeisureItems } from '../../hooks/useLeisureItems';
 import type { LeisureItemFormValues } from '../../schemas/leisureItemSchema';
@@ -29,7 +30,7 @@ import { PlanEntryDialog } from '../PlanEntryDialog/PlanEntryDialog';
 /** `/app/tempo-livre/hobbies` — recurring, prazer-driven activities. Sessions are logged (`LeisureLogEntry`) without ever marking the hobby itself "completed" — a hobby is meant to be practiced again. */
 export function HobbiesPage() {
   const { status, items, reload } = useLeisureItems();
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
 
   const [addOpen, setAddOpen] = useState(false);
   const [planTarget, setPlanTarget] = useState<LeisureItem | null>(null);
@@ -45,6 +46,8 @@ export function HobbiesPage() {
       showSuccess('Hobby salvo.');
       setAddOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar o item agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -52,9 +55,13 @@ export function HobbiesPage() {
 
   async function handlePlan(values: PlanEntryFormValues) {
     if (!planTarget) return;
-    await leisurePlanService.createPlanEntry({ ...values, leisureItemId: planTarget.id });
-    showSuccess('Sessão planejada.');
-    setPlanTarget(null);
+    try {
+      await leisurePlanService.createPlanEntry({ ...values, leisureItemId: planTarget.id });
+      showSuccess('Sessão planejada.');
+      setPlanTarget(null);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível planejar agora.'));
+    }
   }
 
   async function handleLogSession(draft: LogEntryDraft) {
@@ -72,6 +79,8 @@ export function HobbiesPage() {
       });
       showSuccess('Sessão registrada.');
       setSessionTarget(null);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível registrar a sessão agora.'));
     } finally {
       setIsSubmitting(false);
     }

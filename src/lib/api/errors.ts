@@ -15,6 +15,14 @@ export type ApiErrorCode =
   | 'LEISURE_PLAN_ENTRY_DATE_INVALID'
   | 'LEISURE_NOTE_NOT_FOUND'
   | 'LEISURE_COLLECTION_NOT_FOUND'
+  | 'LEISURE_PLAN_ENTRY_ARCHIVED'
+  | 'LEISURE_PLAN_ENTRY_COMPLETION_NOT_TODAY'
+  | 'VALIDATION_ERROR'
+  | 'RATE_LIMITED'
+  | 'INTERNAL_ERROR'
+  | 'AUTH_REQUIRED'
+  | 'TOKEN_INVALID'
+  | 'TOKEN_EXPIRED'
   | (string & {});
 
 /** RFC 9457 Problem Details, plus the backend's own `code`/`redirectTo` extensions. */
@@ -71,15 +79,24 @@ const FRIENDLY_ERROR_MESSAGES: Partial<Record<string, string>> = {
   LEISURE_PLAN_ENTRY_DATE_INVALID: 'A data e o horário do planejamento não podem estar no passado.',
   LEISURE_NOTE_NOT_FOUND: 'Esta nota não foi encontrada.',
   LEISURE_COLLECTION_NOT_FOUND: 'Esta coleção não foi encontrada.',
+  LEISURE_PLAN_ENTRY_ARCHIVED: 'Este planejamento está arquivado. Desarquive-o antes de alterá-lo.',
+  LEISURE_PLAN_ENTRY_COMPLETION_NOT_TODAY: 'Só é possível concluir uma atividade no dia planejado.',
+  VALIDATION_ERROR: 'Alguns dados são inválidos. Revise e tente novamente.',
+  RATE_LIMITED: 'Muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.',
+  INTERNAL_ERROR: 'Algo deu errado do nosso lado. Tente novamente em instantes.',
+  AUTH_REQUIRED: 'Sua sessão expirou. Entre novamente para continuar.',
+  TOKEN_INVALID: 'Sua sessão expirou. Entre novamente para continuar.',
+  TOKEN_EXPIRED: 'Sua sessão expirou. Entre novamente para continuar.',
 };
 
-/** Maps a stable error code to pt-BR copy; falls back to the error's own message, then to `fallback`. */
+/**
+ * Maps a stable error code to pt-BR copy, falling back to the call site's
+ * own pt-BR `fallback`. Never the backend's `detail`: that's English,
+ * technical text (e.g. "sourceUrl: Invalid URL") meant for logs.
+ */
 export function friendlyErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof ApiError) {
-    if (error.code && FRIENDLY_ERROR_MESSAGES[error.code]) {
-      return FRIENDLY_ERROR_MESSAGES[error.code]!;
-    }
-    if (error.message) return error.message;
+  if (error instanceof ApiError && error.code) {
+    return FRIENDLY_ERROR_MESSAGES[error.code] ?? fallback;
   }
   return fallback;
 }
