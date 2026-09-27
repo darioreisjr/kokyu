@@ -320,37 +320,49 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
           >
             Adicionar a uma lista
           </KokyuButton>
-          <KokyuButton
-            variant="text"
-            fullWidth
-            startIcon={<EditRoundedIcon />}
-            component={NextLink}
-            href={leisureRoutes.itemEdit(item.id)}
-          >
-            Editar
-          </KokyuButton>
         </Stack>
       </Stack>
 
       {/* Right: what this item is. */}
       <Stack spacing={4} sx={{ flex: 1, minWidth: 0, width: '100%' }}>
         <Stack spacing={0.5}>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Typography variant="displaySmall" component="h1">
-              {item.title}
-            </Typography>
-            <IconButton
-              aria-label={item.favorite ? 'Remover dos favoritos' : 'Favoritar'}
-              onClick={handleToggleFavorite}
+          <Stack
+            direction="row"
+            sx={{
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              columnGap: 2,
+              rowGap: 1,
+            }}
+          >
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', minWidth: 0 }}>
+              <Typography variant="displaySmall" component="h1">
+                {item.title}
+              </Typography>
+              <IconButton
+                aria-label={item.favorite ? 'Remover dos favoritos' : 'Favoritar'}
+                onClick={handleToggleFavorite}
+              >
+                {item.favorite ? (
+                  <StarRoundedIcon
+                    sx={(theme) => ({ color: themePalette(theme).kokyu.feedback.warning })}
+                  />
+                ) : (
+                  <StarOutlineRoundedIcon />
+                )}
+              </IconButton>
+            </Stack>
+            <KokyuButton
+              variant="outlined"
+              size="small"
+              startIcon={<EditRoundedIcon />}
+              component={NextLink}
+              href={leisureRoutes.itemEdit(item.id)}
+              sx={{ flexShrink: 0, marginTop: 0.5 }}
             >
-              {item.favorite ? (
-                <StarRoundedIcon
-                  sx={(theme) => ({ color: themePalette(theme).kokyu.feedback.warning })}
-                />
-              ) : (
-                <StarOutlineRoundedIcon />
-              )}
-            </IconButton>
+              Editar
+            </KokyuButton>
           </Stack>
           {item.description ? (
             <Typography
