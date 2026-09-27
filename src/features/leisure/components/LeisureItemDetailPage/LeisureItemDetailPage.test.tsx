@@ -27,6 +27,18 @@ describe('LeisureItemDetailPage', () => {
     expect(screen.getByText(/Filme · Para assistir · 2h49/)).toBeInTheDocument();
   });
 
+  it('shows the cover and actions in one column and the filled-in details in the other', async () => {
+    render(<LeisureItemDetailPage itemId="book-hiperfoco" />);
+
+    expect(await screen.findByRole('heading', { name: 'Detalhes', level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Foco Total/ })).toBeInTheDocument();
+    expect(screen.getByText('Autor')).toBeInTheDocument();
+    expect(screen.getByText('Autor Exemplo')).toBeInTheDocument();
+    expect(screen.getByText('Páginas')).toBeInTheDocument();
+    expect(screen.getByText('220')).toBeInTheDocument();
+    expect(within(screen.getByLabelText('Tags')).getByText('aprender')).toBeInTheDocument();
+  });
+
   it('shows a "not found" message for an unknown item', async () => {
     render(<LeisureItemDetailPage itemId="does-not-exist" />);
     await waitFor(() => expect(screen.getByText('Item não encontrado.')).toBeInTheDocument());
