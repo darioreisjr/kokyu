@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { EmptyState, KokyuButton } from '@/design-system/components';
@@ -13,45 +14,29 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
+import { leisureRoutes } from '../../constants/leisureRoutes';
+
 import { useLeisureItems } from '../../hooks/useLeisureItems';
-import type { LeisureItemFormValues } from '../../schemas/leisureItemSchema';
 import type { PlanEntryFormValues } from '../../schemas/planEntrySchema';
 import { historyService } from '../../services/historyService';
-import { leisureItemService } from '../../services/leisureItemService';
 import { leisurePlanService } from '../../services/leisurePlanService';
 import type { LeisureItem } from '../../types/leisureItem.types';
 import { toDateKey } from '../../utils/dateHelpers';
-import { mapFormValuesToLeisureItemInput } from '../../utils/leisureItemFormMapper';
 import { LeisureItemCard } from '../LeisureItemCard/LeisureItemCard';
-import { LeisureItemDialog } from '../LeisureItemDialog/LeisureItemDialog';
 import { LogEntryDialog, type LogEntryDraft } from '../LogEntryDialog/LogEntryDialog';
 import { PlanEntryDialog } from '../PlanEntryDialog/PlanEntryDialog';
 
 /** `/app/tempo-livre/hobbies` — recurring, prazer-driven activities. Sessions are logged (`LeisureLogEntry`) without ever marking the hobby itself "completed" — a hobby is meant to be practiced again. */
 export function HobbiesPage() {
-  const { status, items, reload } = useLeisureItems();
+  const router = useRouter();
+  const { status, items } = useLeisureItems();
   const { showSuccess, showError } = useSnackbar();
 
-  const [addOpen, setAddOpen] = useState(false);
   const [planTarget, setPlanTarget] = useState<LeisureItem | null>(null);
   const [sessionTarget, setSessionTarget] = useState<LeisureItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const hobbies = items.filter((item) => item.type === 'hobby');
-
-  async function handleAdd(values: LeisureItemFormValues) {
-    setIsSubmitting(true);
-    try {
-      await leisureItemService.createLeisureItem(mapFormValuesToLeisureItemInput(values));
-      showSuccess('Hobby salvo.');
-      setAddOpen(false);
-      reload();
-    } catch (error) {
-      showError(friendlyErrorMessage(error, 'Não foi possível salvar o item agora.'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
 
   async function handlePlan(values: PlanEntryFormValues) {
     if (!planTarget) return;
@@ -106,7 +91,7 @@ export function HobbiesPage() {
         </Stack>
         <KokyuButton
           variant="contained"
-          onClick={() => setAddOpen(true)}
+          onClick={() => router.push(leisureRoutes.hobbyNew)}
           sx={{ alignSelf: { xs: 'stretch', sm: 'auto' } }}
         >
           Adicionar
@@ -137,7 +122,7 @@ export function HobbiesPage() {
           icon={FavoriteBorderRoundedIcon}
           title="Adicione algo que você gosta de fazer no seu tempo livre."
           action={
-            <KokyuButton variant="contained" onClick={() => setAddOpen(true)}>
+            <KokyuButton variant="contained" onClick={() => router.push(leisureRoutes.hobbyNew)}>
               Adicionar
             </KokyuButton>
           }
@@ -182,14 +167,6 @@ export function HobbiesPage() {
           ))}
         </Box>
       ) : null}
-
-      <LeisureItemDialog
-        open={addOpen}
-        lockedType="hobby"
-        onClose={() => setAddOpen(false)}
-        onSave={handleAdd}
-        isSubmitting={isSubmitting}
-      />
 
       <PlanEntryDialog
         open={Boolean(planTarget)}
