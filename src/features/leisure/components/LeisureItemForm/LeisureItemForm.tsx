@@ -58,6 +58,22 @@ async function loadLeisureItemTags(): Promise<string[]> {
  * full-page flows (e.g. `/app/tempo-livre/hobbies/novo`); it starts from
  * `defaultValues` each time it mounts.
  */
+/**
+ * Drops `null` values so the form's own defaults apply instead. Callers
+ * often pass fields straight from the API, which returns `null` for unset
+ * columns (description, sourceUrl, ...), while the form schema only
+ * accepts strings/`undefined` - a `null` failed validation, often on a
+ * field the user can't see, and Salvar silently did nothing.
+ */
+function withoutNulls(
+  values: Partial<LeisureItemFormValues> | undefined,
+): Partial<LeisureItemFormValues> {
+  if (!values) return {};
+  return Object.fromEntries(
+    Object.entries(values).filter(([, value]) => value !== null),
+  ) as Partial<LeisureItemFormValues>;
+}
+
 export function LeisureItemForm({
   formId,
   defaultValues,
@@ -74,7 +90,7 @@ export function LeisureItemForm({
     resolver: zodResolver(leisureItemSchema),
     defaultValues: {
       ...leisureItemFormDefaultValues,
-      ...defaultValues,
+      ...withoutNulls(defaultValues),
       ...(lockedType ? { type: lockedType } : {}),
     },
   });
