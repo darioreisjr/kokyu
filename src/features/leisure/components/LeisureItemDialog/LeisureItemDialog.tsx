@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { KokyuButton, KokyuTagsField, KokyuTextField } from '@/design-system/components';
+import { extractPastedUrl } from '@/shared/links/httpLink';
 import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
 
 import { CoverImageField } from '../CoverImageField/CoverImageField';
@@ -131,8 +132,12 @@ export function LeisureItemDialog({
           <Controller
             control={control}
             name="coverImage"
-            render={({ field }) => (
-              <CoverImageField value={field.value} onChange={field.onChange} />
+            render={({ field, fieldState }) => (
+              <CoverImageField
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+              />
             )}
           />
 
@@ -296,7 +301,25 @@ export function LeisureItemDialog({
             {...register('description')}
           />
           <Stack direction="row" spacing={2}>
-            <KokyuTextField label="Link (opcional)" sx={{ flex: 1 }} {...register('sourceUrl')} />
+            <Controller
+              control={control}
+              name="sourceUrl"
+              render={({ field, fieldState }) => (
+                <KokyuTextField
+                  label="Link (opcional)"
+                  placeholder="https://..."
+                  sx={{ flex: 1 }}
+                  {...field}
+                  value={field.value ?? ''}
+                  onBlur={(event) => {
+                    field.onChange(extractPastedUrl(event.target.value));
+                    field.onBlur();
+                  }}
+                  error={Boolean(fieldState.error)}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
             <KokyuTextField
               label="Recomendado por (opcional)"
               sx={{ flex: 1 }}

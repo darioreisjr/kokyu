@@ -8,6 +8,8 @@ import { useRef, useState } from 'react';
 
 import { KokyuButton, KokyuTextField } from '@/design-system/components';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { ApiError, friendlyErrorMessage } from '@/lib/api/errors';
+import { extractPastedUrl, isHttpUrl } from '@/shared/links/httpLink';
 
 import { uploadLeisureCoverImage } from '../../services/leisureCoverUploadService';
 import { validateCoverImageFile } from '../../utils/validateCoverImageFile';
@@ -15,6 +17,8 @@ import { validateCoverImageFile } from '../../utils/validateCoverImageFile';
 export interface CoverImageFieldProps {
   value: string | undefined;
   onChange: (url: string) => void;
+  /** Validation message for the link (e.g. not an http(s) URL). */
+  error?: string;
 }
 
 /**
@@ -24,7 +28,10 @@ export interface CoverImageFieldProps {
  * same field the link input edits — from the form's point of view
  * there's only ever one `coverImage` string, however it got there.
  */
-export function CoverImageField({ value, onChange }: CoverImageFieldProps) {
+export function CoverImageField({ value, onChange, error }: CoverImageFieldProps) {
+  // Only a valid http(s) link is previewed - never arbitrary typed text
+  // interpolated into a CSS url().
+  const previewUrl = value && isHttpUrl(value) ? value : undefined;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -48,7 +55,13 @@ export function CoverImageField({ value, onChange }: CoverImageFieldProps) {
       const url = await uploadLeisureCoverImage(file);
       onChange(url);
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Não foi possível enviar a imagem.');
+      setUploadError(
+        error instanceof ApiError
+          ? friendlyErrorMessage(error, 'Não foi possível enviar a imagem.')
+          : error instanceof Error
+            ? error.message
+            : 'Não foi possível enviar a imagem.',
+      );
     } finally {
       setIsUploading(false);
     }
@@ -63,7 +76,7 @@ export function CoverImageField({ value, onChange }: CoverImageFieldProps) {
           flexShrink: 0,
           borderRadius: 1,
           backgroundColor: themePalette(theme).kokyu.background.subtle,
-          backgroundImage: value ? `url(${value})` : undefined,
+          backgroundImage: previewUrl ? `url("${encodeURI(previewUrl)}")` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           display: 'flex',
@@ -71,7 +84,7 @@ export function CoverImageField({ value, onChange }: CoverImageFieldProps) {
           justifyContent: 'center',
         })}
       >
-        {!value ? (
+        {!previewUrl ? (
           <ImageRoundedIcon
             aria-hidden="true"
             sx={(theme) => ({ fontSize: 28, color: themePalette(theme).kokyu.text.disabled })}
@@ -85,6 +98,9 @@ export function CoverImageField({ value, onChange }: CoverImageFieldProps) {
           placeholder="https://..."
           value={value ?? ''}
           onChange={(event) => onChange(event.target.value)}
+          onBlur={(event) => onChange(extractPastedUrl(event.target.value))}
+          error={Boolean(error)}
+          helperText={error}
         />
         <input
           ref={inputRef}

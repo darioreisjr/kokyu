@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { optionalHttpLinkSchema } from '@/shared/links/httpLink';
+
 const leisureItemTypeValues = [
   'movie',
   'tvShow',
@@ -39,8 +41,8 @@ export const leisureItemSchema = z.object({
   durationType: z.enum(durationTypeValues),
   estimatedDuration: z.number().min(0).optional(),
   minimumUsefulDuration: z.number().min(0).optional(),
-  coverImage: z.string().optional(),
-  sourceUrl: z.string().optional(),
+  coverImage: optionalHttpLinkSchema.optional(),
+  sourceUrl: optionalHttpLinkSchema.optional(),
   recommendedBy: z.string().optional(),
   // Type-specific, all optional — only the ones for the chosen `type` are shown/used.
   author: z.string().optional(),
