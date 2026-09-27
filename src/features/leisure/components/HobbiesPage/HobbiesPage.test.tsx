@@ -3,15 +3,22 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
-import { leisureItemService } from '../../services/leisureItemService';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { historyService } from '../../services/historyService';
+import { leisureRoutes } from '../../constants/leisureRoutes';
+import { leisurePlanService } from '../../services/leisurePlanService';
 import { resetLeisureDb } from '../../services/leisureMockDb';
 import { HobbiesPage } from './HobbiesPage';
+
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 
 describe('HobbiesPage', () => {
   beforeEach(() => {
     resetLeisureDb();
+    mockPush.mockClear();
   });
 
   it('shows the header and lists hobbies only', async () => {
@@ -62,78 +69,41 @@ describe('HobbiesPage', () => {
     expect(history.some((entry) => entry.leisureItemId === 'hobby-violao')).toBe(true);
   });
 
-  it('adds a new hobby, locked to the hobby type', async () => {
+  it('opens the new-hobby page from Adicionar instead of a dialog', async () => {
     const user = userEvent.setup();
     render(<HobbiesPage />);
     await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
 
     await user.click(screen.getByRole('button', { name: 'Adicionar' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
-    expect(within(dialog).getByLabelText('Tipo')).toHaveAttribute('aria-disabled', 'true');
-    await user.type(within(dialog).getByLabelText('Título'), 'Jardinagem');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
-    await waitFor(() => expect(screen.getByText('Hobby salvo.')).toBeInTheDocument());
+    expect(mockPush).toHaveBeenCalledWith(leisureRoutes.hobbyNew);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('saves a hobby whose link was pasted as Markdown, with the cleaned URL (reported bug)', async () => {
+  it('shows a pt-BR error and keeps the dialog open when planning a session fails', async () => {
     const user = userEvent.setup();
-    const createSpy = vi.spyOn(leisureItemService, 'createLeisureItem');
-    render(<HobbiesPage />);
-    await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
-
-    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
-    await user.type(within(dialog).getByLabelText('Título'), 'Astrofotografia Básica');
-    const link = within(dialog).getByLabelText('Link (opcional)');
-    await user.click(link);
-    await user.paste('https://www.astrobin.com](https://www.astrobin.com)');
-    await user.tab();
-    expect(link).toHaveValue('https://www.astrobin.com');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
-
-    await waitFor(() => expect(screen.getByText('Hobby salvo.')).toBeInTheDocument());
-    expect(createSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ sourceUrl: 'https://www.astrobin.com' }),
-    );
-    createSpy.mockRestore();
-  });
-
-  it('blocks an invalid link in the form instead of sending it', async () => {
-    const user = userEvent.setup();
-    const createSpy = vi.spyOn(leisureItemService, 'createLeisureItem');
-    render(<HobbiesPage />);
-    await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
-
-    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
-    await user.type(within(dialog).getByLabelText('Título'), 'Astrofotografia');
-    await user.type(within(dialog).getByLabelText('Link (opcional)'), 'astrobin');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
-
-    expect(
-      await within(dialog).findByText('Informe um link válido, começando com https://'),
-    ).toBeInTheDocument();
-    expect(createSpy).not.toHaveBeenCalled();
-    createSpy.mockRestore();
-  });
-
-  it('shows a pt-BR error and keeps the dialog open when the API rejects the hobby', async () => {
-    const user = userEvent.setup();
-    const createSpy = vi
-      .spyOn(leisureItemService, 'createLeisureItem')
+    const planSpy = vi
+      .spyOn(leisurePlanService, 'createPlanEntry')
       .mockRejectedValueOnce(apiValidationError());
     render(<HobbiesPage />);
     await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
 
-    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
-    await user.type(within(dialog).getByLabelText('Título'), 'Jardinagem');
+    const buttons = screen.getAllByRole('button', { name: 'Planejar sessão' });
+    await user.click(buttons[0]!);
+    const dialog = await screen.findByRole('dialog', { name: 'Planejar atividade' });
+    const dayGroup = within(dialog).getByRole('group', { name: 'Dia' });
+    await user.click(dayGroup.querySelector('[aria-label="Day"]') as HTMLElement);
+    await user.paste('01/01/2030');
+    fireEvent.change(within(dialog).getByLabelText('Início'), { target: { value: '19:00' } });
+    fireEvent.change(within(dialog).getByLabelText('Fim'), { target: { value: '20:00' } });
+    await user.type(within(dialog).getByLabelText('Duração em minutos'), '60');
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Salvar' })).toBeEnabled(),
+    );
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
-    expect(screen.getByRole('dialog', { name: 'Novo item' })).toBeInTheDocument();
-    expect(within(dialog).getByLabelText('Título')).toHaveValue('Jardinagem');
-    createSpy.mockRestore();
+    expect(screen.getByRole('dialog', { name: 'Planejar atividade' })).toBeInTheDocument();
+    planSpy.mockRestore();
   });
 });
