@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { leisureItemFormDefaultValues } from '../schemas/leisureItemSchema';
-import type { BookItem, UnsortedItem } from '../types/leisureItem.types';
+import { leisureItemFormDefaultValues, leisureItemSchema } from '../schemas/leisureItemSchema';
+import type { BookItem, LeisureItem, UnsortedItem } from '../types/leisureItem.types';
 import {
   mapFormValuesToLeisureItemInput,
   mapFormValuesToLeisureItemPatch,
@@ -136,5 +136,33 @@ describe('mapLeisureItemToFormValues', () => {
       unsorted: {},
     };
     expect(mapLeisureItemToFormValues(unsorted).type).toBe('custom');
+  });
+
+  it('maps API nulls to values the form schema accepts (regression: edit could not be saved)', () => {
+    const fromApi = {
+      id: 'item-1',
+      type: 'hobby',
+      title: 'Astrofotografia',
+      description: null,
+      status: 'wantToTry',
+      coverImage: null,
+      tags: [],
+      priority: null,
+      estimatedDuration: null,
+      durationType: 'unknown',
+      minimumUsefulDuration: null,
+      favorite: false,
+      source: null,
+      sourceUrl: null,
+      recommendedBy: null,
+      hobby: {},
+      createdAt: '2030-01-01T00:00:00.000Z',
+      updatedAt: '2030-01-01T00:00:00.000Z',
+    } as unknown as LeisureItem;
+
+    const result = leisureItemSchema.safeParse(mapLeisureItemToFormValues(fromApi));
+
+    expect(result.error?.issues ?? []).toEqual([]);
+    expect(result.success).toBe(true);
   });
 });
