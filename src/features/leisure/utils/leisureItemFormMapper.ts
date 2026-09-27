@@ -60,6 +60,13 @@ export function mapFormValuesToLeisureItemPatch(
  * "organized" instead, never "edited"), but falls back to `custom` if
  * one ever does, so the form still renders something sane.
  */
+/**
+ * The API returns `null` for an unset nullable column (priority,
+ * estimated_duration, ...), but the form schema only accepts `undefined`
+ * (`.optional()`). A leftover `null` failed validation on a field that is
+ * often hidden (e.g. the duration only shows for "Fixa"), so Salvar did
+ * nothing and showed no error - hence every `?? undefined` below.
+ */
 export function mapLeisureItemToFormValues(item: LeisureItem): LeisureItemFormValues {
   const typeData = (item as unknown as Record<string, Record<string, unknown> | undefined>)[
     item.type
@@ -69,16 +76,16 @@ export function mapLeisureItemToFormValues(item: LeisureItem): LeisureItemFormVa
     type: item.type === 'unsorted' ? 'custom' : item.type,
     description: item.description ?? '',
     status: item.status,
-    tags: item.tags,
-    priority: item.priority,
+    tags: item.tags ?? [],
+    priority: item.priority ?? undefined,
     durationType: item.durationType,
-    estimatedDuration: item.estimatedDuration,
-    minimumUsefulDuration: item.minimumUsefulDuration,
+    estimatedDuration: item.estimatedDuration ?? undefined,
+    minimumUsefulDuration: item.minimumUsefulDuration ?? undefined,
     coverImage: item.coverImage ?? '',
     sourceUrl: item.sourceUrl ?? '',
     recommendedBy: item.recommendedBy ?? '',
     author: (typeData?.author as string | undefined) ?? '',
-    pages: typeData?.pages as number | undefined,
+    pages: (typeData?.pages as number | null | undefined) ?? undefined,
     platform: (typeData?.platform as string | undefined) ?? '',
     category: (typeData?.category as string | undefined) ?? '',
     address: (typeData?.address as string | undefined) ?? '',

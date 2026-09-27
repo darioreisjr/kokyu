@@ -1,12 +1,13 @@
 import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, waitFor } from '../../../../../test/test-utils';
 import { leisureRoutes } from '../../constants/leisureRoutes';
 import { leisurePlanService } from '../../services/leisurePlanService';
 import { resetLeisureDb } from '../../services/leisureMockDb';
 import type { LeisurePlanEntry } from '../../types/leisurePlan.types';
+import { toDateKey } from '../../utils/dateHelpers';
 import { PlanEntryFormPage } from './PlanEntryFormPage';
 
 const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
@@ -40,6 +41,10 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('PlanEntryFormPage', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   beforeEach(() => {
     resetLeisureDb();
     mockPush.mockClear();
@@ -164,10 +169,15 @@ describe('PlanEntryFormPage', () => {
   });
 
   it('creates a custom entry anchored to the earliest marked date', async () => {
+    // Pinned to local noon on a fixed day: the entry is 19:00-20:00 *today*,
+    // which the past-time rule rejects once the real clock passes 19:00 (CI
+    // runs in UTC). Only Date is faked, so user-event's timers still work.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2030, 0, 15, 12, 0, 0));
     const user = userEvent.setup();
     render(<PlanEntryFormPage mode="create" />);
-    const todayLabel = String(new Date().getDate());
-    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayLabel = '15';
+    const todayKey = toDateKey(new Date());
 
     await fillRequiredFields(user);
     await user.click(screen.getByLabelText('Recorrência'));
@@ -183,6 +193,7 @@ describe('PlanEntryFormPage', () => {
     expect(created?.recurrence).toBe('custom');
     expect(created?.customDates).toEqual([todayKey]);
     expect(created?.date).toBe(todayKey);
+    vi.useRealTimers();
   });
 
   it('navigates back to the planner via Cancelar', async () => {

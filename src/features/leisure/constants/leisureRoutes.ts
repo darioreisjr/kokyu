@@ -6,11 +6,13 @@ export const leisureRoutes = {
   library: '/app/tempo-livre/biblioteca',
   places: '/app/tempo-livre/lugares',
   hobbies: '/app/tempo-livre/hobbies',
+  hobbyNew: '/app/tempo-livre/hobbies/novo',
   notes: '/app/tempo-livre/notas',
   noteNew: '/app/tempo-livre/notas/nova',
   noteEdit: (id: string) => `/app/tempo-livre/notas/${id}/editar`,
   history: '/app/tempo-livre/historico',
   item: (id: string) => `/app/tempo-livre/item/${id}`,
+  itemEdit: (id: string) => `/app/tempo-livre/item/${id}/editar`,
   planNew: '/app/tempo-livre/planejamento/nova',
   planEdit: (id: string) => `/app/tempo-livre/planejamento/${id}/editar`,
 } as const;

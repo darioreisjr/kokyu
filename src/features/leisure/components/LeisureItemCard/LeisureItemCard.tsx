@@ -44,6 +44,10 @@ export function LeisureItemCard({ item, layout = 'grid' }: LeisureItemCardProps)
         padding: 2,
         textDecoration: 'none',
         color: 'inherit',
+        minWidth: 0,
+        // In a grid, fill the cell (Biblioteca) or the space above the
+        // action buttons (Hobbies, Lugares) so every card is the same height.
+        ...(layout === 'grid' ? { height: '100%', flex: '1 1 auto' } : {}),
       })}
     >
       <Box

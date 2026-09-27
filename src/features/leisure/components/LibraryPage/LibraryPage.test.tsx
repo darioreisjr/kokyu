@@ -1,6 +1,8 @@
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
+import { leisureItemService } from '../../services/leisureItemService';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { resetLeisureDb } from '../../services/leisureMockDb';
 import { LibraryPage } from './LibraryPage';
@@ -84,5 +86,23 @@ describe('LibraryPage', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     await waitFor(() => expect(screen.getByText('Item salvo.')).toBeInTheDocument());
+  });
+
+  it('shows a pt-BR error and keeps the dialog open when the API rejects the item', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi
+      .spyOn(leisureItemService, 'createLeisureItem')
+      .mockRejectedValueOnce(apiValidationError());
+    render(<LibraryPage />);
+    await waitFor(() => expect(screen.getByText('Interestelar')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
+    await user.type(within(dialog).getByLabelText('Título'), 'Duna');
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+
+    expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Novo item' })).toBeInTheDocument();
+    createSpy.mockRestore();
   });
 });

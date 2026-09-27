@@ -186,4 +186,31 @@ describe('NoteFormPage', () => {
     expect(updateSpy.mock.calls[0]![1].tags).toEqual(['dica']);
     updateSpy.mockRestore();
   });
+
+  it('cleans a link pasted as Markdown in a link note and blocks an invalid one', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi.spyOn(noteService, 'createNote');
+    render(<NoteFormPage mode="create" />);
+
+    await user.click(screen.getByLabelText('Tipo'));
+    await user.click(screen.getByRole('option', { name: 'Link' }));
+    await user.type(screen.getByLabelText('Título (opcional)'), 'Docs');
+    const link = screen.getByLabelText('Link');
+
+    await user.type(link, 'nextjs');
+    await user.tab();
+    expect(screen.getByText('Informe um link válido, começando com https://')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+
+    await user.clear(link);
+    await user.click(link);
+    await user.paste('[Next.js](https://nextjs.org/docs)');
+    await user.tab();
+    expect(link).toHaveValue('https://nextjs.org/docs');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(createSpy).toHaveBeenCalled());
+    expect(createSpy.mock.calls[0]![0].linkUrl).toBe('https://nextjs.org/docs');
+    createSpy.mockRestore();
+  });
 });

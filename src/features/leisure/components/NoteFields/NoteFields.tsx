@@ -8,9 +8,10 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
-import type { Dispatch, SetStateAction } from 'react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 import { KokyuButton, KokyuTagsField, KokyuTextField } from '@/design-system/components';
+import { extractPastedUrl, INVALID_LINK_MESSAGE, isHttpUrl } from '@/shared/links/httpLink';
 import { useTagSuggestions } from '@/shared/tags/useTagSuggestions';
 
 import { noteService } from '../../services/noteService';
@@ -37,7 +38,15 @@ export function emptyNoteDraft(): NoteDraft {
 }
 
 /** A checklist needs a title or at least one item; every other type needs a title or some content. */
+/** A link note's link, when filled, must be an http(s) URL - the rule the API enforces. */
+export function noteLinkError(draft: NoteDraft): string | null {
+  if (draft.type !== 'link') return null;
+  const link = draft.linkUrl.trim();
+  return link && !isHttpUrl(link) ? INVALID_LINK_MESSAGE : null;
+}
+
 export function canSubmitNoteDraft(draft: NoteDraft): boolean {
+  if (noteLinkError(draft)) return false;
   return draft.type === 'checklist'
     ? Boolean(draft.title.trim()) || draft.checklistItems.length > 0
     : Boolean(draft.content.trim()) || Boolean(draft.title.trim());
@@ -65,6 +74,9 @@ export interface NoteFieldsProps {
 /** The text/checklist/link/idea note fields — shared by `NoteDialog` and `NoteFormPage`, so both edit the exact same shape. */
 export function NoteFields({ draft, setDraft, autoFocus }: NoteFieldsProps) {
   const tagSuggestions = useTagSuggestions(loadNoteTags);
+  // Shown once the field has been left, not while the link is still being typed.
+  const [linkTouched, setLinkTouched] = useState(false);
+  const linkError = linkTouched ? noteLinkError(draft) : null;
 
   function updateItem(id: string, patch: Partial<ChecklistNoteItem>) {
     setDraft((current) => ({
@@ -118,8 +130,16 @@ export function NoteFields({ draft, setDraft, autoFocus }: NoteFieldsProps) {
       {draft.type === 'link' ? (
         <KokyuTextField
           label="Link"
+          placeholder="https://..."
           value={draft.linkUrl}
           onChange={(event) => setDraft((current) => ({ ...current, linkUrl: event.target.value }))}
+          onBlur={(event) => {
+            const cleaned = extractPastedUrl(event.target.value);
+            setDraft((current) => ({ ...current, linkUrl: cleaned }));
+            setLinkTouched(true);
+          }}
+          error={Boolean(linkError)}
+          helperText={linkError ?? undefined}
         />
       ) : null}
 

@@ -17,7 +17,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { EmptyState, KokyuButton, KokyuTextField } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
+import { leisureCardGridAutoRows, leisureCardGridColumns } from '../../constants/leisureGrid';
 import { leisureItemTypeDefinitions } from '../../constants/leisureItemTypes';
 import { useCollections } from '../../hooks/useCollections';
 import { useLeisureItems } from '../../hooks/useLeisureItems';
@@ -52,7 +54,7 @@ const filterOptions: { id: FilterValue; label: string }[] = [
 export function LibraryPage() {
   const { status, items, reload } = useLeisureItems();
   const { status: collectionsStatus, collections, reload: reloadCollections } = useCollections();
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
 
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterValue>('todos');
@@ -111,16 +113,22 @@ export function LibraryPage() {
       showSuccess('Item salvo.');
       setAddDialogOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar o item agora.'));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function handleCreateCollection(name: string) {
-    await collectionService.createCollection({ name });
-    showSuccess('Lista criada.');
-    setCreateCollectionOpen(false);
-    reloadCollections();
+    try {
+      await collectionService.createCollection({ name });
+      showSuccess('Lista criada.');
+      setCreateCollectionOpen(false);
+      reloadCollections();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível criar a coleção agora.'));
+    }
   }
 
   return (
@@ -250,7 +258,7 @@ export function LibraryPage() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            gridTemplateColumns: leisureCardGridColumns,
             gap: 2,
           }}
         >
@@ -282,10 +290,8 @@ export function LibraryPage() {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns:
-                viewMode === 'grid'
-                  ? { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(4, 1fr)' }
-                  : '1fr',
+              gridTemplateColumns: viewMode === 'grid' ? leisureCardGridColumns : '1fr',
+              gridAutoRows: viewMode === 'grid' ? leisureCardGridAutoRows : undefined,
               gap: 2,
             }}
           >

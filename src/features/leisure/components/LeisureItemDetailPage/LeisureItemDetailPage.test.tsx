@@ -2,7 +2,10 @@ import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
+import { leisureItemService } from '../../services/leisureItemService';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
+import { leisureRoutes } from '../../constants/leisureRoutes';
 import { resetLeisureDb } from '../../services/leisureMockDb';
 import { LeisureItemDetailPage } from './LeisureItemDetailPage';
 
@@ -23,6 +26,18 @@ describe('LeisureItemDetailPage', () => {
       expect(screen.getByRole('heading', { name: 'Interestelar' })).toBeInTheDocument(),
     );
     expect(screen.getByText(/Filme · Para assistir · 2h49/)).toBeInTheDocument();
+  });
+
+  it('shows the cover and actions in one column and the filled-in details in the other', async () => {
+    render(<LeisureItemDetailPage itemId="book-hiperfoco" />);
+
+    expect(await screen.findByRole('heading', { name: 'Detalhes', level: 2 })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Foco Total/ })).toBeInTheDocument();
+    expect(screen.getByText('Autor')).toBeInTheDocument();
+    expect(screen.getByText('Autor Exemplo')).toBeInTheDocument();
+    expect(screen.getByText('Páginas')).toBeInTheDocument();
+    expect(screen.getByText('220')).toBeInTheDocument();
+    expect(within(screen.getByLabelText('Tags')).getByText('aprender')).toBeInTheDocument();
   });
 
   it('shows a "not found" message for an unknown item', async () => {
@@ -97,27 +112,17 @@ describe('LeisureItemDetailPage', () => {
     );
   });
 
-  it('edits the item, prefilling the form from its current data', async () => {
-    const user = userEvent.setup();
+  it('links Editar to the edit page instead of opening a dialog', async () => {
     render(<LeisureItemDetailPage itemId="book-hobbit" />);
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'O Hobbit' })).toBeInTheDocument(),
     );
 
-    await user.click(screen.getByRole('button', { name: 'Editar' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Editar item' });
-    expect(within(dialog).getByLabelText('Autor')).toHaveValue('J.R.R. Tolkien');
-
-    await user.clear(within(dialog).getByLabelText('Título'));
-    await user.type(within(dialog).getByLabelText('Título'), 'O Hobbit — edição revisada');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
-
-    await waitFor(() => expect(screen.getByText('Item atualizado.')).toBeInTheDocument());
-    await waitFor(() =>
-      expect(
-        screen.getByRole('heading', { name: 'O Hobbit — edição revisada' }),
-      ).toBeInTheDocument(),
+    expect(screen.getByRole('link', { name: 'Editar' })).toHaveAttribute(
+      'href',
+      leisureRoutes.itemEdit('book-hobbit'),
     );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('plans the item', async () => {
@@ -180,31 +185,28 @@ describe('LeisureItemDetailPage', () => {
     );
   });
 
-  it('archives the item after confirming', async () => {
-    const user = userEvent.setup();
+  it('no longer offers Arquivar or Excluir (they moved to the edit page)', async () => {
     render(<LeisureItemDetailPage itemId="movie-curta-noite" />);
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Arquivar' })).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByRole('link', { name: 'Editar' })).toBeInTheDocument());
 
-    await user.click(screen.getByRole('button', { name: 'Arquivar' }));
-    const confirmDialog = await screen.findByRole('dialog', { name: 'Arquivar item?' });
-    await user.click(within(confirmDialog).getByRole('button', { name: 'Arquivar' }));
-
-    await waitFor(() => expect(screen.getByText('Item arquivado.')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Arquivar' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Excluir' })).not.toBeInTheDocument();
   });
 
-  it('deletes the item after confirming, then navigates to the library', async () => {
+  it('shows a pt-BR error when toggling favorite fails', async () => {
     const user = userEvent.setup();
-    render(<LeisureItemDetailPage itemId="movie-curta-noite" />);
+    const toggleSpy = vi
+      .spyOn(leisureItemService, 'toggleFavorite')
+      .mockRejectedValueOnce(apiValidationError());
+    render(<LeisureItemDetailPage itemId="book-hiperfoco" />);
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Excluir' })).toBeInTheDocument(),
+      expect(screen.getByRole('button', { name: 'Favoritar' })).toBeInTheDocument(),
     );
 
-    await user.click(screen.getByRole('button', { name: 'Excluir' }));
-    const confirmDialog = await screen.findByRole('dialog', { name: 'Excluir item?' });
-    await user.click(within(confirmDialog).getByRole('button', { name: 'Excluir' }));
+    await user.click(screen.getByRole('button', { name: 'Favoritar' }));
 
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/app/tempo-livre/biblioteca'));
+    expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Favoritar' })).toBeInTheDocument();
+    toggleSpy.mockRestore();
   });
 });
