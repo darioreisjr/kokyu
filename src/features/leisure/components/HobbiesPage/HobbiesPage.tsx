@@ -14,6 +14,7 @@ import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { friendlyErrorMessage } from '@/lib/api/errors';
 
+import { leisureCardGridColumns } from '../../constants/leisureGrid';
 import { leisureRoutes } from '../../constants/leisureRoutes';
 
 import { useLeisureItems } from '../../hooks/useLeisureItems';
@@ -102,7 +103,7 @@ export function HobbiesPage() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            gridTemplateColumns: leisureCardGridColumns,
             gap: 2,
           }}
         >
@@ -133,24 +134,19 @@ export function HobbiesPage() {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-              lg: 'repeat(4, 1fr)',
-            },
+            gridTemplateColumns: leisureCardGridColumns,
             gap: 2,
           }}
         >
           {hobbies.map((item) => (
             <Stack key={item.id} spacing={1}>
               <LeisureItemCard item={item} />
-              <Stack direction="row" spacing={1}>
+              <Stack spacing={1}>
                 <KokyuButton
                   variant="outlined"
                   size="small"
                   onClick={() => setPlanTarget(item)}
-                  sx={{ flex: 1 }}
+                  fullWidth
                 >
                   Planejar sessão
                 </KokyuButton>
@@ -158,7 +154,7 @@ export function HobbiesPage() {
                   variant="outlined"
                   size="small"
                   onClick={() => setSessionTarget(item)}
-                  sx={{ flex: 1 }}
+                  fullWidth
                 >
                   Registrar sessão
                 </KokyuButton>
