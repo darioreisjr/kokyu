@@ -20,6 +20,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { KokyuButton, KokyuTextField } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { getLeisureItemTypeLabel } from '../../constants/leisureItemTypes';
 import { leisureRoutes } from '../../constants/leisureRoutes';
@@ -65,7 +66,7 @@ function progressFieldLabel(item: LeisureItem): string | null {
 /** `/app/tempo-livre/item/[id]` — the first dynamic route in Tempo Livre. Only ever shows the fields relevant to the item's own `type`. */
 export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
   const router = useRouter();
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
   const confirmAction = useConfirmAction();
 
   const [status, setStatus] = useState<'loading' | 'ready' | 'error' | 'not-found'>('loading');
@@ -123,8 +124,12 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
 
   async function handleToggleFavorite() {
     if (!item) return;
-    await leisureItemService.toggleFavorite(item.id);
-    reload();
+    try {
+      await leisureItemService.toggleFavorite(item.id);
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível atualizar o favorito agora.'));
+    }
   }
 
   async function handleEdit(values: LeisureItemFormValues) {
@@ -138,6 +143,8 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
       showSuccess('Item atualizado.');
       setEditOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar as alterações agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -145,36 +152,48 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
 
   async function handleToggleCollection(collectionId: string, checked: boolean) {
     if (!item) return;
-    if (checked) {
-      await collectionService.addItemToCollection(collectionId, item.id);
-    } else {
-      await collectionService.removeItemFromCollection(collectionId, item.id);
+    try {
+      if (checked) {
+        await collectionService.addItemToCollection(collectionId, item.id);
+      } else {
+        await collectionService.removeItemFromCollection(collectionId, item.id);
+      }
+      const updated = await collectionService.getCollections();
+      setCollections(updated);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível atualizar a coleção agora.'));
     }
-    const updated = await collectionService.getCollections();
-    setCollections(updated);
   }
 
   async function handleStart() {
     if (!item) return;
-    await leisureItemService.updateLeisureItem(item.id, { status: 'inProgress' } as Parameters<
-      typeof leisureItemService.updateLeisureItem
-    >[1]);
-    showSuccess('Atividade iniciada.');
-    reload();
+    try {
+      await leisureItemService.updateLeisureItem(item.id, { status: 'inProgress' } as Parameters<
+        typeof leisureItemService.updateLeisureItem
+      >[1]);
+      showSuccess('Atividade iniciada.');
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível iniciar agora.'));
+    }
   }
 
   async function handleArchive() {
     if (!item) return;
-    confirmAction.request({
-      title: 'Arquivar item?',
-      description: `"${item.title}" será arquivado.`,
-      confirmLabel: 'Arquivar',
-      onConfirm: async () => {
-        await leisureItemService.archiveLeisureItem(item.id);
-        showSuccess('Item arquivado.');
-        reload();
-      },
-    });
+    try {
+      confirmAction.request({
+        title: 'Arquivar item?',
+        description: `"${item.title}" será arquivado.`,
+        confirmLabel: 'Arquivar',
+        onConfirm: async () => {
+          await leisureItemService.archiveLeisureItem(item.id);
+          showSuccess('Item arquivado.');
+          reload();
+        },
+      });
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível arquivar agora.'));
+    }
   }
 
   function handleDelete() {
@@ -193,9 +212,13 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
 
   async function handlePlan(values: PlanEntryFormValues) {
     if (!item) return;
-    await leisurePlanService.createPlanEntry({ ...values, leisureItemId: item.id });
-    showSuccess('Atividade planejada.');
-    setPlanOpen(false);
+    try {
+      await leisurePlanService.createPlanEntry({ ...values, leisureItemId: item.id });
+      showSuccess('Atividade planejada.');
+      setPlanOpen(false);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível planejar agora.'));
+    }
   }
 
   async function handleCreateNote(draft: NoteDraft) {
@@ -214,6 +237,8 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
       showSuccess('Nota salva.');
       setNoteOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar a nota agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -238,6 +263,8 @@ export function LeisureItemDetailPage({ itemId }: LeisureItemDetailPageProps) {
       showSuccess('Item concluído.');
       setLogOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível concluir agora.'));
     } finally {
       setIsSubmitting(false);
     }

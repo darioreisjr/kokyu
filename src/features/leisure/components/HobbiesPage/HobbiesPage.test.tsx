@@ -1,7 +1,9 @@
 import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
+import { leisureItemService } from '../../services/leisureItemService';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { historyService } from '../../services/historyService';
 import { resetLeisureDb } from '../../services/leisureMockDb';
@@ -72,5 +74,66 @@ describe('HobbiesPage', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     await waitFor(() => expect(screen.getByText('Hobby salvo.')).toBeInTheDocument());
+  });
+
+  it('saves a hobby whose link was pasted as Markdown, with the cleaned URL (reported bug)', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi.spyOn(leisureItemService, 'createLeisureItem');
+    render(<HobbiesPage />);
+    await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
+    await user.type(within(dialog).getByLabelText('Título'), 'Astrofotografia Básica');
+    const link = within(dialog).getByLabelText('Link (opcional)');
+    await user.click(link);
+    await user.paste('https://www.astrobin.com](https://www.astrobin.com)');
+    await user.tab();
+    expect(link).toHaveValue('https://www.astrobin.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+
+    await waitFor(() => expect(screen.getByText('Hobby salvo.')).toBeInTheDocument());
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceUrl: 'https://www.astrobin.com' }),
+    );
+    createSpy.mockRestore();
+  });
+
+  it('blocks an invalid link in the form instead of sending it', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi.spyOn(leisureItemService, 'createLeisureItem');
+    render(<HobbiesPage />);
+    await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
+    await user.type(within(dialog).getByLabelText('Título'), 'Astrofotografia');
+    await user.type(within(dialog).getByLabelText('Link (opcional)'), 'astrobin');
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+
+    expect(
+      await within(dialog).findByText('Informe um link válido, começando com https://'),
+    ).toBeInTheDocument();
+    expect(createSpy).not.toHaveBeenCalled();
+    createSpy.mockRestore();
+  });
+
+  it('shows a pt-BR error and keeps the dialog open when the API rejects the hobby', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi
+      .spyOn(leisureItemService, 'createLeisureItem')
+      .mockRejectedValueOnce(apiValidationError());
+    render(<HobbiesPage />);
+    await waitFor(() => expect(screen.getByText('Violão')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Novo item' });
+    await user.type(within(dialog).getByLabelText('Título'), 'Jardinagem');
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+
+    expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Novo item' })).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('Título')).toHaveValue('Jardinagem');
+    createSpy.mockRestore();
   });
 });

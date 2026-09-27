@@ -13,6 +13,7 @@ import { MotionPreferenceProvider } from '@/design-system/providers/MotionPrefer
 import { SnackbarProvider } from '@/design-system/providers/SnackbarProvider';
 import { ThemeRegistry } from '@/design-system/providers/ThemeRegistry';
 import { PreferencesProvider, usePreferences } from '@/features/settings';
+import { UnhandledApiErrorListener } from '@/lib/api/UnhandledApiErrorListener';
 
 /**
  * Single place to compose every app-wide provider. `PreferencesProvider`
@@ -41,7 +42,10 @@ function PreferenceAwareProviders({ children }: { children: ReactNode }) {
     >
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
         <MotionPreferenceProvider mode={preferences.accessibility.reducedMotion}>
-          <SnackbarProvider>{children}</SnackbarProvider>
+          <SnackbarProvider>
+            <UnhandledApiErrorListener />
+            {children}
+          </SnackbarProvider>
         </MotionPreferenceProvider>
       </LocalizationProvider>
     </ThemeRegistry>

@@ -19,6 +19,7 @@ import { EmptyState, KokyuButton } from '@/design-system/components';
 import { useSnackbar } from '@/design-system/providers/SnackbarProvider';
 import { themePalette } from '@/design-system/theme/useThemePalette';
 import { cardTokens } from '@/design-system/tokens/component';
+import { friendlyErrorMessage } from '@/lib/api/errors';
 
 import { useConfirmAction } from '../../hooks/useConfirmAction';
 import { useLeisureItems } from '../../hooks/useLeisureItems';
@@ -142,7 +143,7 @@ function LaterItemRow({
  */
 export function LaterPage() {
   const { status, items, reload } = useLeisureItems();
-  const { showSuccess } = useSnackbar();
+  const { showSuccess, showError } = useSnackbar();
   const confirmAction = useConfirmAction();
 
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
@@ -170,6 +171,8 @@ export function LaterPage() {
       showSuccess('Adicionado para depois.');
       setQuickCaptureOpen(false);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível salvar agora.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -197,23 +200,33 @@ export function LaterPage() {
       showSuccess('Item organizado.');
       setOrganizeTarget(null);
       reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível organizar o item agora.'));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function handleStart(item: LeisureItem) {
-    await leisureItemService.updateLeisureItem(item.id, { status: 'inProgress' } as Parameters<
-      typeof leisureItemService.updateLeisureItem
-    >[1]);
-    showSuccess('Atividade iniciada.');
-    reload();
+    try {
+      await leisureItemService.updateLeisureItem(item.id, { status: 'inProgress' } as Parameters<
+        typeof leisureItemService.updateLeisureItem
+      >[1]);
+      showSuccess('Atividade iniciada.');
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível iniciar agora.'));
+    }
   }
 
   async function handleArchive(item: LeisureItem) {
-    await leisureItemService.archiveLeisureItem(item.id);
-    showSuccess('Item arquivado.');
-    reload();
+    try {
+      await leisureItemService.archiveLeisureItem(item.id);
+      showSuccess('Item arquivado.');
+      reload();
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível arquivar agora.'));
+    }
   }
 
   function handleRemove(item: LeisureItem) {
@@ -232,9 +245,13 @@ export function LaterPage() {
 
   async function handlePlan(values: PlanEntryFormValues) {
     if (!planTarget) return;
-    await leisurePlanService.createPlanEntry({ ...values, leisureItemId: planTarget.id });
-    showSuccess('Atividade planejada.');
-    setPlanTarget(null);
+    try {
+      await leisurePlanService.createPlanEntry({ ...values, leisureItemId: planTarget.id });
+      showSuccess('Atividade planejada.');
+      setPlanTarget(null);
+    } catch (error) {
+      showError(friendlyErrorMessage(error, 'Não foi possível planejar agora.'));
+    }
   }
 
   return (

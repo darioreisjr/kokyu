@@ -2,6 +2,7 @@ import { fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { apiValidationError, VALIDATION_ERROR_MESSAGE } from '../../../../../test/apiErrors';
 import { render, screen, waitFor, within } from '../../../../../test/test-utils';
 import { leisureItemService } from '../../services/leisureItemService';
 import { resetLeisureDb } from '../../services/leisureMockDb';
@@ -167,5 +168,23 @@ describe('LaterPage', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
 
     await waitFor(() => expect(screen.getByText('Adicionado para depois.')).toBeInTheDocument());
+  });
+
+  it('shows a pt-BR error and keeps the dialog open when a quick capture fails', async () => {
+    const user = userEvent.setup();
+    const createSpy = vi
+      .spyOn(leisureItemService, 'createLeisureItem')
+      .mockRejectedValueOnce(apiValidationError());
+    render(<LaterPage />);
+    await waitFor(() => expect(screen.getByText('Sua lista está vazia.')).toBeInTheDocument());
+
+    await user.click(screen.getByRole('button', { name: 'Guardar para depois' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Guardar para depois' });
+    await user.type(within(dialog).getByLabelText('Título'), 'Algo novo');
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+
+    expect(await screen.findByText(VALIDATION_ERROR_MESSAGE)).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Guardar para depois' })).toBeInTheDocument();
+    createSpy.mockRestore();
   });
 });
