@@ -1,75 +1,72 @@
 import { expect, test } from '@playwright/test';
 
-const primaryLabels = [
-  'Respiração',
-  'Missões',
-  'Ritmo Diário',
-  'Treinamento',
-  'Nutrição',
-  'Hábitos',
-  'Metas',
-  'Tempo Livre',
-];
+import { navigationFlags } from './fixtures/flags';
+
+/** Primary sections, in menu order, with their feature flag id and route. */
+const primarySections = [
+  { label: 'Respiração', flag: 'respiracao', route: '/app' },
+  { label: 'Missões', flag: 'missoes', route: '/app/missoes' },
+  { label: 'Ritmo Diário', flag: 'ritmo-diario', route: '/app/ritmo-diario' },
+  { label: 'Treinamento', flag: 'treinamento', route: '/app/treinamento' },
+  { label: 'Nutrição', flag: 'nutricao', route: '/app/nutricao' },
+  { label: 'Hábitos', flag: 'habitos', route: '/app/habitos' },
+  { label: 'Metas', flag: 'metas', route: '/app/metas' },
+  { label: 'Tempo Livre', flag: 'tempo-livre', route: '/app/tempo-livre' },
+] as const;
+
+/** Splits the sections by the backend's feature flags: enabled ones are links, the rest are locked. */
+async function sectionsByFlag() {
+  const flags = await navigationFlags();
+  return {
+    enabled: primarySections.filter((section) => flags[section.flag]),
+    locked: primarySections.filter((section) => !flags[section.flag]),
+  };
+}
+
+// `/` needs no escaping inside `new RegExp`.
+const routePattern = (route: string) => new RegExp(`${route}$`);
 
 test.describe('App shell — desktop navigation', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test('full navigation, active state and collapse round-trip', async ({ page }) => {
-    // 1-2. Access /app and verify the menu.
+    const { enabled, locked } = await sectionsByFlag();
     await page.goto('/app');
     const sidebar = page.locator('aside[aria-label="Barra lateral"]');
     await expect(sidebar).toBeVisible();
-    for (const label of primaryLabels) {
+
+    // Enabled sections are links; the rest are disabled, marked "Em breve".
+    for (const { label } of enabled) {
       await expect(sidebar.getByRole('link', { name: label })).toBeVisible();
     }
+    for (const { label } of locked) {
+      await expect(sidebar.getByRole('button', { name: new RegExp(`^${label}`) })).toBeDisabled();
+    }
 
-    // 3. "Respiração" starts active.
+    // "Respiração" starts active.
     await expect(sidebar.getByRole('link', { name: 'Respiração' })).toHaveAttribute(
       'aria-current',
       'page',
     );
 
-    // 4-7. Navigate to "Missões" and confirm URL, title and active state.
-    await sidebar.getByRole('link', { name: 'Missões' }).click();
-    await expect(page).toHaveURL(/\/app\/missoes$/);
-    await expect(page.getByRole('heading', { name: 'Missões' })).toBeVisible();
-    await expect(sidebar.getByRole('link', { name: 'Missões' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    await expect(sidebar.getByRole('link', { name: 'Respiração' })).not.toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-
-    // 8. Walk through every remaining primary item.
-    const routeByLabel: Record<string, string> = {
-      Respiração: '/app',
-      Missões: '/app/missoes',
-      'Ritmo Diário': '/app/ritmo-diario',
-      Treinamento: '/app/treinamento',
-      Nutrição: '/app/nutricao',
-      Hábitos: '/app/habitos',
-      Metas: '/app/metas',
-      'Tempo Livre': '/app/tempo-livre',
-    };
-    for (const label of primaryLabels) {
+    // Walk through every enabled section: URL, title and active state.
+    for (const { label, route } of enabled) {
       await sidebar.getByRole('link', { name: label }).click();
-      await expect(page).toHaveURL(new RegExp(`${routeByLabel[label]!.replace(/\//g, '\\/')}$`));
-      await expect(page.getByRole('heading', { name: label })).toBeVisible();
+      await expect(page).toHaveURL(routePattern(route));
+      await expect(page.getByRole('heading', { name: label, level: 1 })).toBeVisible();
       await expect(sidebar.getByRole('link', { name: label })).toHaveAttribute(
         'aria-current',
         'page',
       );
     }
 
-    // 9-10. Collapse the sidebar and verify compact mode.
+    // Collapse the sidebar and verify compact mode.
     await page.getByRole('button', { name: 'Recolher menu' }).click();
     await expect(page.getByRole('button', { name: 'Expandir menu' })).toBeVisible();
     await expect(sidebar.getByText('Tempo Livre')).not.toBeVisible();
     await expect(sidebar.getByRole('link', { name: 'Tempo Livre' })).toBeVisible();
 
-    // 11. Expand again.
+    // Expand again.
     await page.getByRole('button', { name: 'Expandir menu' }).click();
     await expect(page.getByRole('button', { name: 'Recolher menu' })).toBeVisible();
     await expect(sidebar.getByText('Tempo Livre')).toBeVisible();
@@ -79,24 +76,18 @@ test.describe('App shell — desktop navigation', () => {
     await page.goto('/app');
     await page.getByRole('button', { name: 'Recolher menu' }).click();
 
-    const treinamentoLink = page.locator('aside').getByRole('link', { name: 'Treinamento' });
-    await treinamentoLink.hover();
-    await expect(page.getByRole('tooltip', { name: 'Treinamento' })).toBeVisible();
+    await page.locator('aside').getByRole('link', { name: 'Tempo Livre' }).hover();
+    await expect(page.getByRole('tooltip', { name: 'Tempo Livre' })).toBeVisible();
   });
 
-  test('navigates to /app/perfil, /app/configuracoes and logs out to /login', async ({ page }) => {
+  test('navigates to /app/perfil', async ({ page }) => {
     await page.goto('/app');
 
     await page.getByRole('link', { name: 'Perfil' }).click();
     await expect(page).toHaveURL(/\/app\/perfil$/);
     await expect(page.getByRole('heading', { name: 'Perfil' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Configurações' }).click();
-    await expect(page).toHaveURL(/\/app\/configuracoes$/);
-    await expect(page.getByRole('heading', { name: 'Configurações' })).toBeVisible();
-
-    await page.getByRole('button', { name: 'Sair' }).click();
-    await expect(page).toHaveURL(/\/login$/);
+    // Configurações is behind a feature flag and logout lives in logout.spec.ts.
   });
 });
 
@@ -104,52 +95,44 @@ test.describe('App shell — mobile navigation', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test('drawer opens, navigates, closes and reflects the active item', async ({ page }) => {
-    // 1-2. Access /app — no permanent sidebar.
+    const { enabled } = await sectionsByFlag();
+    // Access /app — no permanent sidebar.
     await page.goto('/app');
     await expect(page.locator('aside[aria-label="Barra lateral"]')).toBeHidden();
 
-    // 3-4. Open the menu and verify items.
+    // Open the menu and verify the enabled sections.
     await page.getByRole('button', { name: 'Abrir menu' }).click();
     const drawerNav = page.getByRole('navigation', { name: 'Navegação principal' });
-    for (const label of primaryLabels) {
+    for (const { label } of enabled) {
       await expect(drawerNav.getByRole('link', { name: label })).toBeVisible();
     }
 
-    // 5-7. Select "Treinamento" — the drawer closes and the URL updates.
-    await drawerNav.getByRole('link', { name: 'Treinamento' }).click();
-    await expect(page).toHaveURL(/\/app\/treinamento$/);
+    // Select "Tempo Livre" — the drawer closes and the URL updates.
+    await drawerNav.getByRole('link', { name: 'Tempo Livre' }).click();
+    await expect(page).toHaveURL(/\/app\/tempo-livre$/);
     await expect(drawerNav).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tempo Livre', level: 1 })).toBeVisible();
 
-    // 8. Verify the page title.
-    await expect(page.getByRole('heading', { name: 'Treinamento' })).toBeVisible();
-
-    // 9-10. Reopen the menu — "Treinamento" is active.
+    // Reopen the menu — "Tempo Livre" is active.
     await page.getByRole('button', { name: 'Abrir menu' }).click();
     await expect(
       page.getByRole('navigation', { name: 'Navegação principal' }).getByRole('link', {
-        name: 'Treinamento',
+        name: 'Tempo Livre',
       }),
     ).toHaveAttribute('aria-current', 'page');
   });
 
   test('closes on Escape and shows the current page name in the top bar', async ({ page }) => {
-    await page.goto('/app/nutricao');
-    await expect(page.getByRole('heading', { name: 'Nutrição' })).toBeVisible();
-    await expect(page.locator('header').getByText('Nutrição', { exact: true })).toBeVisible();
+    await page.goto('/app/tempo-livre');
+    await expect(page.getByRole('heading', { name: 'Tempo Livre', level: 1 })).toBeVisible();
+    await expect(page.locator('header').getByText('Tempo Livre', { exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: 'Abrir menu' }).click();
-    await expect(page.getByRole('link', { name: 'Metas' })).toBeVisible();
+    const drawerNav = page.getByRole('navigation', { name: 'Navegação principal' });
+    await expect(drawerNav.getByRole('link', { name: 'Respiração' })).toBeVisible();
 
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('link', { name: 'Metas' })).not.toBeVisible();
-  });
-
-  test('logs out from the drawer', async ({ page }) => {
-    await page.goto('/app');
-    await page.getByRole('button', { name: 'Abrir menu' }).click();
-    await page.getByRole('button', { name: 'Sair' }).click();
-
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(drawerNav).not.toBeVisible();
   });
 });
 

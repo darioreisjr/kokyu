@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { SIGNED_OUT } from './fixtures/auth';
+
+// The public 404: signed out, its CTA leads to /login.
+test.use(SIGNED_OUT);
+
 test.describe('404 — Respiração Perdida', () => {
   test('shows the 404 page for an unknown route', async ({ page }) => {
     const response = await page.goto('/essa-rota-nao-existe');

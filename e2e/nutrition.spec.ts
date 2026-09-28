@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { skipUnlessSectionEnabled } from './fixtures/flags';
+
+// Nutrição is behind a navigation feature flag; skipped while it's off.
+skipUnlessSectionEnabled('nutricao', 'Nutrição');
+
 /** Next Wednesday from "now" (today counts if it's already Wednesday) — computed at run time so the test never goes stale. */
 function nextWednesday(): { day: string; month: string; year: string; isCurrentWeek: boolean } {
   const today = new Date();

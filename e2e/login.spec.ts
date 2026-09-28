@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { SIGNED_OUT } from './fixtures/auth';
+
+// Starts without a session: this spec covers public pages or logs in itself.
+test.use(SIGNED_OUT);
+
 test.describe('Login flow', () => {
   test('redirects the root route to /login', async ({ page }) => {
     await page.goto('/');

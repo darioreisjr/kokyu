@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { skipUnlessSectionEnabled } from './fixtures/flags';
+
+// Ritmo Diário is behind a navigation feature flag; skipped while it's off.
+skipUnlessSectionEnabled('ritmo-diario', 'Ritmo Diário');
+
 test.describe('Ritmo Diário Module', () => {
   test('navigates through Ritmo Diário views, opens planning, and manages entries', async ({
     page,

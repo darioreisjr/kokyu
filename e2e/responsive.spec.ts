@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { SIGNED_OUT } from './fixtures/auth';
+
+// Starts without a session: this spec covers public pages or logs in itself.
+test.use(SIGNED_OUT);
+
 const viewports = {
   mobile: { width: 390, height: 844 },
   tablet: { width: 820, height: 1180 },

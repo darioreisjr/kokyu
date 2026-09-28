@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { skipUnlessSectionEnabled } from './fixtures/flags';
+
+// Metas is behind a navigation feature flag; skipped while it's off.
+skipUnlessSectionEnabled('metas', 'Metas');
+
 async function goThroughStep(page: Page) {
   await page.getByRole('button', { name: 'Continuar' }).click();
 }

@@ -1,5 +1,11 @@
 import type { Page } from '@playwright/test';
 
+/** Where `setup/auth.setup.ts` saves the signed-in session (git-ignored). */
+export const AUTH_STATE_PATH = 'e2e/.auth/user.json';
+
+/** `test.use(SIGNED_OUT)` for a spec that must start without a session (login, signup, ...). */
+export const SIGNED_OUT = { storageState: { cookies: [], origins: [] } };
+
 /**
  * Shared e2e auth fixtures. There is no Playwright `storageState`
  * project wired up yet (see the note at the bottom) — every helper
@@ -26,13 +32,32 @@ export const COMPLETE_PROFILE_USER = {
   password: process.env.E2E_COMPLETE_USER_PASSWORD ?? 'super-secreta',
 };
 
-/** Logs in as `COMPLETE_PROFILE_USER` via the real login form and waits for the post-login redirect to resolve. */
-export async function loginAsCompleteUser(page: Page): Promise<void> {
+/**
+ * A second complete-profile user, only for the logout tests: the app signs
+ * out with Supabase's default *global* scope, which revokes every session of
+ * that user - logging out as COMPLETE_PROFILE_USER would kill the session
+ * every other spec shares (saved by setup/auth.setup.ts) mid-run.
+ */
+export const LOGOUT_USER = {
+  email: process.env.E2E_LOGOUT_USER_EMAIL ?? 'logout-e2e@example.com',
+  password: process.env.E2E_LOGOUT_USER_PASSWORD ?? 'super-secreta',
+};
+
+/** Logs in via the real login form and waits for the post-login redirect to resolve. */
+export async function loginAs(
+  page: Page,
+  user: { email: string; password: string },
+): Promise<void> {
   await page.goto('/login');
-  await page.getByLabel('E-mail').fill(COMPLETE_PROFILE_USER.email);
-  await page.getByLabel('Senha', { exact: true }).fill(COMPLETE_PROFILE_USER.password);
+  await page.getByLabel('E-mail').fill(user.email);
+  await page.getByLabel('Senha', { exact: true }).fill(user.password);
   await page.getByRole('button', { name: 'Entrar' }).click();
   await page.waitForURL(/\/app/, { timeout: 15000 });
+}
+
+/** Logs in as `COMPLETE_PROFILE_USER` via the real login form. */
+export async function loginAsCompleteUser(page: Page): Promise<void> {
+  await loginAs(page, COMPLETE_PROFILE_USER);
 }
 
 /** A syntactically valid, virtually-never-colliding email/username pair for a fresh signup in a given test run. */

@@ -92,3 +92,6 @@ $RECYCLE.BIN/
 /.gemini
 /.cursor
 .aider*
+
+# e2e session saved by e2e/setup/auth.setup.ts
+/e2e/.auth

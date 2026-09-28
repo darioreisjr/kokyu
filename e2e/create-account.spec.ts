@@ -1,5 +1,10 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+import { SIGNED_OUT } from './fixtures/auth';
+
+// Starts without a session: this spec covers public pages or logs in itself.
+test.use(SIGNED_OUT);
+
 async function fillBirthDate(page: Page, day: string, month: string, year: string) {
   const group = page.getByRole('group', { name: 'Data de nascimento' });
   await group.locator('[aria-label="Day"]').click();

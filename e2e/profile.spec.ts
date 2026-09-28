@@ -1,7 +1,10 @@
 import path from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 
-import { freshSignupIdentity, loginAsCompleteUser } from './fixtures/auth';
+import { freshSignupIdentity, loginAsCompleteUser, SIGNED_OUT } from './fixtures/auth';
+
+// Starts without a session: this spec covers public pages or logs in itself.
+test.use(SIGNED_OUT);
 
 const testImage = path.resolve(__dirname, 'fixtures/test-avatar.png');
 
