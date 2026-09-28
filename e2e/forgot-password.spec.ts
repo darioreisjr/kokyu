@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { freshSignupIdentity, SIGNED_OUT } from './fixtures/auth';
+
+// Starts without a session: this spec covers public pages or logs in itself.
+test.use(SIGNED_OUT);
+
 test.describe('Forgot password flow', () => {
   test('navigates from login to the recovery screen', async ({ page }) => {
     await page.goto('/login');
@@ -35,9 +40,13 @@ test.describe('Forgot password flow', () => {
   });
 
   test('submits a valid email and shows the neutral confirmation state', async ({ page }) => {
+    // A fresh address per test: Supabase sends at most one email per
+    // address per minute, so reusing one across tests made the second
+    // request fail. Unknown addresses get the same neutral answer.
+    const { email } = freshSignupIdentity();
     await page.goto('/forgot-password');
 
-    await page.getByLabel('E-mail').fill('usuario@example.com');
+    await page.getByLabel('E-mail').fill(email);
     await page.getByRole('button', { name: 'Enviar instruções' }).click();
 
     await expect(page.getByRole('heading', { name: 'Verifique seu e-mail' })).toBeVisible();
@@ -46,7 +55,7 @@ test.describe('Forgot password flow', () => {
         'Se existir uma conta associada a este endereço, você receberá as instruções para redefinir sua senha.',
       ),
     ).toBeVisible();
-    await expect(page.getByText('usuario@example.com')).toBeVisible();
+    await expect(page.getByText(email)).toBeVisible();
 
     // The interface must never reveal whether the account actually exists.
     for (const forbidden of ['não encontrado', 'não cadastrado', 'conta inexistente']) {
@@ -55,9 +64,10 @@ test.describe('Forgot password flow', () => {
   });
 
   test('"Enviar novamente" starts a cooldown that counts down', async ({ page }) => {
+    const { email } = freshSignupIdentity();
     await page.goto('/forgot-password');
 
-    await page.getByLabel('E-mail').fill('usuario@example.com');
+    await page.getByLabel('E-mail').fill(email);
     await page.getByRole('button', { name: 'Enviar instruções' }).click();
     await page.getByRole('heading', { name: 'Verifique seu e-mail' }).waitFor();
 

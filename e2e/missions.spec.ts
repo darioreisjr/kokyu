@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { skipUnlessSectionEnabled } from './fixtures/flags';
+
+// Missões is behind a navigation feature flag; skipped while it's off.
+skipUnlessSectionEnabled('missoes', 'Missões');
+
 test.describe('Missões — fluxo principal', () => {
   test('captura, processa a Inbox, planeja e conclui uma missão', async ({ page }) => {
     // 1. Acessar Missões (Hoje).

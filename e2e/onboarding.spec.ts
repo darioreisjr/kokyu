@@ -4,7 +4,11 @@ import {
   confirmationLinkFromInbucket,
   freshSignupIdentity,
   loginAsCompleteUser,
+  SIGNED_OUT,
 } from './fixtures/auth';
+
+// Starts without a session: this spec covers public pages or logs in itself.
+test.use(SIGNED_OUT);
 
 /**
  * End-to-end coverage for profile-completion gating

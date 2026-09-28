@@ -1,9 +1,17 @@
 import { expect, test } from '@playwright/test';
 
+import { navigationFlags } from './fixtures/flags';
+
 test.describe('Respiração (Home)', () => {
   test('shows the day synthesis, completes a quick mission, and stays consistent after visiting Ritmo Diário', async ({
     page,
   }) => {
+    const flags = await navigationFlags();
+    test.skip(
+      !flags.missoes || !flags['ritmo-diario'],
+      'Completes a mission and visits Ritmo Diário, both behind feature flags that are off.',
+    );
+
     // 1. Access Respiração.
     await page.goto('/app');
     await expect(page.getByRole('heading', { name: 'Respiração', level: 1 })).toBeAttached();
