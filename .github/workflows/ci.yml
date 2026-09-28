@@ -57,3 +57,110 @@ jobs:
 
       - name: Dependency audit (advisory, does not fail the pipeline)
         run: pnpm audit --audit-level=high || true
+
+  e2e:
+    name: E2E (Playwright, Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # The frontend under test (built and served on :3100 by playwright.config.ts).
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api/v1
+      # Cloudflare's always-pass test site key; the local Supabase has no captcha.
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+      E2E_API_URL: http://localhost:3000/api/v1
+      E2E_SUPABASE_URL: http://127.0.0.1:54321
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: frontend
+
+      # The backend at the same stage: main for releases, develop otherwise.
+      - uses: actions/checkout@v7
+        with:
+          repository: darioreisjr/kokyu-sam
+          ref: ${{ (github.base_ref || github.ref_name) == 'main' && 'main' || 'develop' }}
+          path: backend
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: |
+            frontend/pnpm-lock.yaml
+            backend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: |
+          pnpm --dir frontend install --frozen-lockfile
+          pnpm --dir backend install --frozen-lockfile
+
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.117.0
+
+      - name: Start Supabase local (backend migrations)
+        working-directory: backend
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor
+
+      - name: Export Supabase keys
+        working-directory: backend
+        run: |
+          STATUS=$(supabase status -o json)
+          ANON=$(echo "$STATUS" | jq -r '.ANON_KEY')
+          SERVICE=$(echo "$STATUS" | jq -r '.SERVICE_ROLE_KEY')
+          echo "::add-mask::$SERVICE"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON"
+            echo "E2E_SUPABASE_ANON_KEY=$ANON"
+            echo "E2E_SUPABASE_SERVICE_ROLE_KEY=$SERVICE"
+          } >> "$GITHUB_ENV"
+
+      - name: Build and start the API
+        working-directory: backend
+        env:
+          NODE_ENV: development
+          PORT: '3000'
+          APP_URL: http://localhost:3000
+          FRONTEND_URL: http://localhost:3100
+          CORS_ORIGINS: http://localhost:3100
+          SUPABASE_URL: http://127.0.0.1:54321
+          LOG_LEVEL: warn
+          # Every browser session in the suite shares one IP.
+          THROTTLE_DEFAULT_LIMIT: '10000'
+        run: |
+          pnpm build
+          SUPABASE_PUBLISHABLE_KEY="$E2E_SUPABASE_ANON_KEY" SUPABASE_SECRET_KEY="$E2E_SUPABASE_SERVICE_ROLE_KEY" \
+            nohup node dist/main.js > "$RUNNER_TEMP/api.log" 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf http://localhost:3000/api/health/ready && exit 0
+            sleep 2
+          done
+          cat "$RUNNER_TEMP/api.log"
+          exit 1
+
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run e2e (Chromium)
+        working-directory: frontend
+        run: pnpm exec playwright test --project=chromium
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7
+
+      - name: API log
+        if: failure()
+        run: cat "$RUNNER_TEMP/api.log" || true
