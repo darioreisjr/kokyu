@@ -87,11 +87,19 @@ automaticamente para `/login`.
 - **Unitários** (`pnpm test`): Vitest + Testing Library, ambiente jsdom. Testam comportamento —
   o que o usuário vê e pode fazer — nunca detalhe de implementação. Cobertura mínima configurada:
   80% statements, 75% branches, 80% functions, 80% lines (`vitest.config.ts`).
-- **End-to-end** (`pnpm test:e2e`): Playwright, contra um build de produção real
-  (`next build` + `next start`). Cobre o fluxo completo de login — redirecionamento, validação,
-  mostrar/ocultar senha, envio, botão do Google — e os três breakpoints principais
-  (mobile/tablet/desktop). Configurado para Chromium, Firefox, WebKit e viewports mobile/tablet
-  (`playwright.config.ts`); a verificação padrão roda em Chromium.
+- **End-to-end** (`pnpm test:e2e`): Playwright contra um build de produção real
+  (`next build` + `next start` na porta 3100), o backend `kokyu-sam` e o Supabase local. Roda no
+  CI (job **E2E**) em todo PR e push, com Chromium — as specs já definem os próprios viewports
+  (mobile/tablet/desktop). Firefox, WebKit e os perfis de dispositivo continuam disponíveis
+  localmente (`--project=firefox` etc.).
+  - Um projeto `setup` faz login uma vez e salva a sessão (`e2e/.auth`); specs que precisam
+    começar deslogadas usam `test.use(SIGNED_OUT)`. O logout usa um usuário próprio, porque o app
+    encerra todas as sessões do usuário ao sair.
+  - Specs de áreas desligadas por feature flag (Missões, Metas, …) são puladas enquanto a flag
+    estiver off e voltam a rodar sozinhas quando a área for lançada.
+  - Localmente: `supabase start` e `THROTTLE_DEFAULT_LIMIT=10000 pnpm dev` no `kokyu-sam`, depois
+    `E2E_SUPABASE_ANON_KEY=... E2E_SUPABASE_SERVICE_ROLE_KEY=... pnpm test:e2e --project=chromium`
+    (as chaves vêm de `supabase status`; com elas, o `setup` cria os usuários de teste).
 
 ## Storybook
 
